@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Text.Json;
-using System.Xml;
+using Newtonsoft.Json;
 
 namespace YMplugins.Settings.Translator
 {
@@ -50,7 +48,7 @@ namespace YMplugins.Settings.Translator
             try
             {
                 var json = File.ReadAllText(_jsonPath);
-                return JsonSerializer.Deserialize<TranslatorSettings>(json);
+                return JsonConvert.DeserializeObject<TranslatorSettings>(json);
             }
             catch
             {
@@ -64,15 +62,15 @@ namespace YMplugins.Settings.Translator
         //    File.WriteAllText(_jsonPath, json);
         //}
 
-        public void SaveToJson()
-        {
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true
-            };
-            var json = JsonSerializer.Serialize(this, options);
-            File.WriteAllText(_jsonPath, json);
-        }
+        //public void SaveToJson()
+        //{
+        //    var options = new JsonSerializerOptions
+        //    {
+        //        WriteIndented = true
+        //    };
+        //    var json = JsonSerializer.Serialize(this, options);
+        //    File.WriteAllText(_jsonPath, json);
+        //}
 
         /// <summary>
         /// Gets the path of the JSON file with settings, corresponding to an active Revit version.

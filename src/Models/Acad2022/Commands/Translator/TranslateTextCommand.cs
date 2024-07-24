@@ -2,160 +2,39 @@
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 using Gile.AutoCAD.Extension;
-using Newtonsoft.Json;
-using System;
+using SimpleInjector;
 using System.Collections.Generic;
-using System.IO;
-using System.Text.RegularExpressions;
-using Formatting = System.Xml.Formatting;
+using YMplugins.Contracts;
+using YMplugins.Models.Acad2022.Services;
+using YMplugins.Services.SettingsReader;
+using YMplugins.Services.Translator;
 
 namespace YMplugins.Models.Acad2022.Commands.Translator
 {
 
-    internal class TranslateTextCommand
+    public class TranslateTextCommand
     {
-        static string filename = @"c:\temp\dict.json";
-
         [CommandMethod("TranslateToTarget")]
         public void TranslateText()
         {
+            var container = new Container();
+            container.Register(() => new SettingsService());
 
-
-            // Пример использования словаря
-            if (dictionary.TryGetValue("Общие данные", out string value))
+            container.Register(() =>
             {
-                Console.WriteLine($"Общие данные: {value}");
-            }
+                var settingsService = container.GetInstance<SettingsService>();
+                var config = settingsService.LoadSettings();
+                return new DictionaryService(config.DictFilePath);
+            }, Lifestyle.Singleton);
 
-            Dictionary<string, string> textFromJson = JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonFileToRead);
+            container.Register<ITextTranslator, TextTranslator>();
+            container.Register<TextProcessor>();
 
-            TypedValue[] acTypValAr = new TypedValue[4];
-            acTypValAr.SetValue(new TypedValue((int)DxfCode.Operator, "<or"), 0);
-            acTypValAr.SetValue(new TypedValue((int)DxfCode.Start, "TEXT"), 1);
-            acTypValAr.SetValue(new TypedValue((int)DxfCode.Start, "MTEXT"), 2);
-            acTypValAr.SetValue(new TypedValue((int)DxfCode.Operator, "or>"), 3);
+            container.Verify();
+            var textProcessor = container.GetInstance<TextProcessor>();
 
-            SelectionFilter acSelFtr = new SelectionFilter(acTypValAr);
+            textProcessor.ProcessTexts();
 
-            using (Transaction acTrans = Active.Database.TransactionManager.StartTransaction())
-            {
-                PromptSelectionResult acSSPrompt = Active.Editor.GetSelection(acSelFtr);
-
-                if (acSSPrompt.Status == PromptStatus.OK)
-                {
-                    SelectionSet acSSet = acSSPrompt.Value;
-                    ObjectId[] selectedIds = acSSet.GetObjectIds();
-
-                    Dictionary<string, string> dict = new Dictionary<string, string>();
-                    string regex = "[^A-Za-z0-9]+";
-
-                    foreach (ObjectId acSSObj in selectedIds)
-                    {
-                        if (acSSObj != null)
-                        {
-
-                            Entity acEnt = acTrans.GetObject(acSSObj, OpenMode.ForWrite) as Entity;
-
-                            if (acEnt.GetType() == typeof(MText))
-                            {
-                                MText mText = ((MText)acEnt);
-                                TextEditor textEditor = TextEditor.CreateTextEditor(mText);
-                                textEditor.SelectAll();
-                                TextEditorSelection selection = textEditor.Selection;
-                                selection.RemoveAllFormatting();
-                                string mtextStr = selection.SelectionString.Trim();
-
-                                try
-                                {
-                                    if (!textFromJson.ContainsKey(mtextStr) && !IsLatin(mtextStr))
-                                    {
-                                        if (Regex.IsMatch(mtextStr, regex))
-                                        {
-                                            string TranslatedMtext = TranslateYandex(mtextStr, "ru-en");
-                                            //string TranslatedMtext = MtextStr + "translated text";
-                                            //Application.ShowAlertDialog(TranslatedMtext);
-
-                                            //textEditor = TextEditor.CreateTextEditor(mText);
-                                            //textEditor.SelectAll();
-                                            //textEditor.ClearSelection();
-
-                                            mText.Contents = TranslatedMtext;
-                                            //textEditor.Close(TextEditor.ExitStatus.ExitSave);
-                                            dict.Add(mtextStr, TranslatedMtext);
-                                            Active.Editor.WriteMessage(mtextStr + "добавлен в базу");
-                                            //Application.ShowAlertDialog(MtextStr + "добавлен в базу");
-                                        }
-
-                                    }
-                                    else
-                                    {
-                                        mText.Contents = textFromJson[mtextStr];
-                                        Active.Editor.WriteMessage(mtextStr + "добавлен в базу");
-                                        //Application.ShowAlertDialog(MtextStr + "переведен из базы");
-                                    }
-                                }
-                                catch
-                                {
-                                    //mText.Contents = textFromJson[MtextStr];
-                                    Active.Editor.WriteMessage(mtextStr + "ошибка");
-                                    //Application.ShowAlertDialog(MtextStr + "есть или уже есть");
-                                }
-                            }
-                            if (acEnt.GetType() == typeof(DBText))
-                            {
-                                DBText dBText = ((DBText)acEnt);
-                                string DbtextStr = dBText.TextString.Trim();
-                                Active.Editor.WriteMessage("\n This is Dbtext " + DbtextStr);
-                                try
-                                {
-                                    if (!textFromJson.ContainsKey(DbtextStr) && !IsLatin(DbtextStr))
-                                    {
-                                        //Application.ShowAlertDialog(Regex.IsMatch(DbtextStr, regex).ToString());
-                                        if (Regex.IsMatch(DbtextStr, regex))
-                                        {
-                                            string TranslatedDbtext = Translate(DbtextStr);
-                                            //string TranslatedDbtext = DbtextStr + "translated text";
-                                            dict.Add(DbtextStr, TranslatedDbtext);
-
-                                            //Application.ShowAlertDialog(DbtextStr + "добавлен");
-                                            dBText.TextString = TranslatedDbtext;
-                                            Active.Editor.WriteMessage(DbtextStr + "добавлен");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        dBText.TextString = textFromJson[DbtextStr];
-                                        Active.Editor.WriteMessage(dBText + "переведен из базы");
-                                        //Application.ShowAlertDialog(MtextStr + "переведен из базы");
-                                    }
-                                }
-                                catch
-                                {
-                                    Active.Editor.WriteMessage(DbtextStr + "значение ключа пустое или ключ латиница");
-                                    //Application.ShowAlertDialog(DbtextStr + "значение ключа пустое или ключ латиница");
-                                }
-                            }
-
-                        }
-                    }
-                    acTrans.Commit();
-
-                    foreach (var item in dict)
-                    {
-                        if (textFromJson.ContainsKey(item.Key))
-                        {
-                            Active.Editor.WriteMessage("\n в базе есть слово  " + item);
-                        }
-                        else
-                        {
-                            textFromJson.Add(item.Key, item.Value);
-                        }
-                    }
-
-                    string JsonToWrite = JsonConvert.SerializeObject(textFromJson, Formatting.Indented);
-                    File.WriteAllText(filename, JsonToWrite);
-                }
-            }
         }
     }
 }

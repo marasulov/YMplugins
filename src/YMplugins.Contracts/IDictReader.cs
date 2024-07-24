@@ -2,8 +2,8 @@
 
 namespace YMplugins.Contracts
 {
-    public interface ISettingsReader
+    public interface IDictReader
     {
-        List<string> GetFamilyNames();
+        Dictionary<string, string> GetDictDb();
     }
 }

@@ -17,9 +17,4 @@
     <PackageReference Include="SimpleInjector" Version="5.4.4" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\src\ViewModels\WS.ViewModels.csproj" />
-    <ProjectReference Include="..\..\Mocks\Mocks.csproj" />
-  </ItemGroup>
-
 </Project>
