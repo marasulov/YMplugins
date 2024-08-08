@@ -15,7 +15,7 @@ namespace YMplugins.Services.Translator
 {
     //public class TranslationUtils
     //{
-    //    private readonly TranslatorSettings _settings = null;
+    //    private readonly TranslationSettings _settings = null;
     //    private readonly string _apiUrl = "https://api-free.deepl.com/v2/translate";
     //    private readonly HttpClient _httpClient = null;
     //    private static int _translationsCount = 0;
@@ -34,7 +34,7 @@ namespace YMplugins.Services.Translator
     //    /// </summary>
     //    internal static ConcurrentBag<(object, string, string, int)> Translations { get; set; } = new();
 
-    //    public TranslationUtils(TranslatorSettings settings)
+    //    public TranslationUtils(TranslationSettings settings)
     //    {
     //        _settings = settings;
     //        _httpClient = new HttpClient();
@@ -49,7 +49,7 @@ namespace YMplugins.Services.Translator
     //    /// </summary>
     //    /// <param name="settings">The settings object containing the API key and target language.</param>
     //    /// <returns>True if translation can be performed, false otherwise.</returns>
-    //    public static bool CanTranslate(TranslatorSettings settings)
+    //    public static bool CanTranslate(TranslationSettings settings)
     //    {
     //        if (settings.DeeplApiKey == null || settings.TargetLanguage == null)
     //        {
@@ -456,7 +456,7 @@ namespace YMplugins.Services.Translator
     public class TranslationResult
     {
         [JsonProperty("translations")]
-        public Translation[] Translations
+        public Translation[]? Translations
         {
             get; set;
         }
@@ -465,13 +465,13 @@ namespace YMplugins.Services.Translator
     public class Translation
     {
         [JsonProperty("detected_source_language")]
-        public string DetectedSourceLanguage
+        public string? DetectedSourceLanguage
         {
             get; set;
         }
 
         [JsonProperty("text")]
-        public string Text
+        public string? Text
         {
             get; set;
         }

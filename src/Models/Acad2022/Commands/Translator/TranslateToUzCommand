@@ -1,25 +1,34 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Runtime;
-using Gile.AutoCAD.Extension;
-using SimpleInjector;
+﻿using System;
 using System.Collections.Generic;
-using YMplugins.Contracts;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Autodesk.AutoCAD.Runtime;
+using SimpleInjector;
 using YMplugins.Models.Acad2022.Services;
 using YMplugins.Services.SettingsReader;
+using YMplugins.Services.Translator.Google;
 using YMplugins.Services.Translator;
+using YMplugins.Services.Translator.DeepL;
 
 namespace YMplugins.Models.Acad2022.Commands.Translator
 {
-
-    public class TranslateTextCommand
+    public class TranslateToUzCommand
     {
-        [CommandMethod("TranslateToTarget")]
+        [CommandMethod("TrToUzWithOrg")]
         public void TranslateText()
         {
-            var container = new Container();
-            container.Register(() => new SettingsService());
+            var settings = new TranslationSettings
+            {
+                SourceLanguage = "en",
+                TargetLanguage = "uz"
+            };
 
+            var container = new Container();
+            container.RegisterInstance(settings);
+
+            container.Register(() => new SettingsService());
+            container.Register<ITextTranslator, GoogleTranslateService>();
             container.Register(() =>
             {
                 var settingsService = container.GetInstance<SettingsService>();
@@ -27,14 +36,14 @@ namespace YMplugins.Models.Acad2022.Commands.Translator
                 return new DictionaryService(config.DictFilePath);
             }, Lifestyle.Singleton);
 
-            container.Register<ITextTranslator, TextTranslator>();
             container.Register<TextProcessor>();
 
             container.Verify();
             var textProcessor = container.GetInstance<TextProcessor>();
 
-            textProcessor.ProcessTexts();
+            textProcessor.ProcessTexts(true);
 
         }
+
     }
 }

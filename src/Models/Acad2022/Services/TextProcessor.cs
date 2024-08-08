@@ -1,12 +1,11 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.EditorInput.IoC;
-using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Gile.AutoCAD.Extension;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using YMplugins.Services.Translator;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace YMplugins.Models.Acad2022.Services
 {
@@ -15,179 +14,171 @@ namespace YMplugins.Models.Acad2022.Services
         private readonly DictionaryService _dictionaryService;
         private readonly ITextTranslator _textTranslator;
         private readonly Dictionary<string, string> _dict;
+        private string _fromLanguage = "ru";
+        private string _targetLanguage = "en";
+        private readonly TranslationSettings _translationSettings;
 
-        public TextProcessor(DictionaryService dictionaryService, ITextTranslator textTranslator)
+        public TextProcessor(DictionaryService dictionaryService, ITextTranslator textTranslator, TranslationSettings translationSettings)
         {
             _dictionaryService = dictionaryService;
             _textTranslator = textTranslator;
             _dict = new Dictionary<string, string>();
+            _translationSettings = translationSettings;
         }
 
         public void ProcessTexts()
         {
             using (var acTrans = Active.Database.TransactionManager.StartTransaction())
             {
-                var acSSPrompt = Active.Editor.GetSelection(new SelectionFilter(new TypedValue[] { new TypedValue((int)DxfCode.Start, "TEXT,MTEXT,ACAD_TABLE,MULTILEADER,INSERT,ATTDEF,ATTRIB") }));
+                var acSSPrompt = Active.Editor.GetSelection(CreateTextAndTableFilter());
 
                 if (acSSPrompt.Status == PromptStatus.OK)
                 {
                     var acSSet = acSSPrompt.Value;
                     var selectedIds = acSSet.GetObjectIds();
                     string regex = "[^A-Za-z0-9]+";
-
-                    foreach (ObjectId acSSObj in selectedIds)
+                    string separator = "\n";
+                    var preserveOriginalText = false;
+                    if (selectedIds.Length > 0)
                     {
-                        if (acSSObj != null)
-                        {
-                            var acEnt = acTrans.GetObject(acSSObj, OpenMode.ForWrite) as Entity;
+                        PromptKeywordOptions pKeyOpts = new PromptKeywordOptions("\nSave native text?");
+                        pKeyOpts.Keywords.Add("Yes");
+                        pKeyOpts.Keywords.Add("No");
+                        pKeyOpts.AllowNone = true;
 
-                            switch (acEnt)
+                        PromptResult pKeyRes = Active.Editor.GetKeywords(pKeyOpts);
+
+                        if (pKeyRes.Status == PromptStatus.OK && pKeyRes.StringResult == "Yes")
+                        {
+                           preserveOriginalText = true;
+
+                            PromptStringOptions pStrOpts = new PromptStringOptions(
+                                "\nВведите сепаратор между оригиналом и переводом (нажмите Enter для принятия сепаратора \"-\" для text и /n для mtext):");
+                            PromptResult pStrRes = Active.Editor.GetString(pStrOpts);
+
+                            if (pStrRes.Status == PromptStatus.OK)
                             {
-                                case MText mText:
-                                    ProcessMText(mText, regex);
-                                    break;
-                                case DBText dbText:
-                                    ProcessDBText(dbText, regex);
-                                    break;
-                                case Table table:
-                                    ProcessTable(table, regex);
-                                    break;
-                                case Leader leader:
-                                    ProcessLeader(leader, regex);
-                                    break;
-                                case MLeader mLeader:
-                                    ProcessMLeader(mLeader, regex);
-                                    break;
-                                case BlockReference blockRef:
-                                    ProcessBlockReference(blockRef, regex);
-                                    break;
+                                separator = pStrRes.StringResult;
+
+                                if (string.IsNullOrEmpty(separator))
+                                {
+                                    separator = "\n"; 
+                                }
+                                
+                            }
+
+                        }
+
+                        foreach (ObjectId acSSObj in selectedIds)
+                        {
+                            if (acSSObj != null)
+                            {
+                                var acEnt = acTrans.GetObject(acSSObj, OpenMode.ForWrite) as Entity;
+
+                                switch (acEnt)
+                                {
+                                    case MText mText:
+                                        ProcessMText(mText, separator,preserveOriginalText);
+                                        break;
+                                    case DBText dbText:
+                                        ProcessDbText(dbText, separator, preserveOriginalText);
+                                        break;
+                                    case Table table:
+                                        ProcessTable(table, separator, preserveOriginalText);
+                                        break;
+                                    case Leader leader:
+                                        ProcessLeader(leader, separator);
+                                        break;
+                                    case MLeader mLeader:
+                                        ProcessMLeader(mLeader, regex);
+                                        break;
+                                    case BlockReference blockRef:
+                                        ProcessBlockReference(blockRef, regex);
+                                        break;
+                                }
                             }
                         }
+
+                        acTrans.Commit();
                     }
 
-                    acTrans.Commit();
+                
                 }
             }
 
             _dictionaryService.UpdateDictionaryAndSaveToJson(_dict);
         }
-        private void ProcessBlockReference(BlockReference blockRef, string regex)
-        {
-            var editor = Application.DocumentManager.MdiActiveDocument.Editor;
 
-            foreach (ObjectId attId in blockRef.AttributeCollection)
+
+        private SelectionFilter CreateTextAndTableFilter()
+        {
+            var filterList = new TypedValue[]
             {
-                if (attId != ObjectId.Null)
-                {
-                    var attRef = attId.GetObject(OpenMode.ForWrite) as AttributeReference;
-                    if (attRef != null)
-                    {
-                        ProcessAttributeReference(attRef, regex);
-                    }
-                }
-            }
+                new TypedValue((int)DxfCode.Start, "TEXT,MTEXT,ACAD_TABLE,LEADER,MULTILEADER,ATTDEF,ATTRIB,INSERT")
+            };
+
+            return new SelectionFilter(filterList);
         }
 
-        private void ProcessMText(MText mText, string regex)
+        private void ProcessMText(MText mText, string separator, bool preserveOriginalText = false)
         {
-            var editor = Application.DocumentManager.MdiActiveDocument.Editor;
 
-            TextEditor textEditor = TextEditor.CreateTextEditor(mText);
-            textEditor.SelectAll();
-            TextEditorSelection selection = textEditor.Selection;
-            selection.RemoveAllFormatting();
-            string mtextStr = selection.SelectionString.Trim();
+            var text = GetClearString(mText.Contents);
 
-            try
-            {
-                if (!IsLatin(mtextStr) && Regex.IsMatch(mtextStr, regex))
-                {
-                    if (!_dictionaryService.TextFromJson.ContainsKey(mtextStr))
-                    {
-                        string translatedText = _textTranslator.Translate(mtextStr);
-                        mText.Contents = translatedText;
-                        _dict.Add(mtextStr, translatedText);
-                        editor.WriteMessage($"\n{mtextStr} добавлен в базу");
-                    }
-                    else
-                    {
-                        mText.Contents = _dictionaryService.TextFromJson[mtextStr];
-                        editor.WriteMessage($"\n{mtextStr} переведен из базы");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                editor.WriteMessage($"\nОшибка при обработке MText '{mtextStr}': {ex.Message}");
-            }
+            //if (ShouldTranslate(text, regex))
+            //{
+                mText.Contents = preserveOriginalText ? $"{mText.Contents}{separator}{TranslateText(text)}" : TranslateText(text);
+            //}
         }
 
-        private void ProcessDBText(DBText dbText, string regex)
+        private void ProcessDbText(DBText dbText, string separator, bool preserveOriginalText = false)
         {
-            var editor = Application.DocumentManager.MdiActiveDocument.Editor;
-            string dbTextStr = dbText.TextString.Trim();
-
-            try
-            {
-                if (!IsLatin(dbTextStr) && Regex.IsMatch(dbTextStr, regex))
-                {
-                    if (!_dictionaryService.TextFromJson.ContainsKey(dbTextStr))
-                    {
-                        string translatedText = _textTranslator.Translate(dbTextStr);
-                        dbText.TextString = translatedText;
-                        _dict.Add(dbTextStr, translatedText);
-                        editor.WriteMessage($"\n{dbTextStr} добавлен в базу");
-                    }
-                    else
-                    {
-                        dbText.TextString = _dictionaryService.TextFromJson[dbTextStr];
-                        editor.WriteMessage($"\n{dbTextStr} переведен из базы");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                editor.WriteMessage($"\nОшибка при обработке DBText '{dbTextStr}': {ex.Message}");
-            }
+            string text = dbText.TextString.Trim();
+            if (separator == "\n") separator = "-";
+            //if (ShouldTranslate(text))
+            //{
+                dbText.TextString = preserveOriginalText ? $"{text}{separator}{TranslateText(text)}" : TranslateText(text);
+            //}
         }
 
-        private void ProcessTable(Table table, string regex)
+        private void ProcessTable(Table table, string separator, bool preserveOriginalText = false)
         {
-            var editor = Application.DocumentManager.MdiActiveDocument.Editor;
-
             for (int row = 0; row < table.Rows.Count; row++)
             {
                 for (int col = 0; col < table.Columns.Count; col++)
                 {
-                    var cellContent = table.Cells[row, col].TextString.Trim();
-
-                    try
+                    string cellContent = table.Cells[row, col].TextString.Trim();
+                    if (!string.IsNullOrWhiteSpace(cellContent))
                     {
-                        if (!IsLatin(cellContent) && Regex.IsMatch(cellContent, regex))
-                        {
-                            if (!_dictionaryService.TextFromJson.ContainsKey(cellContent))
-                            {
-                                string translatedText = _textTranslator.Translate(cellContent);
-                                table.Cells[row, col].TextString = translatedText;
-                                _dict.Add(cellContent, translatedText);
-                                editor.WriteMessage($"\n{cellContent} добавлен в базу");
-                            }
-                            else
-                            {
-                                table.Cells[row, col].TextString = _dictionaryService.TextFromJson[cellContent];
-                                editor.WriteMessage($"\n{cellContent} переведен из базы");
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        editor.WriteMessage($"\nОшибка при обработке ячейки таблицы '{cellContent}': {ex.Message}");
+                        var clearedText = GetClearString(cellContent);
+                        //if (ShouldTranslate(clearedText, regex))
+                        //{
+                            table.Cells[row, col].TextString = preserveOriginalText? $"{cellContent}{separator}{TranslateText(clearedText)}" : TranslateText(clearedText);
+                        //}
                     }
                 }
             }
         }
 
-        private void ProcessLeader(Leader leader, string regex)
+        private string GetClearString(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source))
+                return string.Empty;
+            using (MText mText = new MText { Contents = source })
+            {
+                var text = mText.Text.Trim();
+                if (text.Contains("\r\n"))
+                {
+                    string newtext = text.Replace("\r\n", "");
+                    text = newtext;
+                }
+                    
+
+                return text;
+            }
+        }
+
+        private void ProcessLeader(Leader leader, string separator)
         {
             var mtextId = leader.Annotation;
             if (mtextId != ObjectId.Null)
@@ -195,83 +186,90 @@ namespace YMplugins.Models.Acad2022.Services
                 var mText = mtextId.GetObject(OpenMode.ForRead) as MText;
                 if (mText != null)
                 {
-                    ProcessMText(mText, regex);
+                    ProcessMText(mText, separator);
                 }
             }
         }
 
-        private void ProcessMLeader(MLeader mLeader, string regex)
+        private void ProcessMLeader(MLeader mLeader, string sepatator)
         {
             var mText = mLeader.MText;
-
             if (mText != null)
             {
-                ProcessMText(mText, regex);
+                ProcessMText(mText, sepatator);
             }
         }
 
-        private void ProcessAttributeDefinition(AttributeDefinition attDef, string regex)
-        {
-            var editor = Application.DocumentManager.MdiActiveDocument.Editor;
-            string attDefStr = attDef.TextString.Trim();
 
-            try
+        private void ProcessAttribute(AttributeReference attRef, string regex)
+        {
+            string text = attRef.TextString.Trim();
+            //if (ShouldTranslate(text))
+            //{
+                attRef.TextString = TranslateText(text);
+            //}
+        }
+
+        private void ProcessBlockReference(BlockReference blockRef, string separator)
+        {
+            foreach (ObjectId attId in blockRef.AttributeCollection)
             {
-                if (!IsLatin(attDefStr) && Regex.IsMatch(attDefStr, regex))
+                if (attId != ObjectId.Null)
                 {
-                    if (!_dictionaryService.TextFromJson.ContainsKey(attDefStr))
+                    var attRef = attId.GetObject(OpenMode.ForWrite) as AttributeReference;
+                    if (attRef != null)
                     {
-                        string translatedText = _textTranslator.Translate(attDefStr);
-                        attDef.TextString = translatedText;
-                        _dict.Add(attDefStr, translatedText);
-                        editor.WriteMessage($"\n{attDefStr} добавлен в базу");
-                    }
-                    else
-                    {
-                        attDef.TextString = _dictionaryService.TextFromJson[attDefStr];
-                        editor.WriteMessage($"\n{attDefStr} переведен из базы");
+                        ProcessAttribute(attRef, separator);
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                editor.WriteMessage($"\nОшибка при обработке AttributeDefinition '{attDefStr}': {ex.Message}");
-            }
-        }
 
-        private void ProcessAttributeReference(AttributeReference attRef, string regex)
-        {
-            var editor = Application.DocumentManager.MdiActiveDocument.Editor;
-            string attRefStr = attRef.TextString.Trim();
-
-            try
+            var blockTableRecord = blockRef.DynamicBlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
+            if (blockTableRecord != null)
             {
-                if (!IsLatin(attRefStr) && Regex.IsMatch(attRefStr, regex))
+                foreach (ObjectId id in blockTableRecord)
                 {
-                    if (!_dictionaryService.TextFromJson.ContainsKey(attRefStr))
+                    var entity = id.GetObject(OpenMode.ForRead) as Entity;
+                    if (entity != null)
                     {
-                        string translatedText = _textTranslator.Translate(attRefStr);
-                        attRef.TextString = translatedText;
-                        _dict.Add(attRefStr, translatedText);
-                        editor.WriteMessage($"\n{attRefStr} добавлен в базу");
-                    }
-                    else
-                    {
-                        attRef.TextString = _dictionaryService.TextFromJson[attRefStr];
-                        editor.WriteMessage($"\n{attRefStr} переведен из базы");
+                        if (entity is MText mText)
+                        {
+                            ProcessMText(mText, separator);
+                        }
+                        else if (entity is DBText dbText)
+                        {
+                            ProcessDbText(dbText, separator);
+                        }
                     }
                 }
             }
-            catch (Exception ex)
+        }
+
+        private bool ShouldTranslate(string text)
+        {
+            return !IsLatin(text);
+        }
+
+        private string TranslateText(string text)
+        {
+            if (!_dictionaryService.TextFromJson.ContainsKey(text))
             {
-                editor.WriteMessage($"\nОшибка при обработке AttributeReference '{attRefStr}': {ex.Message}");
+                string translatedText = _textTranslator.Translate(text,_translationSettings.SourceLanguage, _translationSettings.TargetLanguage);
+                
+                Active.Editor.WriteMessage($"\n{text} переведен но не добавлен в базу");
+                return translatedText;
+            }
+            else
+            {
+                string translatedText = _dictionaryService.TextFromJson[text];
+                Active.Editor.WriteMessage($"\n{text} переведен из базы");
+                return translatedText;
             }
         }
 
-        private bool IsLatin(string input)
+        private bool IsLatin(string text)
         {
-            // Проверка на латиницу
-            return Regex.IsMatch(input, @"^[a-zA-Z]+$");
+            return text.All(c => c < 128);
         }
 
         private void Translate(string textStr)
