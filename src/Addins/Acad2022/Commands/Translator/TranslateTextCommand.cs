@@ -11,14 +11,14 @@ namespace YMplugins.Models.Acad2022.Commands.Translator
 
     public class TranslateTextCommand
     {
-        [CommandMethod("TrToEn")]
-        public void TranslateText()
+        //[CommandMethod("TrToEn")]
+        public void TranslateText(TranslationSettings settings)
         {
-            var settings = new TranslationSettings
-            {
-                SourceLanguage = "auto",
-                TargetLanguage = "en"
-            };
+            //var settings = new TranslationSettings
+            //{
+            //    SourceLanguage = "auto",
+            //    TargetLanguage = "en"
+            //};
 
             var container = new Container();
             container.RegisterInstance(settings);
@@ -36,7 +36,7 @@ namespace YMplugins.Models.Acad2022.Commands.Translator
             container.Verify();
             var textProcessor = container.GetInstance<TextProcessor>();
 
-            textProcessor.ProcessTexts();
+            textProcessor.ProcessTexts(settings);
         }
     }
 }

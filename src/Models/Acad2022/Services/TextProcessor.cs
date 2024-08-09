@@ -1,11 +1,12 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Gile.AutoCAD.Extension;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using YMplugins.Services.Translator;
 using static System.Net.Mime.MediaTypeNames;
+using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace YMplugins.Models.Acad2022.Services
 {
@@ -26,83 +27,83 @@ namespace YMplugins.Models.Acad2022.Services
             _translationSettings = translationSettings;
         }
 
-        public void ProcessTexts()
+        public void ProcessTexts(TranslationSettings translationSettings)
         {
-            using (var acTrans = Active.Database.TransactionManager.StartTransaction())
+
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database destdb = doc.Database;
+            using (DocumentLock docLock = doc.LockDocument())
             {
-                var acSSPrompt = Active.Editor.GetSelection(CreateTextAndTableFilter());
-
-                if (acSSPrompt.Status == PromptStatus.OK)
+                using (var acTrans = Active.Database.TransactionManager.StartTransaction())
                 {
-                    var acSSet = acSSPrompt.Value;
-                    var selectedIds = acSSet.GetObjectIds();
-                    string regex = "[^A-Za-z0-9]+";
-                    string separator = "\n";
-                    var preserveOriginalText = false;
-                    if (selectedIds.Length > 0)
+                    var acSSPrompt = Active.Editor.GetSelection(CreateTextAndTableFilter());
+                    if (acSSPrompt.Status == PromptStatus.OK)
                     {
-                        PromptKeywordOptions pKeyOpts = new PromptKeywordOptions("\nSave native text?");
-                        pKeyOpts.Keywords.Add("Yes");
-                        pKeyOpts.Keywords.Add("No");
-                        pKeyOpts.AllowNone = true;
-
-                        PromptResult pKeyRes = Active.Editor.GetKeywords(pKeyOpts);
-
-                        if (pKeyRes.Status == PromptStatus.OK && pKeyRes.StringResult == "Yes")
+                        var acSSet = acSSPrompt.Value;
+                        var selectedIds = acSSet.GetObjectIds();
+                        string regex = "[^A-Za-z0-9]+";
+                        string separator = "\n";
+                        var preserveOriginalText = false;
+                        if (selectedIds.Length > 0)
                         {
-                           preserveOriginalText = true;
+                            PromptKeywordOptions pKeyOpts = new PromptKeywordOptions("\nSave native text?");
+                            pKeyOpts.Keywords.Add("Yes");
+                            pKeyOpts.Keywords.Add("No");
 
-                            PromptStringOptions pStrOpts = new PromptStringOptions(
-                                "\nВведите сепаратор между оригиналом и переводом (нажмите Enter для принятия сепаратора \"-\" для text и /n для mtext):");
-                            PromptResult pStrRes = Active.Editor.GetString(pStrOpts);
+                            PromptResult pKeyRes = Active.Editor.GetKeywords(pKeyOpts);
 
-                            if (pStrRes.Status == PromptStatus.OK)
+                            if (pKeyRes.Status == PromptStatus.OK && pKeyRes.StringResult == "Yes")
                             {
-                                separator = pStrRes.StringResult;
+                                preserveOriginalText = true;
+                                PromptStringOptions pStrOpts = new PromptStringOptions(
+                                    "\nВведите сепаратор между оригиналом и переводом (нажмите Enter для принятия сепаратора \"-\" для text и /n для mtext):");
+                                PromptResult pStrRes = Active.Editor.GetString(pStrOpts);
 
-                                if (string.IsNullOrEmpty(separator))
+                                if (pStrRes.Status == PromptStatus.OK)
                                 {
-                                    separator = "\n"; 
-                                }
-                                
-                            }
-
-                        }
-
-                        foreach (ObjectId acSSObj in selectedIds)
-                        {
-                            if (acSSObj != null)
-                            {
-                                var acEnt = acTrans.GetObject(acSSObj, OpenMode.ForWrite) as Entity;
-
-                                switch (acEnt)
-                                {
-                                    case MText mText:
-                                        ProcessMText(mText, separator,preserveOriginalText);
-                                        break;
-                                    case DBText dbText:
-                                        ProcessDbText(dbText, separator, preserveOriginalText);
-                                        break;
-                                    case Table table:
-                                        ProcessTable(table, separator, preserveOriginalText);
-                                        break;
-                                    case Leader leader:
-                                        ProcessLeader(leader, separator);
-                                        break;
-                                    case MLeader mLeader:
-                                        ProcessMLeader(mLeader, regex);
-                                        break;
-                                    case BlockReference blockRef:
-                                        ProcessBlockReference(blockRef, regex);
-                                        break;
+                                    separator = pStrRes.StringResult;
+                                    if (string.IsNullOrEmpty(separator))
+                                    {
+                                        separator = "\n";
+                                    }
                                 }
                             }
+
+                            foreach (ObjectId acSSObj in selectedIds)
+                            {
+                                if (acSSObj != null)
+                                {
+                                    var acEnt = acTrans.GetObject(acSSObj, OpenMode.ForWrite) as Entity;
+
+                                    switch (acEnt)
+                                    {
+                                        case MText mText:
+                                            ProcessMText(mText, separator, preserveOriginalText);
+                                            break;
+                                        case DBText dbText:
+                                            ProcessDbText(dbText, separator, preserveOriginalText);
+                                            break;
+                                        case Table table:
+                                            ProcessTable(table, separator, preserveOriginalText);
+                                            break;
+                                        case Leader leader:
+                                            ProcessLeader(leader, separator);
+                                            break;
+                                        case MLeader mLeader:
+                                            ProcessMLeader(mLeader, regex);
+                                            break;
+                                        case BlockReference blockRef:
+                                            ProcessBlockReference(blockRef, regex);
+                                            break;
+                                    }
+                                }
+                            }
+
+                            acTrans.Commit();
                         }
 
-                        acTrans.Commit();
+
                     }
-
-                
                 }
             }
 
@@ -127,7 +128,7 @@ namespace YMplugins.Models.Acad2022.Services
 
             //if (ShouldTranslate(text, regex))
             //{
-                mText.Contents = preserveOriginalText ? $"{mText.Contents}{separator}{TranslateText(text)}" : TranslateText(text);
+            mText.Contents = preserveOriginalText ? $"{mText.Contents}{separator}{TranslateText(text)}" : TranslateText(text);
             //}
         }
 
@@ -137,7 +138,7 @@ namespace YMplugins.Models.Acad2022.Services
             if (separator == "\n") separator = "-";
             //if (ShouldTranslate(text))
             //{
-                dbText.TextString = preserveOriginalText ? $"{text}{separator}{TranslateText(text)}" : TranslateText(text);
+            dbText.TextString = preserveOriginalText ? $"{text}{separator}{TranslateText(text)}" : TranslateText(text);
             //}
         }
 
@@ -153,7 +154,7 @@ namespace YMplugins.Models.Acad2022.Services
                         var clearedText = GetClearString(cellContent);
                         //if (ShouldTranslate(clearedText, regex))
                         //{
-                            table.Cells[row, col].TextString = preserveOriginalText? $"{cellContent}{separator}{TranslateText(clearedText)}" : TranslateText(clearedText);
+                        table.Cells[row, col].TextString = preserveOriginalText ? $"{cellContent}{separator}{TranslateText(clearedText)}" : TranslateText(clearedText);
                         //}
                     }
                 }
@@ -172,7 +173,7 @@ namespace YMplugins.Models.Acad2022.Services
                     string newtext = text.Replace("\r\n", "");
                     text = newtext;
                 }
-                    
+
 
                 return text;
             }
@@ -206,7 +207,7 @@ namespace YMplugins.Models.Acad2022.Services
             string text = attRef.TextString.Trim();
             //if (ShouldTranslate(text))
             //{
-                attRef.TextString = TranslateText(text);
+            attRef.TextString = TranslateText(text);
             //}
         }
 
@@ -254,8 +255,8 @@ namespace YMplugins.Models.Acad2022.Services
         {
             if (!_dictionaryService.TextFromJson.ContainsKey(text))
             {
-                string translatedText = _textTranslator.Translate(text,_translationSettings.SourceLanguage, _translationSettings.TargetLanguage);
-                
+                string translatedText = _textTranslator.Translate(text, _translationSettings.SourceLanguage, _translationSettings.TargetLanguage);
+
                 Active.Editor.WriteMessage($"\n{text} переведен но не добавлен в базу");
                 return translatedText;
             }

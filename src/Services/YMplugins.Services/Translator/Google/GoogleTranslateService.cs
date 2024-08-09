@@ -1,20 +1,10 @@
 ﻿using Google.Cloud.Translation.V2;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using System.Web;
-using Google.Apis.Auth.OAuth2;
-using Newtonsoft.Json;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.IO;
-using System.Net.Http;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text.RegularExpressions;
 
 namespace YMplugins.Services.Translator.Google
 {
@@ -179,86 +169,88 @@ namespace YMplugins.Services.Translator.Google
         }
 
 
-        
+
 
         //private static string LanguageEnumToIdentifier(string language)
         //{
         //    string empty = string.Empty;
         //    Translator.EnsureInitialized();
-        //    Translator._languageModeMap.TryGetValue(language, out empty);
+        //    LanguageModeMap.TryGetValue(language, out empty);
         //    return empty;
         //}
 
-        //private static void EnsureInitialized()
-        //{
-        //    if (Translator._languageModeMap != null)
-        //        return;
-        //    Translator._languageModeMap = new Dictionary<string, string>();
-        //    Translator._languageModeMap.Add("Detect language", "auto");
-        //    Translator._languageModeMap.Add("Afrikaans", "af");
-        //    Translator._languageModeMap.Add("Albanian", "sq");
-        //    Translator._languageModeMap.Add("Arabic", "ar");
-        //    Translator._languageModeMap.Add("Armenian", "hy");
-        //    Translator._languageModeMap.Add("Azerbaijani", "az");
-        //    Translator._languageModeMap.Add("Basque", "eu");
-        //    Translator._languageModeMap.Add("Belarusian", "be");
-        //    Translator._languageModeMap.Add("Bengali", "bn");
-        //    Translator._languageModeMap.Add("Bulgarian", "bg");
-        //    Translator._languageModeMap.Add("Catalan", "ca");
-        //    Translator._languageModeMap.Add("Chinese", "zh-CN");
-        //    Translator._languageModeMap.Add("Croatian", "hr");
-        //    Translator._languageModeMap.Add("Czech", "cs");
-        //    Translator._languageModeMap.Add("Danish", "da");
-        //    Translator._languageModeMap.Add("Dutch", "nl");
-        //    Translator._languageModeMap.Add("English", "en");
-        //    Translator._languageModeMap.Add("Esperanto", "eo");
-        //    Translator._languageModeMap.Add("Estonian", "et");
-        //    Translator._languageModeMap.Add("Filipino", "tl");
-        //    Translator._languageModeMap.Add("Finnish", "fi");
-        //    Translator._languageModeMap.Add("French", "fr");
-        //    Translator._languageModeMap.Add("Galician", "gl");
-        //    Translator._languageModeMap.Add("German", "de");
-        //    Translator._languageModeMap.Add("Georgian", "ka");
-        //    Translator._languageModeMap.Add("Greek", "el");
-        //    Translator._languageModeMap.Add("Haitian Creole", "ht");
-        //    Translator._languageModeMap.Add("Hebrew", "iw");
-        //    Translator._languageModeMap.Add("Hindi", "hi");
-        //    Translator._languageModeMap.Add("Hungarian", "hu");
-        //    Translator._languageModeMap.Add("Icelandic", "is");
-        //    Translator._languageModeMap.Add("Indonesian", "id");
-        //    Translator._languageModeMap.Add("Irish", "ga");
-        //    Translator._languageModeMap.Add("Italian", "it");
-        //    Translator._languageModeMap.Add("Japanese", "ja");
-        //    Translator._languageModeMap.Add("Korean", "ko");
-        //    Translator._languageModeMap.Add("Lao", "lo");
-        //    Translator._languageModeMap.Add("Latin", "la");
-        //    Translator._languageModeMap.Add("Latvian", "lv");
-        //    Translator._languageModeMap.Add("Lithuanian", "lt");
-        //    Translator._languageModeMap.Add("Macedonian", "mk");
-        //    Translator._languageModeMap.Add("Malay", "ms");
-        //    Translator._languageModeMap.Add("Maltese", "mt");
-        //    Translator._languageModeMap.Add("Norwegian", "no");
-        //    Translator._languageModeMap.Add("Persian", "fa");
-        //    Translator._languageModeMap.Add("Polish", "pl");
-        //    Translator._languageModeMap.Add("Portuguese", "pt");
-        //    Translator._languageModeMap.Add("Romanian", "ro");
-        //    Translator._languageModeMap.Add("Russian", "ru");
-        //    Translator._languageModeMap.Add("Serbian", "sr");
-        //    Translator._languageModeMap.Add("Slovak", "sk");
-        //    Translator._languageModeMap.Add("Slovenian", "sl");
-        //    Translator._languageModeMap.Add("Spanish", "es");
-        //    Translator._languageModeMap.Add("Swahili", "sw");
-        //    Translator._languageModeMap.Add("Swedish", "sv");
-        //    Translator._languageModeMap.Add("Tamil", "ta");
-        //    Translator._languageModeMap.Add("Telugu", "te");
-        //    Translator._languageModeMap.Add("Thai", "th");
-        //    Translator._languageModeMap.Add("Turkish", "tr");
-        //    Translator._languageModeMap.Add("Ukrainian", "uk");
-        //    Translator._languageModeMap.Add("Urdu", "ur");
-        //    Translator._languageModeMap.Add("Vietnamese", "vi");
-        //    Translator._languageModeMap.Add("Welsh", "cy");
-        //    Translator._languageModeMap.Add("Yiddish", "yi");
-        //}
+        private static void EnsureInitialized()
+        {
+            if (LanguageModeMap != null)
+                return;
+            LanguageModeMap = new Dictionary<string, string>();
+            LanguageModeMap.Add("Detect language", "auto");
+            LanguageModeMap.Add("Afrikaans", "af");
+            LanguageModeMap.Add("Albanian", "sq");
+            LanguageModeMap.Add("Arabic", "ar");
+            LanguageModeMap.Add("Armenian", "hy");
+            LanguageModeMap.Add("Azerbaijani", "az");
+            LanguageModeMap.Add("Basque", "eu");
+            LanguageModeMap.Add("Belarusian", "be");
+            LanguageModeMap.Add("Bengali", "bn");
+            LanguageModeMap.Add("Bulgarian", "bg");
+            LanguageModeMap.Add("Catalan", "ca");
+            LanguageModeMap.Add("Chinese", "zh-CN");
+            LanguageModeMap.Add("Croatian", "hr");
+            LanguageModeMap.Add("Czech", "cs");
+            LanguageModeMap.Add("Danish", "da");
+            LanguageModeMap.Add("Dutch", "nl");
+            LanguageModeMap.Add("English", "en");
+            LanguageModeMap.Add("Esperanto", "eo");
+            LanguageModeMap.Add("Estonian", "et");
+            LanguageModeMap.Add("Filipino", "tl");
+            LanguageModeMap.Add("Finnish", "fi");
+            LanguageModeMap.Add("French", "fr");
+            LanguageModeMap.Add("Galician", "gl");
+            LanguageModeMap.Add("German", "de");
+            LanguageModeMap.Add("Georgian", "ka");
+            LanguageModeMap.Add("Greek", "el");
+            LanguageModeMap.Add("Haitian Creole", "ht");
+            LanguageModeMap.Add("Hebrew", "iw");
+            LanguageModeMap.Add("Hindi", "hi");
+            LanguageModeMap.Add("Hungarian", "hu");
+            LanguageModeMap.Add("Icelandic", "is");
+            LanguageModeMap.Add("Indonesian", "id");
+            LanguageModeMap.Add("Irish", "ga");
+            LanguageModeMap.Add("Italian", "it");
+            LanguageModeMap.Add("Japanese", "ja");
+            LanguageModeMap.Add("Korean", "ko");
+            LanguageModeMap.Add("Lao", "lo");
+            LanguageModeMap.Add("Latin", "la");
+            LanguageModeMap.Add("Latvian", "lv");
+            LanguageModeMap.Add("Lithuanian", "lt");
+            LanguageModeMap.Add("Macedonian", "mk");
+            LanguageModeMap.Add("Malay", "ms");
+            LanguageModeMap.Add("Maltese", "mt");
+            LanguageModeMap.Add("Norwegian", "no");
+            LanguageModeMap.Add("Persian", "fa");
+            LanguageModeMap.Add("Polish", "pl");
+            LanguageModeMap.Add("Portuguese", "pt");
+            LanguageModeMap.Add("Romanian", "ro");
+            LanguageModeMap.Add("Russian", "ru");
+            LanguageModeMap.Add("Serbian", "sr");
+            LanguageModeMap.Add("Slovak", "sk");
+            LanguageModeMap.Add("Slovenian", "sl");
+            LanguageModeMap.Add("Spanish", "es");
+            LanguageModeMap.Add("Swahili", "sw");
+            LanguageModeMap.Add("Swedish", "sv");
+            LanguageModeMap.Add("Tamil", "ta");
+            LanguageModeMap.Add("Telugu", "te");
+            LanguageModeMap.Add("Thai", "th");
+            LanguageModeMap.Add("Turkish", "tr");
+            LanguageModeMap.Add("Ukrainian", "uk");
+            LanguageModeMap.Add("Urdu", "ur");
+            LanguageModeMap.Add("Vietnamese", "vi");
+            LanguageModeMap.Add("Welsh", "cy");
+            LanguageModeMap.Add("Yiddish", "yi");
+        }
+
+        public static Dictionary<string, string> LanguageModeMap { get; set; }
     }
 
     

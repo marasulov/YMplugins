@@ -9,11 +9,19 @@ using acadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.Windows;
 using System.Windows.Media.Imaging;
+using YMplugins.Views;
+using System.Windows.Forms.Integration;
+using System.Windows.Input;
+using YMplugins.Models.Acad2022.Commands.Translator;
+using YMplugins.Services.Translator;
 
 namespace YMplugins.Addin.Acad2022
 {
     public class Ribbon : IExtensionApplication
     {
+        private static string _selsourceComboValue = "auto";
+        private static string _selTargeComboValue = "en";
+
         public void Initialize()
         {
             Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
@@ -113,18 +121,18 @@ namespace YMplugins.Addin.Acad2022
         {
             try
             {
-                // Получаем доступ к ленте
+                
                 RibbonControl ribCntrl = Autodesk.Windows.ComponentManager.Ribbon;
-                // добавляем свою вкладку
+                
                 RibbonTab ribTab = new RibbonTab();
-                ribTab.Title = "CADBoost"; // Заголовок вкладки
-                ribTab.Id = "CADBoost_ID"; // Идентификатор вкладки
-                ribCntrl.Tabs.Add(ribTab); // Добавляем вкладку в ленту
-                // добавляем содержимое в свою вкладку (одну панель)
-                addExampleContent(ribTab);
-                // Делаем вкладку активной (не желательно, ибо неудобно)
+                ribTab.Title = "CADBoost"; 
+                ribTab.Id = "CADBoost_ID"; 
+                ribCntrl.Tabs.Add(ribTab); 
+                
+                TranlsateButtons(ribTab);
+                
                 //ribTab.IsActive = true;
-                // Обновляем ленту (если делаете вкладку активной, то необязательно)
+                
                 ribCntrl.UpdateLayout();
             }
             catch (System.Exception ex)
@@ -134,11 +142,12 @@ namespace YMplugins.Addin.Acad2022
             }
         }
 
-        // Строим новую панель в нашей вкладке
-        void addExampleContent(RibbonTab ribTab)
+        void TranlsateButtons(RibbonTab ribTab)
         {
             try
             {
+                TestCommand.EnsureInitialized();
+
                 RibbonPanelSource ribSourcePanel = new RibbonPanelSource();
                 ribSourcePanel.Title = "Translator";
                 RibbonPanel ribPanel = new RibbonPanel();
@@ -147,111 +156,61 @@ namespace YMplugins.Addin.Acad2022
 
                 RibbonToolTip tt;
 
-                RibbonRowPanel ribRowPanel = new RibbonRowPanel();
+                var sourceLangCombo = GetRibbonCombo("sourceLangCombo", "source");
+                var targetLangCombo = GetRibbonCombo("targetLangCombo", "target");
+
+                var commandHandler = new ButtonCommandHandler();
+
+                sourceLangCombo.CurrentChanged += (sender, e) =>
+                {
+                    var selectedItem = e.NewValue as RibbonButton;
+                    _selsourceComboValue = selectedItem.Tag.ToString();
+                    commandHandler.SetSelectedValue(_selsourceComboValue, _selTargeComboValue);
+                };
+
+                targetLangCombo.CurrentChanged += (sender, e) =>
+                {
+                    var selectedItem = e.NewValue as RibbonButton;
+                    _selTargeComboValue = selectedItem.Tag.ToString();
+                    commandHandler.SetSelectedValue(_selsourceComboValue, _selTargeComboValue);
+                };
+
                 RibbonButton ribBtn = new RibbonButton();
 
                 #region Кнопка TrtoEn
 
                 tt = new RibbonToolTip();
                 tt.IsHelpEnabled = false;
-                ribBtn.CommandParameter = tt.Command = "TrToEnWithOrg";
-                ribBtn.Name = "Translate to En";
-                ribBtn.Text = tt.Title = "Translate to En";
-                ribBtn.CommandHandler = new RibbonCommandHandler();
-                ribBtn.Orientation = System.Windows.Controls.Orientation.Vertical;
+                //ribBtn.CommandParameter = tt.Command = "Tra";
+                ribBtn.Name = "Translate";
+                ribBtn.Text = "Translate";
+                ribBtn.CommandHandler = commandHandler;
+                ribBtn.Orientation = System.Windows.Controls.Orientation.Horizontal;
                 ribBtn.Size = RibbonItemSize.Large;
-                ribBtn.LargeImage = LoadImage("rutoen");
+                ribBtn.LargeImage = LoadImage("translation");
                 ribBtn.ShowImage = true;
                 ribBtn.ShowText = true;
-                tt.Content = "Translate to English";
+                tt.Content = "Translate";
                 ribBtn.ToolTip = tt;
-                ribRowPanel.Items.Add(ribBtn);
+                //ribRowPanel.Items.Add(ribBtn);
 
                 #endregion
+                ribSourcePanel.Items.Add(sourceLangCombo);
+                ribSourcePanel.Items.Add(targetLangCombo);
+                ribSourcePanel.Items.Add(new RibbonSeparator());
+                ribSourcePanel.Items.Add(ribBtn);
 
-                #region Кнопка TrToRuWithOrg
-
-                tt = new RibbonToolTip();
-                tt.IsHelpEnabled = false;
-                ribBtn = new RibbonButton();
-                ribBtn.CommandParameter = tt.Command = "TrToRuWithOrg";
-                ribBtn.Name = "Translate to Ru";
-                ribBtn.Text = tt.Title = "Translate to Ru";
-                ribBtn.CommandHandler = new RibbonCommandHandler();
-                ribBtn.Orientation = System.Windows.Controls.Orientation.Vertical;
-                ribBtn.Size = RibbonItemSize.Large;
-                ribBtn.LargeImage = LoadImage("entoru");
-                ribBtn.ShowImage = true;
-                ribBtn.ShowText = true;
-                tt.Content = "Translate to russian";
-                ribBtn.ToolTip = tt;
-                ribRowPanel.Items.Add(ribBtn);
-
-                #endregion
-
-                // Добавляем строку в нашу панель
-                ribSourcePanel.Items.Add(ribRowPanel);
-
-                //RibbonRowPanel rowPanel = new RibbonRowPanel();
-                //rowPanel.AreItemsArrangedFromRightToLeft = true;
-
-                //RibbonButton button3 = new RibbonButton
-                //{
-                //    Text = "TrToEn",
-                //    ShowText = true,
-                //    Orientation = Orientation.Vertical,
-                //    Image = LoadImage("en"),
-                //    CommandHandler = new RelayCommandHandler(() =>
-                //    {
-                //        Application.DocumentManager.MdiActiveDocument.SendStringToExecute("TrToEn ", true, false, false);
-                //    })
-                //};
-
-                //RibbonButton button4 = new RibbonButton
-                //{
-                //    Text = "TrToUz",
-                //    ShowText = true,
-                //    Orientation = Orientation.Vertical,
-                //    Image = LoadImage("uz"),
-                //    CommandParameter = "",
-                //    ToolTip = "TrToUzWithOrg",
-
-                //    CommandHandler = new RelayCommandHandler(() =>
-                //    {
-                //        Application.DocumentManager.MdiActiveDocument.SendStringToExecute("TrToUzWithOrg", true, false, false);
-                //    })
-                //};
-
-                //// Добавление маленьких кнопок в RibbonRow
-                //rowPanel.Items.Add(button3);
-                //rowPanel.Items.Add(button4);
-
-                //// Добавление кнопок на панель
-
-                //ribSourcePanel.Items.Add(rowPanel);
-
-                // Добавление разделителя панели
                 RibbonPanelBreak panelBreak = new RibbonPanelBreak();
                 ribSourcePanel.Items.Add(panelBreak);
-
-                //RibbonPanel Panel = new RibbonPanel();
-
-                //Panel.Source = ribSourcePanel;
-
-                //ribTab.Panels.Add(Panel);
-
-
             }
             catch (System.Exception ex)
             {
-                Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(
-                    ex.Message);
+                Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(ex.Message);
             }
         }
 
-        // Получение картинки из ресурсов
-        // Данная функция найдена на просторах интернет
-        System.Windows.Media.Imaging.BitmapImage LoadImage(string ImageName)
+        
+        private BitmapImage LoadImage(string ImageName)
         {
             try
             {
@@ -264,6 +223,33 @@ namespace YMplugins.Addin.Acad2022
                 Console.WriteLine($"Error loading image: {ex.Message}");
                 return null;
             }
+        }
+
+        //TODO законить
+        private RibbonCombo GetRibbonCombo(string comboName, string prefix)
+        {
+            RibbonToolTip tt = new RibbonToolTip();
+            RibbonCombo ribbonCombo = new RibbonCombo();
+            ribbonCombo.Id = comboName;
+            ribbonCombo.Text = tt.Title = prefix;
+            foreach (KeyValuePair<string, string> lang in TestCommand.LanguageModeMap)
+            {
+                var ribBtn = GetRibbonButton(prefix + lang.Value, lang.Key, lang.Value);
+                ribbonCombo.Items.Add(ribBtn);
+            }
+
+            return ribbonCombo;
+        }
+
+        private RibbonButton GetRibbonButton(string id, string text, string tag)
+        {
+            var ribbonButton = new RibbonButton();
+            ribbonButton.Id = id;
+            ribbonButton.Text = text;
+
+            ribbonButton.ShowText = true;
+            ribbonButton.Tag = tag;
+            return ribbonButton;
         }
 
         /* Собственный обраотчик команд
@@ -308,6 +294,36 @@ namespace YMplugins.Addin.Acad2022
             }
 
             public event EventHandler CanExecuteChanged;
+        }
+
+        public class ButtonCommandHandler : ICommand
+        {
+            public event EventHandler CanExecuteChanged;
+
+            private string _selectedSourceValue = "auto";
+            private string _selectedTargetValue = "en";
+
+            public bool CanExecute(object param)
+            {
+                return true;
+            }
+
+            public void SetSelectedValue(string sourceLang, string targeLang)
+            {
+                _selectedSourceValue = sourceLang;
+                _selectedTargetValue = targeLang;
+            }
+
+            public void Execute(object parameter)
+            {
+                var settings = new TranslationSettings
+                {
+                    SourceLanguage = _selectedSourceValue,
+                    TargetLanguage = _selectedTargetValue
+                };
+                var tr = new TranslateTextCommand();
+                tr.TranslateText(settings);
+            }
         }
     }
 }
