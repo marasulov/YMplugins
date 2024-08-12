@@ -253,11 +253,15 @@ namespace YMplugins.Models.Acad2022.Services
 
         private string TranslateText(string text)
         {
+
             if (!_dictionaryService.TextFromJson.ContainsKey(text))
             {
                 string translatedText = _textTranslator.Translate(text, _translationSettings.SourceLanguage, _translationSettings.TargetLanguage);
-
-                Active.Editor.WriteMessage($"\n{text} переведен но не добавлен в базу");
+                if (translatedText != null)
+                {
+                    Active.Editor.WriteMessage($"\n{text} не переведен");
+                }
+                
                 return translatedText;
             }
             else

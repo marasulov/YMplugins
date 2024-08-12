@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.AccessControl;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using Autodesk.AutoCAD.ApplicationServices;
-using acadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.Windows;
-using System.Windows.Media.Imaging;
-using YMplugins.Views;
-using System.Windows.Forms.Integration;
-using System.Windows.Input;
 using YMplugins.Models.Acad2022.Commands.Translator;
 using YMplugins.Services.Translator;
+using acadApp = Autodesk.AutoCAD.ApplicationServices.Application;
+using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
 namespace YMplugins.Addin.Acad2022
 {
@@ -21,10 +18,11 @@ namespace YMplugins.Addin.Acad2022
     {
         private static string _selsourceComboValue = "auto";
         private static string _selTargeComboValue = "en";
+        private static Dictionary<string, string> _languageModeMap;
 
         public void Initialize()
         {
-            Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
+            ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
         }
 
         public void Terminate()
@@ -32,17 +30,17 @@ namespace YMplugins.Addin.Acad2022
 
         }
 
-        void ComponentManager_ItemInitialized(object sender, Autodesk.Windows.RibbonItemEventArgs e)
+        void ComponentManager_ItemInitialized(object sender, RibbonItemEventArgs e)
         {
             // Проверяем, что лента загружена
-            if (Autodesk.Windows.ComponentManager.Ribbon != null)
+            if (ComponentManager.Ribbon != null)
             {
                 // Строим нашу вкладку
                 BuildRibbonTab();
 
                 //и раз уж лента запустилась, то отключаем обработчик событий
-                Autodesk.Windows.ComponentManager.ItemInitialized -=
-                    new EventHandler<RibbonItemEventArgs>(ComponentManager_ItemInitialized);
+                ComponentManager.ItemInitialized -=
+                    ComponentManager_ItemInitialized;
             }
         }
 
@@ -54,14 +52,14 @@ namespace YMplugins.Addin.Acad2022
                 // Строим вкладку
                 CreateRibbonTab();
                 // Подключаем обработчик событий изменения системных переменных
-                acadApp.SystemVariableChanged += new SystemVariableChangedEventHandler(acadApp_SystemVariableChanged);
+                acadApp.SystemVariableChanged += acadApp_SystemVariableChanged;
             }
         }
 
         bool isLoaded()
         {
             bool _loaded = false;
-            RibbonControl ribCntrl = Autodesk.Windows.ComponentManager.Ribbon;
+            RibbonControl ribCntrl = ComponentManager.Ribbon;
             // Делаем итерацию по вкладкам ленты
             foreach (RibbonTab tab in ribCntrl.Tabs)
             {
@@ -83,7 +81,7 @@ namespace YMplugins.Addin.Acad2022
         {
             try
             {
-                RibbonControl ribCntrl = Autodesk.Windows.ComponentManager.Ribbon;
+                RibbonControl ribCntrl = ComponentManager.Ribbon;
                 // Делаем итерацию по вкладкам ленты
                 foreach (RibbonTab tab in ribCntrl.Tabs)
                 {
@@ -93,15 +91,15 @@ namespace YMplugins.Addin.Acad2022
                         ribCntrl.Tabs.Remove(tab);
                         // Отключаем обработчик событий
                         acadApp.SystemVariableChanged -=
-                            new SystemVariableChangedEventHandler(acadApp_SystemVariableChanged);
+                            acadApp_SystemVariableChanged;
                         // Останавливаем итерацию
                         break;
                     }
                 }
             }
-            catch (Autodesk.AutoCAD.Runtime.Exception ex)
+            catch (Exception ex)
             {
-                Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(
+                Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(
                     ex.Message);
             }
         }
@@ -122,7 +120,7 @@ namespace YMplugins.Addin.Acad2022
             try
             {
                 
-                RibbonControl ribCntrl = Autodesk.Windows.ComponentManager.Ribbon;
+                RibbonControl ribCntrl = ComponentManager.Ribbon;
                 
                 RibbonTab ribTab = new RibbonTab();
                 ribTab.Title = "CADBoost"; 
@@ -137,7 +135,7 @@ namespace YMplugins.Addin.Acad2022
             }
             catch (System.Exception ex)
             {
-                Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(
+                Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(
                     ex.Message);
             }
         }
@@ -146,57 +144,80 @@ namespace YMplugins.Addin.Acad2022
         {
             try
             {
-                TestCommand.EnsureInitialized();
+                EnsureInitialized();
 
                 RibbonPanelSource ribSourcePanel = new RibbonPanelSource();
                 ribSourcePanel.Title = "Translator";
+                
                 RibbonPanel ribPanel = new RibbonPanel();
                 ribPanel.Source = ribSourcePanel;
                 ribTab.Panels.Add(ribPanel);
 
-                RibbonToolTip tt;
+                RibbonToolTip tt = new RibbonToolTip();
+                RibbonCombo sourceCombo = new RibbonCombo();
+                sourceCombo.Id = "sourceLangCombo";
+                sourceCombo.Text = tt.Title = "Source language";
+                sourceCombo.ShowText = true;
+                var firstButton = GetRibbonButton("autoDetect", "Detect language", "auto");
+                sourceCombo.Items.Add(firstButton);
+                
+                foreach (KeyValuePair<string, string> lang in _languageModeMap)
+                {
+                    var comboBtn = GetRibbonButton("source" + lang.Value, lang.Key, lang.Value);
+                    comboBtn.Orientation = Orientation.Vertical;
+                    sourceCombo.Items.Add(comboBtn);
+                }
 
-                var sourceLangCombo = GetRibbonCombo("sourceLangCombo", "source");
-                var targetLangCombo = GetRibbonCombo("targetLangCombo", "target");
+                RibbonCombo targetCombo = new RibbonCombo();
+                targetCombo.Id = "sourceLangCombo";
+                targetCombo.Text = tt.Title = "Target language";
+                targetCombo.ShowText = true;
+
+                foreach (KeyValuePair<string, string> lang in _languageModeMap)
+                {
+                    var comboBtn = GetRibbonButton("target" + lang.Value, lang.Key, lang.Value);
+                    comboBtn.Orientation = Orientation.Vertical;
+                    targetCombo.Items.Add(comboBtn);
+                }
+
+                RibbonRowPanel rowPanel = new RibbonRowPanel();
+                rowPanel.Items.Add(sourceCombo);
+                rowPanel.Items.Add(new RibbonRowBreak());
+                rowPanel.Items.Add(targetCombo);
 
                 var commandHandler = new ButtonCommandHandler();
 
-                sourceLangCombo.CurrentChanged += (sender, e) =>
+                sourceCombo.CurrentChanged += (sender, e) =>
                 {
                     var selectedItem = e.NewValue as RibbonButton;
                     _selsourceComboValue = selectedItem.Tag.ToString();
                     commandHandler.SetSelectedValue(_selsourceComboValue, _selTargeComboValue);
                 };
 
-                targetLangCombo.CurrentChanged += (sender, e) =>
+                targetCombo.CurrentChanged += (sender, e) =>
                 {
                     var selectedItem = e.NewValue as RibbonButton;
                     _selTargeComboValue = selectedItem.Tag.ToString();
                     commandHandler.SetSelectedValue(_selsourceComboValue, _selTargeComboValue);
                 };
 
-                RibbonButton ribBtn = new RibbonButton();
-
-                #region Кнопка TrtoEn
-
                 tt = new RibbonToolTip();
                 tt.IsHelpEnabled = false;
-                //ribBtn.CommandParameter = tt.Command = "Tra";
+                
+                RibbonButton ribBtn = new RibbonButton();
+                ribBtn.Id = "translateBtn";
                 ribBtn.Name = "Translate";
                 ribBtn.Text = "Translate";
                 ribBtn.CommandHandler = commandHandler;
-                ribBtn.Orientation = System.Windows.Controls.Orientation.Horizontal;
                 ribBtn.Size = RibbonItemSize.Large;
                 ribBtn.LargeImage = LoadImage("translation");
                 ribBtn.ShowImage = true;
                 ribBtn.ShowText = true;
                 tt.Content = "Translate";
                 ribBtn.ToolTip = tt;
-                //ribRowPanel.Items.Add(ribBtn);
-
-                #endregion
-                ribSourcePanel.Items.Add(sourceLangCombo);
-                ribSourcePanel.Items.Add(targetLangCombo);
+                ribBtn.Orientation = Orientation.Vertical;
+                
+                ribSourcePanel.Items.Add(rowPanel);
                 ribSourcePanel.Items.Add(new RibbonSeparator());
                 ribSourcePanel.Items.Add(ribBtn);
 
@@ -217,7 +238,7 @@ namespace YMplugins.Addin.Acad2022
                 var image = "pack://application:,,,/YMplugins.Addin.Acad2022;component/" + "Icons/" + ImageName + ".png";
                 return new BitmapImage(new Uri(image));
             }
-            catch (Autodesk.AutoCAD.Runtime.Exception ex)
+            catch (Exception ex)
             {
                 // Логирование ошибки или отладочная информация
                 Console.WriteLine($"Error loading image: {ex.Message}");
@@ -225,14 +246,15 @@ namespace YMplugins.Addin.Acad2022
             }
         }
 
-        //TODO законить
         private RibbonCombo GetRibbonCombo(string comboName, string prefix)
         {
             RibbonToolTip tt = new RibbonToolTip();
             RibbonCombo ribbonCombo = new RibbonCombo();
             ribbonCombo.Id = comboName;
             ribbonCombo.Text = tt.Title = prefix;
-            foreach (KeyValuePair<string, string> lang in TestCommand.LanguageModeMap)
+            ribbonCombo.ShowText = true;
+
+            foreach (KeyValuePair<string, string> lang in _languageModeMap)
             {
                 var ribBtn = GetRibbonButton(prefix + lang.Value, lang.Key, lang.Value);
                 ribbonCombo.Items.Add(ribBtn);
@@ -255,7 +277,7 @@ namespace YMplugins.Addin.Acad2022
         /* Собственный обраотчик команд
         * Это один из вариантов вызова команды по нажатию кнопки
         */
-        class RibbonCommandHandler : System.Windows.Input.ICommand
+        class RibbonCommandHandler : ICommand
         {
             public bool CanExecute(object parameter)
             {
@@ -277,7 +299,7 @@ namespace YMplugins.Addin.Acad2022
             }
         }
 
-        public class RelayCommandHandler : System.Windows.Input.ICommand
+        public class RelayCommandHandler : ICommand
         {
             private readonly Action _execute;
 
@@ -325,5 +347,78 @@ namespace YMplugins.Addin.Acad2022
                 tr.TranslateText(settings);
             }
         }
+
+        private static void EnsureInitialized()
+        {
+            if (_languageModeMap != null)
+                return;
+            _languageModeMap = new Dictionary<string, string>();
+            _languageModeMap.Add("English", "en");
+            _languageModeMap.Add("Russian", "ru");
+            _languageModeMap.Add("Uzbek", "uz");
+            _languageModeMap.Add("Afrikaans", "af");
+            _languageModeMap.Add("Albanian", "sq");
+            _languageModeMap.Add("Arabic", "ar");
+            _languageModeMap.Add("Armenian", "hy");
+            _languageModeMap.Add("Azerbaijani", "az");
+            _languageModeMap.Add("Basque", "eu");
+            _languageModeMap.Add("Belarusian", "be");
+            _languageModeMap.Add("Bengali", "bn");
+            _languageModeMap.Add("Bulgarian", "bg");
+            _languageModeMap.Add("Catalan", "ca");
+            _languageModeMap.Add("Chinese", "zh-CN");
+            _languageModeMap.Add("Croatian", "hr");
+            _languageModeMap.Add("Czech", "cs");
+            _languageModeMap.Add("Danish", "da");
+            _languageModeMap.Add("Dutch", "nl");
+            _languageModeMap.Add("Esperanto", "eo");
+            _languageModeMap.Add("Estonian", "et");
+            _languageModeMap.Add("Filipino", "tl");
+            _languageModeMap.Add("Finnish", "fi");
+            _languageModeMap.Add("French", "fr");
+            _languageModeMap.Add("Galician", "gl");
+            _languageModeMap.Add("German", "de");
+            _languageModeMap.Add("Georgian", "ka");
+            _languageModeMap.Add("Greek", "el");
+            _languageModeMap.Add("Haitian Creole", "ht");
+            _languageModeMap.Add("Hebrew", "iw");
+            _languageModeMap.Add("Hindi", "hi");
+            _languageModeMap.Add("Hungarian", "hu");
+            _languageModeMap.Add("Icelandic", "is");
+            _languageModeMap.Add("Indonesian", "id");
+            _languageModeMap.Add("Irish", "ga");
+            _languageModeMap.Add("Italian", "it");
+            _languageModeMap.Add("Japanese", "ja");
+            _languageModeMap.Add("Korean", "ko");
+            _languageModeMap.Add("Lao", "lo");
+            _languageModeMap.Add("Latin", "la");
+            _languageModeMap.Add("Latvian", "lv");
+            _languageModeMap.Add("Lithuanian", "lt");
+            _languageModeMap.Add("Macedonian", "mk");
+            _languageModeMap.Add("Malay", "ms");
+            _languageModeMap.Add("Maltese", "mt");
+            _languageModeMap.Add("Norwegian", "no");
+            _languageModeMap.Add("Persian", "fa");
+            _languageModeMap.Add("Polish", "pl");
+            _languageModeMap.Add("Portuguese", "pt");
+            _languageModeMap.Add("Romanian", "ro");
+            _languageModeMap.Add("Serbian", "sr");
+            _languageModeMap.Add("Slovak", "sk");
+            _languageModeMap.Add("Slovenian", "sl");
+            _languageModeMap.Add("Spanish", "es");
+            _languageModeMap.Add("Swahili", "sw");
+            _languageModeMap.Add("Swedish", "sv");
+            _languageModeMap.Add("Tamil", "ta");
+            _languageModeMap.Add("Telugu", "te");
+            _languageModeMap.Add("Thai", "th");
+            _languageModeMap.Add("Turkish", "tr");
+            _languageModeMap.Add("Ukrainian", "uk");
+            _languageModeMap.Add("Urdu", "ur");
+            _languageModeMap.Add("Vietnamese", "vi");
+            _languageModeMap.Add("Welsh", "cy");
+            _languageModeMap.Add("Yiddish", "yi");
+        }
     }
+
+
 }

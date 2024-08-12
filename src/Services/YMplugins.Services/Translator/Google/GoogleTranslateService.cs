@@ -58,26 +58,34 @@ namespace YMplugins.Services.Translator.Google
         public static string TranslateText(string input, string sourceLanguage, string targetLanguage)
         {
             string url = $"https://translate.googleapis.com/translate_a/single?client=gtx&sl={sourceLanguage}&tl={targetLanguage}&dt=t&q={Uri.EscapeUriString(input)}";
-
-            using (HttpClient client = new HttpClient())
+            try
             {
-                //object result = JsonConvert.DeserializeObject<List<object>>(new HttpClient().GetStringAsync(string.Format("https://translate.googleapis.com/translate_a/single?client=gtx&sl={0}&tl={1}&dt=t&q={2}", "ru", "en", (object)Uri.EscapeUriString(input))).Result)[0];
-                //string result = await client.GetStringAsync(url);
-
-                string result = client.GetStringAsync(url).GetAwaiter().GetResult();
-
-                // Разбираем ответ
-                JArray jsonArray = JArray.Parse(result);
-                List<string> translations = new List<string>();
-
-                foreach (var item in jsonArray[0])
+                using (HttpClient client = new HttpClient())
                 {
-                    translations.Add(item[0].ToString());
-                }
+                    //object result = JsonConvert.DeserializeObject<List<object>>(new HttpClient().GetStringAsync(string.Format("https://translate.googleapis.com/translate_a/single?client=gtx&sl={0}&tl={1}&dt=t&q={2}", "ru", "en", (object)Uri.EscapeUriString(input))).Result)[0];
+                    //string result = await client.GetStringAsync(url);
 
-                // Объединяем все переводы в одну строку и возвращаем
-                return string.Join(" ", translations);
+                    string result = client.GetStringAsync(url).GetAwaiter().GetResult();
+
+                    // Разбираем ответ
+                    JArray jsonArray = JArray.Parse(result);
+                    List<string> translations = new List<string>();
+
+                    foreach (var item in jsonArray[0])
+                    {
+                        translations.Add(item[0].ToString());
+                    }
+
+                    // Объединяем все переводы в одну строку и возвращаем
+                    return string.Join(" ", translations);
+                }
             }
+            catch (Exception e)
+            {
+
+                return null;
+            }
+           
         }
 
         //public string GetTranslate(string url)
