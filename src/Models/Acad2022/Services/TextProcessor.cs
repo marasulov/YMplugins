@@ -1,11 +1,12 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
+﻿using System;
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Gile.AutoCAD.Extension;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using YMplugins.Services.Translator;
-using static System.Net.Mime.MediaTypeNames;
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace YMplugins.Models.Acad2022.Services
@@ -44,63 +45,71 @@ namespace YMplugins.Models.Acad2022.Services
                         string regex = "[^A-Za-z0-9]+";
                         string separator = "\n";
                         var preserveOriginalText = false;
-                        if (selectedIds.Length > 0)
+                        try
                         {
-                            PromptKeywordOptions pKeyOpts = new PromptKeywordOptions("\nSave native text?");
-                            pKeyOpts.Keywords.Add("Yes");
-                            pKeyOpts.Keywords.Add("No");
-
-                            PromptResult pKeyRes = Active.Editor.GetKeywords(pKeyOpts);
-
-                            if (pKeyRes.Status == PromptStatus.OK && pKeyRes.StringResult == "Yes")
+                            if (selectedIds.Length > 0)
                             {
-                                preserveOriginalText = true;
-                                PromptStringOptions pStrOpts = new PromptStringOptions(
-                                    "\nВведите сепаратор между оригиналом и переводом (нажмите Enter для принятия сепаратора \"-\" для text и /n для mtext):");
-                                PromptResult pStrRes = Active.Editor.GetString(pStrOpts);
+                                PromptKeywordOptions pKeyOpts = new PromptKeywordOptions("\nSave native text?");
+                                pKeyOpts.Keywords.Add("Yes");
+                                pKeyOpts.Keywords.Add("No");
 
-                                if (pStrRes.Status == PromptStatus.OK)
+                                PromptResult pKeyRes = Active.Editor.GetKeywords(pKeyOpts);
+
+                                if (pKeyRes.Status == PromptStatus.OK && pKeyRes.StringResult == "Yes")
                                 {
-                                    separator = pStrRes.StringResult;
-                                    if (string.IsNullOrEmpty(separator))
+                                    preserveOriginalText = true;
+                                    PromptStringOptions pStrOpts = new PromptStringOptions(
+                                        "\nEnter separator(or press Enter for text \"-\" and /n for mtext):");
+                                    PromptResult pStrRes = Active.Editor.GetString(pStrOpts);
+
+                                    if (pStrRes.Status == PromptStatus.OK)
                                     {
-                                        separator = "\n";
+                                        separator = pStrRes.StringResult;
+                                        if (string.IsNullOrEmpty(separator))
+                                        {
+                                            separator = "\n";
+                                        }
                                     }
                                 }
-                            }
 
-                            foreach (ObjectId acSSObj in selectedIds)
-                            {
-                                if (acSSObj != null)
+                                foreach (ObjectId acSSObj in selectedIds)
                                 {
-                                    var acEnt = acTrans.GetObject(acSSObj, OpenMode.ForWrite) as Entity;
-
-                                    switch (acEnt)
+                                    if (acSSObj != null)
                                     {
-                                        case MText mText:
-                                            ProcessMText(mText, separator, preserveOriginalText);
-                                            break;
-                                        case DBText dbText:
-                                            ProcessDbText(dbText, separator, preserveOriginalText);
-                                            break;
-                                        case Table table:
-                                            ProcessTable(table, separator, preserveOriginalText);
-                                            break;
-                                        case Leader leader:
-                                            ProcessLeader(leader, separator);
-                                            break;
-                                        case MLeader mLeader:
-                                            ProcessMLeader(mLeader, regex);
-                                            break;
-                                        case BlockReference blockRef:
-                                            ProcessBlockReference(blockRef, regex);
-                                            break;
+                                        var acEnt = acTrans.GetObject(acSSObj, OpenMode.ForWrite) as Entity;
+
+                                        switch (acEnt)
+                                        {
+                                            case MText mText:
+                                                mText.Contents = ProcessMText(mText, separator, preserveOriginalText);
+                                                break;
+                                            case DBText dbText:
+                                                ProcessDbText(dbText, separator, preserveOriginalText);
+                                                break;
+                                            case Table table:
+                                                ProcessTable(table, separator, preserveOriginalText);
+                                                break;
+                                            case Leader leader:
+                                                ProcessLeader(leader, separator);
+                                                break;
+                                            case MLeader mLeader:
+                                                ProcessMLeader(mLeader, separator, preserveOriginalText);
+                                                break;
+                                            case BlockReference blockRef:
+                                                ProcessBlockReference(blockRef, regex);
+                                                break;
+                                        }
                                     }
                                 }
-                            }
 
-                            acTrans.Commit();
+                                acTrans.Commit();
+                            }
                         }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show($"{e.Message} - {e.StackTrace}");
+                        }
+                      
 
 
                     }
@@ -121,14 +130,14 @@ namespace YMplugins.Models.Acad2022.Services
             return new SelectionFilter(filterList);
         }
 
-        private void ProcessMText(MText mText, string separator, bool preserveOriginalText = false)
+        private string ProcessMText(MText mText, string separator, bool preserveOriginalText = false)
         {
 
             var text = GetClearString(mText.Contents);
 
             //if (ShouldTranslate(text, regex))
             //{
-            mText.Contents = preserveOriginalText ? $"{mText.Contents}{separator}{TranslateText(text)}" : TranslateText(text);
+           return preserveOriginalText ? $"{mText.Contents}{separator}{TranslateText(text)}" : TranslateText(text);
             //}
         }
 
@@ -144,21 +153,29 @@ namespace YMplugins.Models.Acad2022.Services
 
         private void ProcessTable(Table table, string separator, bool preserveOriginalText = false)
         {
-            for (int row = 0; row < table.Rows.Count; row++)
+            try
             {
-                for (int col = 0; col < table.Columns.Count; col++)
+                for (int row = 0; row < table.Rows.Count; row++)
                 {
-                    string cellContent = table.Cells[row, col].TextString.Trim();
-                    if (!string.IsNullOrWhiteSpace(cellContent))
+                    for (int col = 0; col < table.Columns.Count; col++)
                     {
-                        var clearedText = GetClearString(cellContent);
-                        //if (ShouldTranslate(clearedText, regex))
-                        //{
-                        table.Cells[row, col].TextString = preserveOriginalText ? $"{cellContent}{separator}{TranslateText(clearedText)}" : TranslateText(clearedText);
-                        //}
+                        string cellContent = table.Cells[row, col].TextString.Trim();
+                        if (!string.IsNullOrWhiteSpace(cellContent))
+                        {
+                            var clearedText = GetClearString(cellContent);
+                            //if (ShouldTranslate(clearedText, regex))
+                            //{
+                            table.Cells[row, col].TextString = preserveOriginalText ? $"{cellContent}{separator}{TranslateText(clearedText)}" : TranslateText(clearedText);
+                            //}
+                        }
                     }
                 }
             }
+            catch (Exception e)
+            {
+               MessageBox.Show("The data may be locked, check for locked layers or data in table cells");
+            }
+            
         }
 
         private string GetClearString(string source)
@@ -187,17 +204,28 @@ namespace YMplugins.Models.Acad2022.Services
                 var mText = mtextId.GetObject(OpenMode.ForRead) as MText;
                 if (mText != null)
                 {
-                    ProcessMText(mText, separator);
+                    mText.Contents = ProcessMText(mText, separator);
+                    leader.Annotation = mText.ObjectId;
                 }
             }
         }
 
-        private void ProcessMLeader(MLeader mLeader, string sepatator)
+        private void ProcessMLeader(MLeader mLeader, string separator, bool preserveOriginalText)
         {
             var mText = mLeader.MText;
             if (mText != null)
             {
-                ProcessMText(mText, sepatator);
+                var text = ProcessMText(mText, separator,preserveOriginalText);
+
+                mLeader.MText = new MText
+                {
+                    Contents = text,
+                    Height = mText.ActualHeight,
+                    Location = mText.Location,
+                    TextStyleId = mText.TextStyleId,
+                    Attachment = mText.Attachment
+                };
+
             }
         }
 
@@ -225,25 +253,25 @@ namespace YMplugins.Models.Acad2022.Services
                 }
             }
 
-            var blockTableRecord = blockRef.DynamicBlockTableRecord.GetObject(OpenMode.ForRead) as BlockTableRecord;
-            if (blockTableRecord != null)
-            {
-                foreach (ObjectId id in blockTableRecord)
-                {
-                    var entity = id.GetObject(OpenMode.ForRead) as Entity;
-                    if (entity != null)
-                    {
-                        if (entity is MText mText)
-                        {
-                            ProcessMText(mText, separator);
-                        }
-                        else if (entity is DBText dbText)
-                        {
-                            ProcessDbText(dbText, separator);
-                        }
-                    }
-                }
-            }
+            //var blockTableRecord = blockRef.DynamicBlockTableRecord.GetObject(OpenMode.ForWrite) as BlockTableRecord;
+            //if (blockTableRecord != null)
+            //{
+            //    foreach (ObjectId id in blockTableRecord)
+            //    {
+            //        var entity = id.GetObject(OpenMode.ForRead) as Entity;
+            //        if (entity != null)
+            //        {
+            //            if (entity is MText mText)
+            //            {
+            //                ProcessMText(mText, separator);
+            //            }
+            //            else if (entity is DBText dbText)
+            //            {
+            //                ProcessDbText(dbText, separator);
+            //            }
+            //        }
+            //    }
+            //}
         }
 
         private bool ShouldTranslate(string text)
@@ -253,14 +281,24 @@ namespace YMplugins.Models.Acad2022.Services
 
         private string TranslateText(string text)
         {
+            
 
             if (!_dictionaryService.TextFromJson.ContainsKey(text))
             {
-                string translatedText = _textTranslator.Translate(text, _translationSettings.SourceLanguage, _translationSettings.TargetLanguage);
-                if (translatedText != null)
+                string translatedText = default;
+                try
                 {
-                    Active.Editor.WriteMessage($"\n{text} не переведен");
+                    translatedText = _textTranslator.Translate(text, _translationSettings.SourceLanguage, _translationSettings.TargetLanguage);
                 }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                }
+               
+                //if (translatedText != null)
+                //{
+                //    Active.Editor.WriteMessage($"\n{text} не переведен");
+                //}
                 
                 return translatedText;
             }
@@ -277,24 +315,7 @@ namespace YMplugins.Models.Acad2022.Services
             return text.All(c => c < 128);
         }
 
-        private void Translate(string textStr)
-        {
-            //if (!IsLatin(textStr))
-            //{
-            //    if (!_dictionaryService.TextFromJson.ContainsKey(textStr))
-            //    {
-            //        string translatedText = _textTranslator.Translate(textStr);
-            //        mText.Contents = translatedText;
-            //        _dict.Add(textStr, translatedText);
-            //        editor.WriteMessage($"\n{textStr} добавлен в базу");
-            //    }
-            //    else
-            //    {
-            //        mText.Contents = _dictionaryService.TextFromJson[textStr];
-            //        editor.WriteMessage($"\n{textStr} переведен из базы");
-            //    }
-            //}
-        }
+       
     }
 
 }

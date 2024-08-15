@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -38,8 +39,17 @@ namespace YMplugins.Services.Translator
                 }
             }
 
-            string jsonToWrite = JsonConvert.SerializeObject(_textFromJson);
-            File.WriteAllText(_jsonFileName, jsonToWrite);
+            try
+            {
+                string jsonToWrite = JsonConvert.SerializeObject(_textFromJson);
+                File.WriteAllText(_jsonFileName, jsonToWrite);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                
+            }
+            
         }
     }
 
