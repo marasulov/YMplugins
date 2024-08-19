@@ -19,6 +19,7 @@ namespace YMplugins.Addin.Acad2022
         private static string _selsourceComboValue = "auto";
         private static string _selTargeComboValue = "en";
         private static Dictionary<string, string> _languageModeMap;
+        private bool _isNewObject = false;
 
         public void Initialize()
         {
@@ -179,11 +180,21 @@ namespace YMplugins.Addin.Acad2022
                     comboBtn.Orientation = Orientation.Vertical;
                     targetCombo.Items.Add(comboBtn);
                 }
+                RibbonCheckBox newObjectCheckbox = new RibbonCheckBox();
+                newObjectCheckbox.Text = "Translated text in new object";
+                newObjectCheckbox.IsChecked = false;
+
+                RibbonLabel label = new RibbonLabel();
+                label.Text = "Translated text \nin new object";
 
                 RibbonRowPanel rowPanel = new RibbonRowPanel();
                 rowPanel.Items.Add(sourceCombo);
+               
+                //rowPanel.Items.Add(label);
                 rowPanel.Items.Add(new RibbonRowBreak());
                 rowPanel.Items.Add(targetCombo);
+                rowPanel.Items.Add(new RibbonRowBreak());
+                rowPanel.Items.Add(newObjectCheckbox);
 
                 var commandHandler = new ButtonCommandHandler();
 
@@ -200,6 +211,12 @@ namespace YMplugins.Addin.Acad2022
                     _selTargeComboValue = selectedItem.Tag.ToString();
                     commandHandler.SetSelectedValue(_selsourceComboValue, _selTargeComboValue);
                 };
+
+                newObjectCheckbox.PropertyChanged += (sender, e) =>
+                {
+                    commandHandler.SetNewObjectCheckBoxValue(newObjectCheckbox.IsChecked);
+                };
+
 
                 tt = new RibbonToolTip();
                 tt.IsHelpEnabled = false;
@@ -324,6 +341,7 @@ namespace YMplugins.Addin.Acad2022
 
             private string _selectedSourceValue = "auto";
             private string _selectedTargetValue = "en";
+            private bool? _selectedEnabled = false;
 
             public bool CanExecute(object param)
             {
@@ -344,7 +362,13 @@ namespace YMplugins.Addin.Acad2022
                     TargetLanguage = _selectedTargetValue
                 };
                 var tr = new TranslateTextCommand();
-                tr.TranslateText(settings);
+                tr.TranslateText(settings, _selectedEnabled);
+            }
+
+            public void SetNewObjectCheckBoxValue(bool? isChecked)
+            {
+                _selectedEnabled = isChecked;
+
             }
         }
 

@@ -28,12 +28,11 @@ namespace YMplugins.Models.Acad2022.Services
             _translationSettings = translationSettings;
         }
 
-        public void ProcessTexts(TranslationSettings translationSettings)
+        public void ProcessTexts(TranslationSettings translationSettings, bool createNewObject)
         {
 
             Document doc = Application.DocumentManager.MdiActiveDocument;
-            Database destdb = doc.Database;
-            using (DocumentLock docLock = doc.LockDocument())
+            using (doc.LockDocument())
             {
                 using (var acTrans = Active.Database.TransactionManager.StartTransaction())
                 {
