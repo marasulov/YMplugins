@@ -35,7 +35,7 @@ namespace YMplugins.Models.Acad2022.Commands.Translator
             container.Verify();
             var textProcessor = container.GetInstance<TextProcessor>();
 
-            textProcessor.ProcessTexts(settings, isCreateNewObject);
+            textProcessor.ProcessTexts(settings);
         }
     }
 }
