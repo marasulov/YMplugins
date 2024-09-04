@@ -181,9 +181,9 @@ namespace YMplugins.Addin.Acad2022
                     comboBtn.Orientation = Orientation.Vertical;
                     targetCombo.Items.Add(comboBtn);
                 }
-                RibbonCheckBox newObjectCheckbox = new RibbonCheckBox();
-                newObjectCheckbox.Text = "Translated text in new object";
-                newObjectCheckbox.IsChecked = false;
+                //RibbonCheckBox newObjectCheckbox = new RibbonCheckBox();
+                //newObjectCheckbox.Text = "Translated text in new object";
+                //newObjectCheckbox.IsChecked = false;
 
                 RibbonLabel label = new RibbonLabel();
                 label.Text = "Translated text \nin new object";
@@ -195,7 +195,7 @@ namespace YMplugins.Addin.Acad2022
                 rowPanel.Items.Add(new RibbonRowBreak());
                 rowPanel.Items.Add(targetCombo);
                 rowPanel.Items.Add(new RibbonRowBreak());
-                rowPanel.Items.Add(newObjectCheckbox);
+                //rowPanel.Items.Add(newObjectCheckbox);
 
                 var commandHandler = new ButtonCommandHandler();
 
@@ -215,10 +215,10 @@ namespace YMplugins.Addin.Acad2022
                     commandHandler.SetSelectedValue(_selsourceComboValue, _selTargeComboValue);
                 };
 
-                newObjectCheckbox.PropertyChanged += (sender, e) =>
-                {
-                    commandHandler.SetNewObjectCheckBoxValue(newObjectCheckbox.IsChecked);
-                };
+                //newObjectCheckbox.PropertyChanged += (sender, e) =>
+                //{
+                //    commandHandler.SetNewObjectCheckBoxValue(newObjectCheckbox.IsChecked);
+                //};
 
 
                 tt = new RibbonToolTip();
