@@ -30,7 +30,6 @@ namespace YMplugins.Models.Acad2022.Services
 
         public void ProcessTexts(TranslationSettings translationSettings, bool createNewObject)
         {
-
             Document doc = Application.DocumentManager.MdiActiveDocument;
             using (doc.LockDocument())
             {

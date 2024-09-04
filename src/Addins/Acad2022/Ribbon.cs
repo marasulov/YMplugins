@@ -7,6 +7,7 @@ using System.Windows.Media.Imaging;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.Windows;
+using YMplugins.Addin.Acad2022.Commands.Translator;
 using YMplugins.Models.Acad2022.Commands.Translator;
 using YMplugins.Services.Translator;
 using acadApp = Autodesk.AutoCAD.ApplicationServices.Application;
@@ -202,6 +203,7 @@ namespace YMplugins.Addin.Acad2022
                 {
                     var selectedItem = e.NewValue as RibbonButton;
                     _selsourceComboValue = selectedItem.Tag.ToString();
+                    TranslationState.Instance.SelectedSourceLanguage = _selsourceComboValue;
                     commandHandler.SetSelectedValue(_selsourceComboValue, _selTargeComboValue);
                 };
 
@@ -209,6 +211,7 @@ namespace YMplugins.Addin.Acad2022
                 {
                     var selectedItem = e.NewValue as RibbonButton;
                     _selTargeComboValue = selectedItem.Tag.ToString();
+                    TranslationState.Instance.SelectedTargetLanguage = _selTargeComboValue;
                     commandHandler.SetSelectedValue(_selsourceComboValue, _selTargeComboValue);
                 };
 
@@ -226,6 +229,7 @@ namespace YMplugins.Addin.Acad2022
                 ribBtn.Name = "Translate";
                 ribBtn.Text = "Translate";
                 ribBtn.CommandHandler = commandHandler;
+                ribBtn.CommandParameter = "YmTranslate";
                 ribBtn.Size = RibbonItemSize.Large;
                 ribBtn.LargeImage = LoadImage("translation");
                 ribBtn.ShowImage = true;
@@ -263,22 +267,22 @@ namespace YMplugins.Addin.Acad2022
             }
         }
 
-        private RibbonCombo GetRibbonCombo(string comboName, string prefix)
-        {
-            RibbonToolTip tt = new RibbonToolTip();
-            RibbonCombo ribbonCombo = new RibbonCombo();
-            ribbonCombo.Id = comboName;
-            ribbonCombo.Text = tt.Title = prefix;
-            ribbonCombo.ShowText = true;
+        //private RibbonCombo GetRibbonCombo(string comboName, string prefix)
+        //{
+        //    RibbonToolTip tt = new RibbonToolTip();
+        //    RibbonCombo ribbonCombo = new RibbonCombo();
+        //    ribbonCombo.Id = comboName;
+        //    ribbonCombo.Text = tt.Title = prefix;
+        //    ribbonCombo.ShowText = true;
 
-            foreach (KeyValuePair<string, string> lang in _languageModeMap)
-            {
-                var ribBtn = GetRibbonButton(prefix + lang.Value, lang.Key, lang.Value);
-                ribbonCombo.Items.Add(ribBtn);
-            }
+        //    foreach (KeyValuePair<string, string> lang in _languageModeMap)
+        //    {
+        //        var ribBtn = GetRibbonButton(prefix + lang.Value, lang.Key, lang.Value);
+        //        ribbonCombo.Items.Add(ribBtn);
+        //    }
 
-            return ribbonCombo;
-        }
+        //    return ribbonCombo;
+        //}
 
         private RibbonButton GetRibbonButton(string id, string text, string tag)
         {
@@ -294,46 +298,46 @@ namespace YMplugins.Addin.Acad2022
         /* Собственный обраотчик команд
         * Это один из вариантов вызова команды по нажатию кнопки
         */
-        class RibbonCommandHandler : ICommand
-        {
-            public bool CanExecute(object parameter)
-            {
-                return true;
-            }
+        //class RibbonCommandHandler : ICommand
+        //{
+        //    public bool CanExecute(object parameter)
+        //    {
+        //        return true;
+        //    }
 
-            public event EventHandler CanExecuteChanged;
+        //    public event EventHandler CanExecuteChanged;
 
-            public void Execute(object parameter)
-            {
-                if (parameter is RibbonButton)
-                {
-                    // Просто берем команду, записанную в CommandParameter кнопки
-                    // и выпоняем её используя функцию SendStringToExecute
-                    RibbonButton button = parameter as RibbonButton;
-                    acadApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
-                        button.CommandParameter + " ", true, false, true);
-                }
-            }
-        }
+        //    public void Execute(object parameter)
+        //    {
+        //        if (parameter is RibbonButton)
+        //        {
+        //            // Просто берем команду, записанную в CommandParameter кнопки
+        //            // и выпоняем её используя функцию SendStringToExecute
+        //            RibbonButton button = parameter as RibbonButton;
+        //            acadApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
+        //                button.CommandParameter + " ", true, false, true);
+        //        }
+        //    }
+        //}
 
-        public class RelayCommandHandler : ICommand
-        {
-            private readonly Action _execute;
+        //public class RelayCommandHandler : ICommand
+        //{
+        //    private readonly Action _execute;
 
-            public RelayCommandHandler(Action execute)
-            {
-                _execute = execute;
-            }
+        //    public RelayCommandHandler(Action execute)
+        //    {
+        //        _execute = execute;
+        //    }
 
-            public bool CanExecute(object parameter) => true;
+        //    public bool CanExecute(object parameter) => true;
 
-            public void Execute(object parameter)
-            {
-                _execute();
-            }
+        //    public void Execute(object parameter)
+        //    {
+        //        _execute();
+        //    }
 
-            public event EventHandler CanExecuteChanged;
-        }
+        //    public event EventHandler CanExecuteChanged;
+        //}
 
         public class ButtonCommandHandler : ICommand
         {
@@ -361,14 +365,17 @@ namespace YMplugins.Addin.Acad2022
                     SourceLanguage = _selectedSourceValue,
                     TargetLanguage = _selectedTargetValue
                 };
-                var tr = new TranslateTextCommand();
-                tr.TranslateText(settings, _selectedEnabled);
-            }
+                //var tr = new TranslateTextCommand();
+                //tr.TranslateText(settings);
 
-            public void SetNewObjectCheckBoxValue(bool? isChecked)
-            {
-                _selectedEnabled = isChecked;
-
+                if (parameter is RibbonButton)
+                {
+                    // Просто берем команду, записанную в CommandParameter кнопки
+                    // и выпоняем её используя функцию SendStringToExecute
+                    RibbonButton button = parameter as RibbonButton;
+                    acadApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
+                        button.CommandParameter + " ", true, false, true);
+                }
             }
         }
 
