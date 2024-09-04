@@ -11,7 +11,7 @@ namespace YMplugins.Models.Acad2022.Commands.Translator
 
     public class TranslateTextCommand
     {
-        //[CommandMethod("TrToEn")]
+        [CommandMethod("YmTranslate")]
         public void TranslateText(TranslationSettings settings)
         {
             //var settings = new TranslationSettings

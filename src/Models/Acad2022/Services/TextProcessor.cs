@@ -30,9 +30,7 @@ namespace YMplugins.Models.Acad2022.Services
 
         public void ProcessTexts(TranslationSettings translationSettings)
         {
-
             Document doc = Application.DocumentManager.MdiActiveDocument;
-            Database destdb = doc.Database;
             using (DocumentLock docLock = doc.LockDocument())
             {
                 using (var acTrans = Active.Database.TransactionManager.StartTransaction())
