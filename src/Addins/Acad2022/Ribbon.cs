@@ -260,13 +260,15 @@ namespace YMplugins.Addin.Acad2022
             ribPanel.Source = ribSourcePanel;
             ribbonTab.Panels.Add(ribPanel);
 
+            var commandHandler = new RibbonCommandHandler();
+
             RibbonToolTip tt = new RibbonToolTip();
             RibbonButton ribBtn = new RibbonButton();
             ribBtn.Id = "translateBtn";
             ribBtn.Name = "Translate";
             ribBtn.Text = "Translate";
             ribBtn.CommandHandler = commandHandler;
-            ribBtn.CommandParameter = "YmTranslate";
+            ribBtn.CommandParameter = "AutoPrint";
             ribBtn.Size = RibbonItemSize.Large;
             ribBtn.LargeImage = LoadImage("translation");
             ribBtn.ShowImage = true;
@@ -325,27 +327,27 @@ namespace YMplugins.Addin.Acad2022
         /* Собственный обраотчик команд
         * Это один из вариантов вызова команды по нажатию кнопки
         */
-        //class RibbonCommandHandler : ICommand
-        //{
-        //    public bool CanExecute(object parameter)
-        //    {
-        //        return true;
-        //    }
+        class RibbonCommandHandler : ICommand
+        {
+            public bool CanExecute(object parameter)
+            {
+                return true;
+            }
 
-        //    public event EventHandler CanExecuteChanged;
+            public event EventHandler CanExecuteChanged;
 
-        //    public void Execute(object parameter)
-        //    {
-        //        if (parameter is RibbonButton)
-        //        {
-        //            // Просто берем команду, записанную в CommandParameter кнопки
-        //            // и выпоняем её используя функцию SendStringToExecute
-        //            RibbonButton button = parameter as RibbonButton;
-        //            acadApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
-        //                button.CommandParameter + " ", true, false, true);
-        //        }
-        //    }
-        //}
+            public void Execute(object parameter)
+            {
+                if (parameter is RibbonButton)
+                {
+                    // Просто берем команду, записанную в CommandParameter кнопки
+                    // и выпоняем её используя функцию SendStringToExecute
+                    RibbonButton button = parameter as RibbonButton;
+                    acadApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
+                        button.CommandParameter + " ", true, false, true);
+                }
+            }
+        }
 
         //public class RelayCommandHandler : ICommand
         //{
