@@ -149,10 +149,6 @@
       <Project>{97403f31-4257-472a-9dda-e3af53ce0d27}</Project>
       <Name>YMplugins.Settings</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Views\WPF\YMplugins.Views.csproj">
-      <Project>{519f7adc-1b5d-4ca0-904a-711df117534c}</Project>
-      <Name>YMplugins.Views</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\en.png" />
