@@ -11,6 +11,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoCAD.NET.Interfaces" Version="24.4.20296.1" />
+    <PackageReference Include="SimpleInjector" Version="5.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Models\YMplugins.Models.Autocad2022\YMplugins.Models.Autocad2022.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Icons\translation.png" />
   </ItemGroup>
 
