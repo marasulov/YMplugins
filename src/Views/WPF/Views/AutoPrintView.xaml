@@ -1,0 +1,32 @@
+﻿<Window x:Class="YMplugins.Views.Views.AutoPrintView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:YMplugins.Views.Views"
+        mc:Ignorable="d"
+        Title="AutoPrintView" Height="450" Width="800">
+    <Grid>
+        <GroupBox Grid.Row="0" Grid.Column="0">
+            <GroupBox.Header>
+                <Label Content="{Binding ElementName=NewHolesGrid, Path=Items.Count}" ContentStringFormat="New ActualHoles {0}"/>
+            </GroupBox.Header>
+            <StackPanel>
+                <RadioButton Content="By Block" GroupName="Views" IsChecked="{Binding IsView1Selected}" Margin="10"/>
+                <RadioButton Content="By Polyline" GroupName="Views" IsChecked="{Binding IsView2Selected}" Margin="10"/>
+            </StackPanel>
+        </GroupBox>
+        <StackPanel Orientation="Vertical" Visibility="Collapsed">
+            <Button Content="Button" Height="36" Width="133"/>
+            <ComboBox Height="47" Width="140"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Vertical" Visibility="Visible">
+            <ComboBox Height="47" Width="140"/>
+            <Button Content="Button" Height="36" Width="133"/>
+            
+        </StackPanel>
+        
+
+    </Grid>
+</Window>
