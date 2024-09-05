@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Icons\translation.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Icons\translation.png" />
+  </ItemGroup>
+
+</Project>
