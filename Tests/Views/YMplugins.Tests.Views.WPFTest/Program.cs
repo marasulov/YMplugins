@@ -1,32 +1,42 @@
-﻿using YMplugins.ViewModels.Commands;
+﻿using SimpleInjector;
+using YMplugins.ViewModels.Commands;
 using YMplugins.ViewModels.VM;
 using YMplugins.Views.Views;
-using SimpleInjector;
+
 using System;
 using Mocks;
 using YMplugins.Contracts;
 
-namespace WS.Views.WPF
+namespace YMplugins.Tests.Views.WPFTest
 {
-    internal class Program
+    class Program
     {
         [STAThread()]
-        public static void Main(string[] args)
+        static void Main(string[] args)
         {
+
             var container = new Container();
             container.Register<GetAttributesCommand>();
             container.Register<GetBlocksNameCommand>();
             container.Register<GetLayersCommand>();
             container.Register<PrintCommand>();
+            container.Register<SelectBlockCommand>();
             container.Register<AutoPrintVm>();
             container.Register<AutoPrintView>();
-            
+
             container.Register<IGetBlocksNameService, GetBlocksNameService>();
+            container.Register<IGetLayersService, GetLayerService>();
+            container.Register<ISelectBlockService, SelectBlockService>();
 
             var window = container
                 .GetInstance<AutoPrintView>();
 
+            var context = (AutoPrintVm)window.DataContext;
+            context.GetBlocksNameCommand.Execute(null);
+            context.GetLayersCommand.Execute(null);
+
             window.ShowDialog();
+
         }
     }
 }

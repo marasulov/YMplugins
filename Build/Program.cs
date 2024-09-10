@@ -30,8 +30,8 @@ namespace Build
                     new InstallDir(pluginDir,
                         new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\PackageContents.xml"),
                         new Dir(@"Contents",
-                            new DirFiles(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Models\Acad2022\bin\Debug\*.dll"),
-                        new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Addins\Acad2022\bin\Debug\YMplugins.Addin.Acad2022.dll")))
+                            new DirFiles(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\*.dll"),
+                        new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Addins\YMplugins.Addin.Autocad2022\bin\Debug\net48\YMplugins.Addin.Autocad2022.dll")))
                 },
 
             };

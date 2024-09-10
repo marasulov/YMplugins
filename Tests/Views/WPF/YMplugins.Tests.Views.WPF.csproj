@@ -52,9 +52,17 @@
     <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\ViewModels\YMplugins.ViewModels.csproj">
+      <Project>{D05E1127-F9C8-45A4-A4AF-86931BF27EEF}</Project>
+      <Name>YMplugins.ViewModels</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Views\WPF\YMplugins.Views.csproj">
       <Project>{519F7ADC-1B5D-4CA0-904A-711DF117534C}</Project>
       <Name>YMplugins.Views</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\YMplugins.Contracts\YMplugins.Contracts.csproj">
+      <Project>{1bb33c1a-b0f2-4086-9b57-3261edef9a32}</Project>
+      <Name>YMplugins.Contracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Mocks\Mocks.csproj">
       <Project>{4b4e1c20-e063-49e9-9020-fb41a91b20bc}</Project>

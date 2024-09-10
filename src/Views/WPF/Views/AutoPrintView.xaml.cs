@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-
+﻿using System.Windows;
+using YMplugins.ViewModels.VM;
 namespace YMplugins.Views.Views
 {
     /// <summary>
@@ -19,9 +7,21 @@ namespace YMplugins.Views.Views
     /// </summary>
     public partial class AutoPrintView : Window
     {
-        public AutoPrintView()
+        public AutoPrintView(AutoPrintVm autoPrintVm)
         {
             InitializeComponent();
+            DataContext = autoPrintVm;
+
+            autoPrintVm.CloseAction ??= Hide;
+
+            autoPrintVm.OpenAction = new Action(() =>
+            {
+                this.ShowDialog();
+                this.Activate();
+                Console.WriteLine("Окно открыто.");
+            });
         }
+
+       
     }
 }

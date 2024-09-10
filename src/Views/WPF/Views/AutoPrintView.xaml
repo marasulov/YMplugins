@@ -4,29 +4,109 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:YMplugins.Views.Views"
+        xmlns:materialDesign ="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:vms="clr-namespace:YMplugins.ViewModels.VM;assembly=YMplugins.ViewModels"
+        d:DataContext="{d:DesignInstance {x:Type  vms:AutoPrintVm}, IsDesignTimeCreatable=False}"
         mc:Ignorable="d"
         Title="AutoPrintView" Height="450" Width="800">
-    <Grid>
-        <GroupBox Grid.Row="0" Grid.Column="0">
-            <GroupBox.Header>
-                <Label Content="{Binding ElementName=NewHolesGrid, Path=Items.Count}" ContentStringFormat="New ActualHoles {0}"/>
-            </GroupBox.Header>
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/WindowResourceDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/><!-- Header -->
+            <RowDefinition Height="*"/><!-- Options -->
+            <RowDefinition Height="Auto"/><!-- Naming -->
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Левая часть: Радиокнопки для выбора -->
+        <GroupBox Header="Print by" Grid.Row="0" Grid.Column="0" Margin="1">
             <StackPanel>
-                <RadioButton Content="By Block" GroupName="Views" IsChecked="{Binding IsView1Selected}" Margin="10"/>
-                <RadioButton Content="By Polyline" GroupName="Views" IsChecked="{Binding IsView2Selected}" Margin="10"/>
+                <RadioButton Name="ByBlockRadioButton" Content="By Block" GroupName="PrintBy" IsChecked="True" Margin="0,0,0,5"/>
+                <RadioButton Name="ByPolylineRadioButton" Content="By Polyline" GroupName="PrintBy" Margin="0,0,0,5"/>
             </StackPanel>
         </GroupBox>
-        <StackPanel Orientation="Vertical" Visibility="Collapsed">
-            <Button Content="Button" Height="36" Width="133"/>
-            <ComboBox Height="47" Width="140"/>
-        </StackPanel>
 
-        <StackPanel Orientation="Vertical" Visibility="Visible">
-            <ComboBox Height="47" Width="140"/>
-            <Button Content="Button" Height="36" Width="133"/>
-            
-        </StackPanel>
-        
+        <!-- Правая часть: Комбобоксы и кнопки -->
+        <GroupBox Header="Options" Grid.Row="0" Grid.Column="1" Margin="1">
+            <StackPanel>
+                <!-- Комбобокс для Block -->
+                <StackPanel Margin="0,0,0,10">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=ByBlockRadioButton, Path=IsChecked}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=ByBlockRadioButton, Path=IsChecked}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
 
+                    <TextBlock Text="Select block name" />
+                    <ComboBox Width="200" Margin="0,0,0,10"  ItemsSource="{Binding BlocksName}" SelectedIndex="0"/>
+                    <Button Content="Select on screen" Command="{Binding SelectBlockCommand }"  CommandParameter="{Binding }" />
+                    <TextBlock Text="{Binding SelectedBlockId}"></TextBlock>
+                </StackPanel>
+
+                <!-- Комбобокс для Polyline -->
+                <StackPanel Margin="0,0,0,10">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=ByPolylineRadioButton, Path=IsChecked}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=ByPolylineRadioButton, Path=IsChecked}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+
+                    <TextBlock Text="Select layer" />
+                    <ComboBox Width="200" Margin="0,0,0,10" ItemsSource="{Binding  Layers}" SelectedIndex="0"/>
+                    <Button Content="Select on screen" Command="{Binding SelectBlockCommand}" />
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Группа Naming снизу -->
+        <GroupBox Header="Naming" Grid.Row="1" Margin="1">
+            <StackPanel>
+                <TextBlock Text="Attribute value:" />
+                <ComboBox  Margin="0,0,0,10"/>
+
+                <TextBlock Text="Numeration:" />
+                <TextBox />
+
+                <TextBlock Text="Prefix:" />
+                <TextBox />
+
+                <TextBlock Text="Suffix:" />
+                <TextBox />
+            </StackPanel>
+        </GroupBox>
+
+        <!-- Кнопки внизу -->
+        <DockPanel LastChildFill="True" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1">
+            <Button Content="OK"  DockPanel.Dock="Right" Margin="5" Command="{Binding PrintCommand}" CommandParameter="{Binding }"/>
+            <Button Content="Cancel" DockPanel.Dock="Right" Margin="5"/>
+        </DockPanel>
     </Grid>
+
+
 </Window>

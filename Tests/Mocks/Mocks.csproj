@@ -6,4 +6,9 @@
     <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ViewModels\YMplugins.ViewModels.csproj" />
+    <ProjectReference Include="..\..\src\YMplugins.Contracts\YMplugins.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>
