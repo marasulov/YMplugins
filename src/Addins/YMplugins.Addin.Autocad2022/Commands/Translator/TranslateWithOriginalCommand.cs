@@ -6,7 +6,7 @@ using YMplugins.Services.SettingsReader;
 using YMplugins.Services.Translator;
 using YMplugins.Services.Translator.Google;
 
-namespace YMplugins.Models.Acad2022.Commands.Translator
+namespace YMplugins.Addin.Autocad2022.Commands.Translator
 {
     public class TranslateWithOriginalCommand
     {

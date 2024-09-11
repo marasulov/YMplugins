@@ -3,14 +3,14 @@ using Autodesk.AutoCAD.Runtime;
 using Dreambuild.AutoCAD;
 using Gile.AutoCAD.Extension;
 
-namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
+namespace YMplugins.Models.Autocad2022.AutoPrint
 {
     public class AutoPrintCommand
     {
         /// <summary>
         /// Selects entities on given layer.
         /// </summary>
-        [CommandMethod("SelectByLayer2")]
+        [CommandMethod("SelectByLayer1")]
         public static void SelectByLayer()
         {
             Active.Editor.WriteMessage(GetAllLayerNames(Active.Database).Length.ToString());

@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoCAD-2022.Native.Base" Version="1.0.0" />
     <PackageReference Include="SimpleInjector" Version="5.5.0">
     </PackageReference>
   </ItemGroup>
@@ -24,8 +23,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="accoremgd">
+      <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2022\accoremgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="AutoCADCommands">
       <HintPath>D:\sharp\Projects for learning\AcadLibs\AutoCADCodePack\bin\r23\AutoCADCommands.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Gile.AutoCAD.Extension">
+      <HintPath>D:\from comp\docs\repos\TransmittalCreator\TransmittalCreator\bin\Debug\Gile.AutoCAD.Extension.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
 
