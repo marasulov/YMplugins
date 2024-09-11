@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using YMplugins.Contracts;
 using YMplugins.ViewModels.Commands;
 
 namespace YMplugins.ViewModels.VM
@@ -9,10 +11,11 @@ namespace YMplugins.ViewModels.VM
     {
         private List<string> _blocksName;
         private List<string> _layers;
-        private List<string> _attributes;
+        private IEnumerable<string> _attributes;
 
         private bool _canExecute = true;
-        private int _selectedBlockId;
+        private string _selectedBlockId;
+        private IAttributesService _attributesService;
 
 
         public AutoPrintVm(
@@ -20,8 +23,10 @@ namespace YMplugins.ViewModels.VM
             GetLayersCommand getLayersCommand, 
             GetAttributesCommand getAttributesCommand, 
             PrintCommand printCommand,
-            SelectBlockCommand selectBlockCommand)
+            SelectBlockCommand selectBlockCommand,
+            IAttributesService attributesService)
         {
+            _attributesService = attributesService;
             GetBlocksNameCommand = getBlocksNameCommand;
             getBlocksNameCommand.ResultObtained += BlocksCommand_ResultObtained;
             GetLayersCommand = getLayersCommand;
@@ -53,15 +58,19 @@ namespace YMplugins.ViewModels.VM
             set => Set(ref _layers, value);
         }
 
-        public List<string> Attributes
+        public IEnumerable<string> Attributes
         {
             get => _attributes;
             set => Set(ref _attributes, value);
         }
-        public int SelectedBlockId
+        public string SelectedBlockId
         {
             get => _selectedBlockId;
-            set => Set(ref _selectedBlockId, value);
+            set
+            {
+                Set(ref _selectedBlockId, value);
+                UpdateAttributes();
+            }
         }
 
         public Action CloseAction { get; set; }
@@ -77,5 +86,17 @@ namespace YMplugins.ViewModels.VM
         public GetAttributesCommand GetAttributesCommand { get; }
 
         public PrintCommand PrintCommand { get; }
+        public string SelectedAttribute { get; set; }
+
+        private void UpdateAttributes()
+        {
+            if (string.IsNullOrEmpty(_selectedBlockId))
+            {
+                Attributes = Enumerable.Empty<string>();
+                return;
+            }
+
+            Attributes = _attributesService.GetAttributesForBlock(_selectedBlockId);
+        }
     }
 }

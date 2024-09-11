@@ -52,7 +52,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YMplugins.Addin.Autocad2022
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YMplugins.Models.Autocad2022", "src\Models\YMplugins.Models.Autocad2022\YMplugins.Models.Autocad2022.csproj", "{5875C3A6-DB26-4152-A77D-F2CD1B94BD97}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YMplugins.Tests.Views.WPFTest", "Tests\Views\YMplugins.Tests.Views.WPFTest\YMplugins.Tests.Views.WPFTest.csproj", "{37DDFB86-81CD-4894-BE1A-D064214BD8EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YMplugins.Tests.Views.WPFTest", "Tests\Views\YMplugins.Tests.Views.WPFTest\YMplugins.Tests.Views.WPFTest.csproj", "{37DDFB86-81CD-4894-BE1A-D064214BD8EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YMplugins.Models.DbCad", "src\Models\YMplugins.Models.DbCad\YMplugins.Models.DbCad.csproj", "{44F92650-BD2B-4B30-AA96-43224BD5E6A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -160,6 +162,14 @@ Global
 		{37DDFB86-81CD-4894-BE1A-D064214BD8EE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{37DDFB86-81CD-4894-BE1A-D064214BD8EE}.Release|x64.ActiveCfg = Release|Any CPU
 		{37DDFB86-81CD-4894-BE1A-D064214BD8EE}.Release|x64.Build.0 = Release|Any CPU
+		{44F92650-BD2B-4B30-AA96-43224BD5E6A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44F92650-BD2B-4B30-AA96-43224BD5E6A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44F92650-BD2B-4B30-AA96-43224BD5E6A9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{44F92650-BD2B-4B30-AA96-43224BD5E6A9}.Debug|x64.Build.0 = Debug|Any CPU
+		{44F92650-BD2B-4B30-AA96-43224BD5E6A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44F92650-BD2B-4B30-AA96-43224BD5E6A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44F92650-BD2B-4B30-AA96-43224BD5E6A9}.Release|x64.ActiveCfg = Release|Any CPU
+		{44F92650-BD2B-4B30-AA96-43224BD5E6A9}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -186,6 +196,7 @@ Global
 		{46E5FAD7-7ECE-44FA-A28C-FBC7428957D3} = {BDCF0BA7-75DA-4EAC-8028-9DD6DBAC8C3B}
 		{5875C3A6-DB26-4152-A77D-F2CD1B94BD97} = {AC17245C-D8A3-4404-8977-484D61FF42B7}
 		{37DDFB86-81CD-4894-BE1A-D064214BD8EE} = {609DC0F8-F9DD-4052-9D95-7FACE900429A}
+		{44F92650-BD2B-4B30-AA96-43224BD5E6A9} = {AC17245C-D8A3-4404-8977-484D61FF42B7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {05C28730-9A06-4CB1-97D8-259F5F2C45F5}

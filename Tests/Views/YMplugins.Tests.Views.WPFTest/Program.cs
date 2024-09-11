@@ -27,6 +27,7 @@ namespace YMplugins.Tests.Views.WPFTest
             container.Register<IGetBlocksNameService, GetBlocksNameService>();
             container.Register<IGetLayersService, GetLayerService>();
             container.Register<ISelectBlockService, SelectBlockService>();
+            container.Register<IAttributesService, AttributesService>();
 
             var window = container
                 .GetInstance<AutoPrintView>();

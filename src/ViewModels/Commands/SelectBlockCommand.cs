@@ -40,7 +40,7 @@ namespace YMplugins.ViewModels.Commands
                     Console.WriteLine($"Выбранный блок: {selectedBlockId}");
 
                     // Обновляем свойство в ViewModel
-                    autoPrintVm.SelectedBlockId = selectedBlockId;
+                    autoPrintVm.SelectedBlockId = selectedBlockId.ToString();
                     Console.WriteLine("Свойство SelectedBlockId обновлено.");
 
                     // Открываем окно заново

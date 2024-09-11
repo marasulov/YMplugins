@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Models\YMplugins.Models.Autocad2022\YMplugins.Models.Autocad2022.csproj" />
+    <ProjectReference Include="..\..\ViewModels\YMplugins.ViewModels.csproj" />
+    <ProjectReference Include="..\..\Views\WPF\YMplugins.Views.csproj" />
   </ItemGroup>
 
   <ItemGroup>
