@@ -9,7 +9,8 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
     {
         public List<string> GetBlocksName()
         {
-            return DbHelper.GetAllBlockNames().ToList();
+            //return DbHelper.GetAllBlockNames().ToList();
+            return default;
         }
     }
 }

@@ -1,4 +1,8 @@
-﻿using Autodesk.AutoCAD.Runtime;
+﻿using System.Linq;
+using System.Windows;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Runtime;
+using Dreambuild.AutoCAD;
 using SimpleInjector;
 using YMplugins.Contracts;
 using YMplugins.Models.Autocad2022.AutoPrint;
@@ -10,31 +14,29 @@ namespace YMplugins.Addin.Acad2022.Commands.AutoPrint
 {
     public class AutoPrintCommand
     {
-        [CommandMethod("AutoPrint")]
-        public static void Print()
+        /// <summary>
+        /// Selects entities on given layer.
+        /// </summary>
+        [CommandMethod("SelectByLayer")]
+        public static void SelectByLayer()
         {
-            var container = new Container();
-            container.Register<GetAttributesCommand>();
-            container.Register<GetBlocksNameCommand>();
-            container.Register<GetLayersCommand>();
-            container.Register<PrintCommand>();
-            container.Register<SelectBlockCommand>();
-            container.Register<AutoPrintVm>();
-            container.Register<AutoPrintView>();
+            var availableLayerNames = GetAllLayerNames();
+            var selectedLayerNames = Gui.GetChoices("Specify layers", availableLayerNames);
+            if (selectedLayerNames.Length < 1)
+            {
+                return;
+            }
 
-            container.Register<IGetBlocksNameService, GetBlocksNameService>();
-            container.Register<IGetLayersService, GetLayersService>();
-            container.Register<ISelectBlockService, SelectBlockService>();
-            container.Register<IAttributesService, AttributesService>();
+            var ids = QuickSelection
+                .SelectAll(FilterList.Create().Layer(selectedLayerNames))
+                .ToArray();
 
-            var window = container
-                .GetInstance<AutoPrintView>();
+            Interaction.SetPickSet(ids);
+        }
 
-            var context = (AutoPrintVm)window.DataContext;
-            context.GetBlocksNameCommand.Execute(null);
-            context.GetLayersCommand.Execute(null);
-
-            window.ShowDialog();
+        public static string[] GetAllLayerNames(Database db = null)
+        {
+            return DbHelper.GetSymbolTableRecordNames((db ?? HostApplicationServices.WorkingDatabase).LayerTableId);
         }
     }
 }

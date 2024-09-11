@@ -5,7 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoCAD.NET.Interfaces" Version="24.4.20296.1" />
+    <PackageReference Include="AutoCAD.NET.Interfaces" Version="24.4.20296.1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>

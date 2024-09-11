@@ -4,6 +4,7 @@
     <TargetFramework>net48</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+   
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,14 +12,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoCAD.NET.Interfaces" Version="24.4.20296.1" />
-    <PackageReference Include="SimpleInjector" Version="5.5.0" />
+    <PackageReference Include="AutoCAD-2022.Native.Base" Version="1.0.0" />
+    <PackageReference Include="SimpleInjector" Version="5.5.0">
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Models\YMplugins.Models.Autocad2022\YMplugins.Models.Autocad2022.csproj" />
     <ProjectReference Include="..\..\ViewModels\YMplugins.ViewModels.csproj" />
     <ProjectReference Include="..\..\Views\WPF\YMplugins.Views.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="AutoCADCommands">
+      <HintPath>D:\sharp\Projects for learning\AcadLibs\AutoCADCodePack\bin\r23\AutoCADCommands.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
