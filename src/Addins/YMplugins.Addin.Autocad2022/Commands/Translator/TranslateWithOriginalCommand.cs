@@ -1,6 +1,8 @@
-﻿using Autodesk.AutoCAD.Runtime;
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Runtime;
+using Dreambuild.AutoCAD;
+using Gile.AutoCAD.Extension;
 using SimpleInjector;
-using YMplugins.Addin.Acad2022.Commands.Translator;
 using YMplugins.Models.Acad2022.Services;
 using YMplugins.Services.SettingsReader;
 using YMplugins.Services.Translator;
@@ -37,6 +39,20 @@ namespace YMplugins.Addin.Autocad2022.Commands.Translator
 
             textProcessor.ProcessTexts(settings);
 
+        }
+
+        /// <summary>
+        /// Selects entities on given layer.
+        /// </summary>
+        [CommandMethod("SelectByLayer2")]
+        public static void SelectByLayer()
+        {
+            Active.Editor.WriteMessage(GetAllLayerNames(Active.Database).Length.ToString());
+        }
+
+        public static string[] GetAllLayerNames(Database db = null)
+        {
+            return DbHelper.GetSymbolTableRecordNames((db ?? HostApplicationServices.WorkingDatabase).LayerTableId);
         }
     }
 }

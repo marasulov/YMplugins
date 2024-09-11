@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace YMplugins.Addin.Acad2022.Commands.Translator
+﻿namespace YMplugins.Addin.Autocad2022.Commands.Translator
 {
     public class TranslationState
     {
