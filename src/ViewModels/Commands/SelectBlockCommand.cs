@@ -28,29 +28,27 @@ namespace YMplugins.ViewModels.Commands
             //await Task.Delay(200);
             //holesVm.OpenAction?.Invoke();
 
-            if (parameter is AutoPrintVm autoPrintVm)
+            if (parameter is not AutoPrintVm autoPrintVm) return;
+            try
             {
-                try
-                {
-                    Console.WriteLine("Закрываем текущее окно...");
-                    autoPrintVm.CloseAction?.Invoke();
+                Console.WriteLine("Закрываем текущее окно...");
+                autoPrintVm.CloseAction?.Invoke();
 
-                    // Выполняем выбор блока синхронно (без Task.Run)
-                    var selectedBlockId = _selectBlockService.SelectBlock();
-                    Console.WriteLine($"Выбранный блок: {selectedBlockId}");
+                // Выполняем выбор блока синхронно (без Task.Run)
+                var selectedBlockId = _selectBlockService.SelectBlock();
+                Console.WriteLine($"Выбранный блок: {selectedBlockId}");
 
-                    // Обновляем свойство в ViewModel
-                    autoPrintVm.SelectedBlockId = selectedBlockId.ToString();
-                    Console.WriteLine("Свойство SelectedBlockId обновлено.");
+                // Обновляем свойство в ViewModel
+                autoPrintVm.SelectedBlock = selectedBlockId;
+                Console.WriteLine("Свойство SelectedBlock обновлено.");
 
-                    // Открываем окно заново
-                    Console.WriteLine("Открываем окно заново...");
-                    autoPrintVm.OpenAction?.Invoke();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Ошибка при выполнении команды: {ex.Message}");
-                }
+                // Открываем окно заново
+                Console.WriteLine("Открываем окно заново...");
+                autoPrintVm.OpenAction?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при выполнении команды: {ex.Message}");
             }
         }
     }

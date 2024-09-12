@@ -15,12 +15,9 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
             List<string> blockNames = new List<string>();
             using (Transaction trans = Active.Database.TransactionManager.StartTransaction())
             {
-
                 //get the blockTable and iterate through all blockDef
 
-                BlockTable bt = (BlockTable)trans.GetObject(Active.Database.BlockTableId,
-
-                    OpenMode.ForRead);
+                BlockTable bt = (BlockTable)trans.GetObject(Active.Database.BlockTableId, OpenMode.ForRead);
 
                 foreach (ObjectId btrId in bt)
                 {
@@ -30,7 +27,6 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
                     if (btr.IsAnonymous) continue;
                     if (blockNames.Contains(btr.Name)) continue;
                     blockNames.Add(btr.Name);
-
                 }
 
                 foreach (var blockName in blockNames)
@@ -43,19 +39,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
             return blockNames;
         }
 
-        private static List<BlockAttribute> GetBlockAttributes(
-            AttributeCollection attributeCollection, Transaction tr)
-        {
-            var attributesDict = new List<BlockAttribute>();
-
-            foreach (ObjectId attId in attributeCollection)
-            {
-                var attRef = (AttributeReference)tr.GetObject(attId, OpenMode.ForRead);
-                attributesDict.Add(new BlockAttribute(attRef.Tag, attRef.TextString));
-            }
-
-            return attributesDict;
-        }
+        
 
         public static ObjectId[] SelectBlocksWithFilter(bool onlySelectedPages = false)
         {

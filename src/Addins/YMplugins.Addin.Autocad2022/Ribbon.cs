@@ -1,4 +1,5 @@
 ﻿
+using System.IO;
 using YMplugins.Addin.Autocad2022.Commands.Translator;
 using YMplugins.Services.Translator;
 
@@ -7,8 +8,10 @@ namespace YMplugins.Addin.Autocad2022
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.Runtime;
     using Autodesk.Windows;
+    using Gile.AutoCAD.Extension;
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Windows.Controls;
     using System.Windows.Input;
     using System.Windows.Media.Imaging;
@@ -27,6 +30,34 @@ namespace YMplugins.Addin.Autocad2022
             public void Initialize()
             {
                 ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
+                var executablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                var pd = new ProxyDomain();
+                var assembly = pd.GetAssembly(Path.Combine(executablePath, "MaterialDesignThemes.Wpf.dll"));
+
+                var assembly1 = pd.GetAssembly(Path.Combine(executablePath, "MaterialDesignColors.dll"));
+
+                if ((assembly != null) | (assembly1 != null)) Active.Editor.WriteMessage("style dlls not load");
+
+
+                //var standartCopier = new StandartCopier();
+                //var isConfFileCopied = standartCopier.CopyParamsFiles();
+
+                //if (!isConfFileCopied) Active.Editor.WriteMessage("файлы не скопированы");
+            }
+
+            internal class ProxyDomain : MarshalByRefObject
+            {
+                public Assembly GetAssembly(string assemblyPath)
+                {
+                    try
+                    {
+                        return Assembly.LoadFrom(assemblyPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidOperationException(ex.Message);
+                    }
+                }
             }
 
             public void Terminate()

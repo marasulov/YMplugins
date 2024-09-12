@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using YMplugins.Contracts;
+using YMplugins.Contracts.Dto;
 using YMplugins.ViewModels.Commands;
 
 namespace YMplugins.ViewModels.VM
@@ -11,10 +12,10 @@ namespace YMplugins.ViewModels.VM
     {
         private List<string> _blocksName;
         private List<string> _layers;
-        private IEnumerable<string> _attributes;
+        private IEnumerable<BlockAttribute> _attributes;
 
         private bool _canExecute = true;
-        private string _selectedBlockId;
+        private Tuple<long, string> _selectedBlock;
         private IAttributesService _attributesService;
 
 
@@ -49,7 +50,10 @@ namespace YMplugins.ViewModels.VM
         public List<string> BlocksName
         {
             get => _blocksName;
-            set => Set(ref _blocksName, value);
+            set
+            {
+                Set(ref _blocksName, value);
+            }
         }
 
         public List<string> Layers
@@ -58,17 +62,17 @@ namespace YMplugins.ViewModels.VM
             set => Set(ref _layers, value);
         }
 
-        public IEnumerable<string> Attributes
+        public IEnumerable<BlockAttribute> Attributes
         {
             get => _attributes;
             set => Set(ref _attributes, value);
         }
-        public string SelectedBlockId
+        public Tuple<long, string> SelectedBlock
         {
-            get => _selectedBlockId;
+            get => _selectedBlock;
             set
             {
-                Set(ref _selectedBlockId, value);
+                Set(ref _selectedBlock, value);
                 UpdateAttributes();
             }
         }
@@ -90,13 +94,13 @@ namespace YMplugins.ViewModels.VM
 
         private void UpdateAttributes()
         {
-            if (string.IsNullOrEmpty(_selectedBlockId))
+            if (string.IsNullOrEmpty(_selectedBlock.Item2))
             {
-                Attributes = Enumerable.Empty<string>();
+                Attributes = Enumerable.Empty<BlockAttribute>();
                 return;
             }
 
-            Attributes = _attributesService.GetAttributesForBlock(_selectedBlockId);
+            Attributes = _attributesService.GetAttributesForBlock(_selectedBlock.Item1);
         }
     }
 }

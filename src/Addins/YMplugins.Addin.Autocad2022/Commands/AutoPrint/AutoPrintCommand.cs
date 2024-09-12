@@ -17,14 +17,6 @@ namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
 {
     public class AutoPrintCommand
     {
-        [CommandMethod("selb")]
-
-        public void selectDynamicBlockReferences()
-        {
-          
-
-        }
-
         [CommandMethod("Autoprint")]
         public static void Print()
         {
@@ -54,74 +46,9 @@ namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
             window.ShowDialog();
         }
 
-        [CommandMethod("ListarBloques")]
-        public void ListarBloques()
-        {
-            Document doc = Application.DocumentManager.MdiActiveDocument;
-            Database db = doc.Database;
-            Editor ed = doc.Editor;
+        
+        
 
-            using (Transaction tr = db.TransactionManager.StartTransaction())
-            {
-                // open the block table which contains all the BlockTableRecords (block definitions and spaces)
-                var blockTable = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
-
-                // open the model space BlockTableRecord
-                var modelSpace = (BlockTableRecord)tr.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead);
-
-                // iterate through the model space 
-                foreach (ObjectId id in modelSpace)
-                {
-                    // check if the current ObjectId is a block reference one
-                    if (id.ObjectClass.DxfName == "INSERT")
-                    {
-                        // open the block reference
-                        var blockReference = (BlockReference)tr.GetObject(id, OpenMode.ForRead);
-
-                        // print the block name to the command line
-                        ed.WriteMessage("\n" + blockReference.Name);
-                    }
-                }
-
-                tr.Commit();
-            }
-        }
-
-        [CommandMethod("TestMe")]
-        public void ListarBloques1()
-        {
-            Document miDibujo = Application.DocumentManager.MdiActiveDocument;
-            Database misElementos = miDibujo.Database;
-
-            var blocks = GetPaperSpaceBlockReferences(misElementos);
-
-            using (Transaction miTransaccion = misElementos.TransactionManager.StartTransaction())
-            {
-
-
-
-                BlockTable blckTbl;
-                blckTbl = miTransaccion.GetObject(misElementos.BlockTableId, OpenMode.ForRead) as BlockTable;
-
-                BlockTableRecord blckTblRcrd;
-                blckTblRcrd = miTransaccion.GetObject(blckTbl[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-
-                foreach (ObjectId id in blckTblRcrd)
-                {
-
-                    var dbObj = miTransaccion.GetObject(id, OpenMode.ForRead);
-                    if (dbObj is BlockReference)
-                    {
-                        var blckRef = (BlockReference)dbObj;
-                        miDibujo.Editor.WriteMessage("" + blckRef.BlockName);
-                    }
-                }
-
-                miTransaccion.Commit();
-            }
-
-
-        }
 
         private IEnumerable<BlockReference> GetPaperSpaceBlockReferences(Database db)
         {

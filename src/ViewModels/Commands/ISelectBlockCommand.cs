@@ -1,6 +1,8 @@
-﻿namespace YMplugins.ViewModels.Commands;
+﻿using System;
+
+namespace YMplugins.ViewModels.Commands;
 
 public interface ISelectBlockService
 {
-    int SelectBlock();
+    Tuple<long, string> SelectBlock();
 }
