@@ -25,7 +25,7 @@
   <ItemGroup>
     <Reference Include="accoremgd">
       <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2022\accoremgd.dll</HintPath>
-      <Private>False</Private>
+      
     </Reference>
     <Reference Include="AutoCADCommands">
       <HintPath>D:\sharp\Projects for learning\AcadLibs\AutoCADCodePack\bin\r23\AutoCADCommands.dll</HintPath>

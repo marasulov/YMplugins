@@ -107,7 +107,7 @@
 
                 <TextBlock Text="Numeration:" />
                 <TextBox  Name="numberingTextbox"
-                          controls:NumberOnly.IsEnabled="True"
+                          
                           Text="{Binding Path= RenumberStartValue ,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                           Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                           materialDesign:TextFieldAssist.HasClearButton="True"

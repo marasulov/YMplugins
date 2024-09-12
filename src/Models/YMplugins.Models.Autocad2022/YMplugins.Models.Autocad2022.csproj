@@ -23,6 +23,7 @@
     </Reference>
     <Reference Include="Gile.AutoCAD.Extension">
       <HintPath>D:\from comp\docs\repos\TransmittalCreator\TransmittalCreator\bin\Debug\Gile.AutoCAD.Extension.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
 
