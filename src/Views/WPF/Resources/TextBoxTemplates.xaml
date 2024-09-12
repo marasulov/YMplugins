@@ -13,7 +13,7 @@
             <TextBlock Text="{TemplateBinding Tag}" />
             <TextBox 
                 Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Text}"
-                Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                
                 materialDesign:TextFieldAssist.HasClearButton="True"
                 Margin="8 0 8 0">
                 <materialDesign:HintAssist.Hint>
