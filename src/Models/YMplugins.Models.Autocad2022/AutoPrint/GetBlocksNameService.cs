@@ -1,10 +1,8 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Gile.AutoCAD.Extension;
-using System;
 using System.Collections.Generic;
 using YMplugins.Contracts;
-using YMplugins.Contracts.Dto;
 
 namespace YMplugins.Models.Autocad2022.AutoPrint
 {
@@ -33,13 +31,10 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
                 {
                     Active.Editor.WriteMessage($"{blockName} \n");
                 }
-
             }
 
             return blockNames;
         }
-
-        
 
         public static ObjectId[] SelectBlocksWithFilter(bool onlySelectedPages = false)
         {

@@ -334,7 +334,7 @@ namespace YMplugins.Addin.Autocad2022
             //{
             //    RibbonToolTip tt = new RibbonToolTip();
             //    RibbonCombo ribbonCombo = new RibbonCombo();
-            //    ribbonCombo.Id = comboName;
+            //    ribbonCombo.ObjectId = comboName;
             //    ribbonCombo.Text = tt.Title = prefix;
             //    ribbonCombo.ShowText = true;
 

@@ -1,20 +1,18 @@
-﻿using SimpleInjector;
+﻿using Mocks;
+using SimpleInjector;
+using System;
+using YMplugins.Contracts;
 using YMplugins.ViewModels.Commands;
 using YMplugins.ViewModels.VM;
 using YMplugins.Views.Views;
 
-using System;
-using Mocks;
-using YMplugins.Contracts;
-
 namespace YMplugins.Tests.Views.WPFTest
 {
-    class Program
+    internal class Program
     {
         [STAThread()]
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-
             var container = new Container();
             container.Register<GetAttributesCommand>();
             container.Register<GetBlocksNameCommand>();
@@ -28,6 +26,10 @@ namespace YMplugins.Tests.Views.WPFTest
             container.Register<IGetLayersService, GetLayerService>();
             container.Register<ISelectBlockService, SelectBlockService>();
             container.Register<IAttributesService, AttributesService>();
+            container.Register<IPrintService, PrintService>();
+            container.Register<ISearchService, SearchService>();
+            container.Register<INamingService, NamingService>();
+            container.Register<IPrintEngine, PrintEngine>();
 
             var window = container
                 .GetInstance<AutoPrintView>();
@@ -37,7 +39,6 @@ namespace YMplugins.Tests.Views.WPFTest
             context.GetLayersCommand.Execute(null);
 
             window.ShowDialog();
-
         }
     }
 }

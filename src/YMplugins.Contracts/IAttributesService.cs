@@ -5,6 +5,6 @@ namespace YMplugins.Contracts
 {
     public interface IAttributesService
     {
-        IEnumerable<BlockAttribute> GetAttributesForBlock(long selectedBlockId);
+        IEnumerable<BlockAttribute> GetAttributesForBlock(string selectedBlockName);
     }
 }

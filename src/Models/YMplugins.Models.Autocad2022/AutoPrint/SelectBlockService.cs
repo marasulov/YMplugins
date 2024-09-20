@@ -1,23 +1,18 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using YMplugins.ViewModels.Commands;
+using YMplugins.Contracts;
 
 namespace YMplugins.Models.Autocad2022.AutoPrint
 {
     public class SelectBlockService : ISelectBlockService
     {
-        public Tuple<long, string> SelectBlock()
+        public string SelectBlock()
         {
             // Get the active document and database
             Document doc = Application.DocumentManager.MdiActiveDocument;
             Database db = doc.Database;
-            Tuple<long, string> blockName = default;
+            string blockName = default;
             using (Transaction tr = db.TransactionManager.StartTransaction())
             {
                 // Set up the prompt options to select only block references
@@ -37,7 +32,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
                     {
                         doc.Editor.WriteMessage($"\nYou selected block: {blockRef.Name}");
 
-                         blockName = new Tuple<long, string>(res.ObjectId.Handle.Value , blockRef.Name);
+                        blockName = blockRef.Name;
                     }
                 }
                 else
@@ -50,7 +45,6 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
             }
 
             return blockName;
-
         }
     }
 }

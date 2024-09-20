@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
+using YMplugins.Contracts;
 using YMplugins.ViewModels.VM;
 
 namespace YMplugins.ViewModels.Commands
@@ -39,8 +36,8 @@ namespace YMplugins.ViewModels.Commands
                 Console.WriteLine($"Выбранный блок: {selectedBlockId}");
 
                 // Обновляем свойство в ViewModel
-                autoPrintVm.SelectedBlock = selectedBlockId;
-                Console.WriteLine("Свойство SelectedBlock обновлено.");
+                autoPrintVm.SelectedBlockOnScreen = selectedBlockId;
+                Console.WriteLine("Свойство SelectedBlockOnScreen обновлено.");
 
                 // Открываем окно заново
                 Console.WriteLine("Открываем окно заново...");

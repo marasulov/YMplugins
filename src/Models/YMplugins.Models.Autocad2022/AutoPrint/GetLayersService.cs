@@ -5,7 +5,7 @@ using YMplugins.Contracts;
 
 namespace YMplugins.Models.Autocad2022.AutoPrint
 {
-    public class GetLayersService :IGetLayersService
+    public class GetLayersService : IGetLayersService
     {
         public List<string> GetLayers()
         {

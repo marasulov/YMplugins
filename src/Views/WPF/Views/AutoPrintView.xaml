@@ -5,111 +5,153 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign ="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:vms="clr-namespace:YMplugins.ViewModels.VM;assembly=YMplugins.ViewModels"
-        xmlns:controls="clr-namespace:YMplugins.Views.Controls"
         xmlns:converters="clr-namespace:YMplugins.Views.Converters"
         d:DataContext="{d:DesignInstance {x:Type  vms:AutoPrintVm}, IsDesignTimeCreatable=False}"
         mc:Ignorable="d"
-        Title="AutoPrintView" Height="500" Width="800" Style="{DynamicResource WindowElementStyle}" >
+        Title="AutoPrintView" Height="530" Width="800" Style="{DynamicResource WindowElementStyle}">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../Resources/WindowResourceDictionary.xaml"/>
-                <ResourceDictionary Source="../Resources/TextBoxTemplates.xaml"/>
+                <ResourceDictionary Source="../Resources/WindowResourceDictionary.xaml" />
+                <ResourceDictionary Source="../Resources/TextBoxTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Ваш конвертер -->
-            <converters:TupleItemConverter x:Key="TupleItemConverter"/>
+            <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
         </ResourceDictionary>
     </Window.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
             <!-- Header -->
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
             <!-- Options -->
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+
+            <RowDefinition Height="*" />
             <!-- Naming -->
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
 
         <!-- Левая часть: Радиокнопки для выбора -->
         <GroupBox Header="Print by" Grid.Row="0" Grid.Column="0" Margin="1">
             <StackPanel>
-                <RadioButton Name="ByBlockRadioButton" Content="By Block" GroupName="PrintBy" IsChecked="True" Margin="0,0,0,5"/>
-                <RadioButton Name="ByPolylineRadioButton" Content="By Polyline" GroupName="PrintBy" Margin="0,0,0,5"/>
-            </StackPanel>
-        </GroupBox>
-
-        <!-- Правая часть: Комбобоксы и кнопки -->
-        <GroupBox Header="Options" Grid.Row="0" Grid.Column="1" Margin="1">
-            <StackPanel>
-                <!-- Комбобокс для Block -->
-                <StackPanel Margin="0,0,0,10">
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=ByBlockRadioButton, Path=IsChecked}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding ElementName=ByBlockRadioButton, Path=IsChecked}" Value="False">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </StackPanel.Style>
-
-                    <TextBlock Text="Select block name" />
-                    <ComboBox Width="200" Margin="0,0,0,10"  ItemsSource="{Binding BlocksName}" SelectedItem="{Binding SelectedBlock, Mode=TwoWay}" SelectedIndex="0"/>
-                    <Button Content="Select on screen" Command="{Binding SelectBlockCommand }"  CommandParameter="{Binding }" />
-                    <TextBlock Text="{Binding SelectedBlock, Converter={StaticResource TupleItemConverter}, ConverterParameter='Item1'}"/>
+                <StackPanel>
+                    <!--<RadioButton Name="ByBlockRadioButton" Content="By Block" GroupName="PrintBy" IsChecked="True" Margin="0,0,0,5" />
+                    <RadioButton Name="ByPolylineRadioButton" Content="By Polyline" GroupName="PrintBy" Margin="0,0,0,5" />-->
+                    <RadioButton Content="By Block"
+                                 Name="ByBlockRadioButton"
+                                 IsChecked="{Binding SelectedPrintByOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=ByBlock}" />
+                    <RadioButton Content="By Polyline" 
+                                 Name="ByPolylineRadioButton"
+                                 IsChecked="{Binding SelectedPrintByOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=ByPolyline}" />
                 </StackPanel>
-
-                <!-- Комбобокс для Polyline -->
-                <StackPanel Margin="0,0,0,10">
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=ByPolylineRadioButton, Path=IsChecked}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding ElementName=ByPolylineRadioButton, Path=IsChecked}" Value="False">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </StackPanel.Style>
-
-                    <TextBlock Text="Select layer" />
-                    <ComboBox Width="200" Margin="0,0,0,10" ItemsSource="{Binding  Layers}" SelectedIndex="0"/>
-                    <Button Content="Select on screen" Command="{Binding SelectBlockCommand}" />
+                <StackPanel>
+                    <CheckBox IsChecked="{Binding IsSearchOnModel}">Search on model</CheckBox>
+                    <CheckBox IsChecked="{Binding IsSearchOnLayout}">Search on layouts</CheckBox>
                 </StackPanel>
             </StackPanel>
         </GroupBox>
 
-        <!-- Группа Naming снизу -->
-        <GroupBox Header="Naming" Grid.Row="1" Margin="1">
+        <Grid Grid.Row="0" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!-- Средняя часть: Комбобоксы и кнопки -->
+            <GroupBox Margin="1">
+                <StackPanel>
+                    <!-- Комбобокс для Block -->
+                    <StackPanel Margin="0,0,0,10">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=ByBlockRadioButton, Path=IsChecked}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=ByBlockRadioButton, Path=IsChecked}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+
+                        <TextBlock Text="Select block name" />
+                        <ComboBox Width="200" Margin="0,0,0,10"
+                      ItemsSource="{Binding BlocksNames}"
+                      SelectedItem="{Binding SelectedBlockOnScreen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedIndex="0"
+                      />
+                        <Button Content="Select on screen" Command="{Binding SelectBlockCommand }"  CommandParameter="{Binding }" />
+                        <!--<TextBlock Text="{Binding SelectedBlockOnScreen}" />-->
+                    </StackPanel>
+
+                    <!-- Комбобокс для Polyline -->
+                    <StackPanel Margin="0,0,0,10">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=ByPolylineRadioButton, Path=IsChecked}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=ByPolylineRadioButton, Path=IsChecked}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+
+                        <TextBlock Text="Select layer" />
+                        <ComboBox Width="200" Margin="0,0,0,10" 
+                      ItemsSource="{Binding  Layers}" 
+                      SelectedIndex="0" />
+                        <Button Content="Select on screen" Command="{Binding SelectBlockCommand}" />
+                        <!--<TextBlock Text="{Binding SelectedBlockOnScreen}" />-->
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <!-- Группа Printing order -->
+            <GroupBox Header="Printing order" Grid.Row="1" Grid.Column="1" Margin="1">
+                <StackPanel>
+                    <TextBlock Text="Printing numbering order" Margin="2 3 5 0" />
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <RadioButton Content="X" 
+                                     IsChecked="{Binding SelectedPrintingOrder, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=ByX}" />
+                        <RadioButton Content="Y" 
+                                     IsChecked="{Binding SelectedPrintingOrder, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=ByY}" />
+                        <RadioButton Content="Select order" 
+                                     IsChecked="{Binding SelectedPrintingOrder, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+
+        <!-- Группа Naming справа -->
+        <GroupBox Header="Naming" Grid.Row="0" Grid.Column="2" Margin="1">
             <StackPanel>
                 <StackPanel>
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding ElementName=ByBlockRadioButton, Path=IsChecked}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding ElementName=ByBlockRadioButton, Path=IsChecked}" Value="False">
-                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Style>
                     <TextBlock Text="Attribute value:" />
-                    <ComboBox  Margin="0,0,0,10" 
+                    <ComboBox  Margin="0,0,0,10"
                                VerticalAlignment="Center" Name="comboAttributes" Height="40"
                                ItemsSource="{Binding Attributes}"
                                SelectedItem="{Binding SelectedAttr, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -146,7 +188,7 @@
 
                 <TextBlock Text="Numeration:" />
                 <TextBox  Name="numberingTextbox"
-                          
+
                           Text="{Binding Path= RenumberStartValue ,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                           Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                           materialDesign:TextFieldAssist.HasClearButton="True"
@@ -166,7 +208,7 @@
                          ToolTip="Enter prefix"
                          Text="{Binding Path=Prefix}"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                         Template="{StaticResource TextBoxWithHintTemplate}"/>
+                         Template="{StaticResource TextBoxWithHintTemplate}" />
 
                 <TextBox Tag="Suffix:"
                          ToolTip="Enter suffix"
@@ -174,15 +216,42 @@
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                          Template="{StaticResource TextBoxWithHintTemplate}" />
 
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Margin="2 20" Text="File name sample:" HorizontalAlignment="Left" />
+                    <TextBlock Margin="2 20" Text="{Binding FileName}" HorizontalAlignment="Center" />
+                </Grid>
             </StackPanel>
         </GroupBox>
 
+
+        <!-- DataGrid для отображения данных блока -->
+        <GroupBox Grid.Row="1" Grid.ColumnSpan="3" Grid.Column="0">
+            <DataGrid ItemsSource="{Binding BlockDataCollection}" 
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"
+                      Margin="10"
+                      Height="200" 
+                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <DataGrid.Columns>
+                    <!-- Пример колонок -->
+                    <DataGridTextColumn Header="Block Name" Binding="{Binding ObjectId}" Width="*" />
+                    <DataGridTextColumn Header="Layer" Binding="{Binding Space}" Width="*" />
+                    <DataGridTextColumn Header="Attribute" Binding="{Binding Format}" Width="*" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+       
+
         <!-- Кнопки внизу -->
-        <DockPanel LastChildFill="True" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1">
-            <Button Content="OK"  DockPanel.Dock="Right" Margin="5" Command="{Binding PrintCommand}" CommandParameter="{Binding }"/>
-            <Button Content="Cancel" DockPanel.Dock="Right" Margin="5"/>
+        <DockPanel LastChildFill="True" VerticalAlignment="Center" Grid.Row="2" Grid.Column="1">
+            <Button Content="OK"  DockPanel.Dock="Right" Margin="5" Command="{Binding PrintCommand}" CommandParameter="{Binding }" />
+            <Button Content="Cancel" DockPanel.Dock="Right" Margin="5" />
         </DockPanel>
+        <DataGrid Grid.Row="3" Grid.ColumnSpan="3" ></DataGrid>
     </Grid>
-
-
 </Window>

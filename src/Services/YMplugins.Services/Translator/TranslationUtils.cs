@@ -160,7 +160,7 @@ namespace YMplugins.Services.Translator
     //            var translated = await TranslateTextAsync(token, text);
     //            if (translated != null)
     //            {
-    //                Translations.Add((textNote, translated, string.Empty, textNote.Id));
+    //                Translations.Add((textNote, translated, string.Empty, textNote.ObjectId));
     //            }
     //        }
     //    }
@@ -173,7 +173,7 @@ namespace YMplugins.Services.Translator
     //            var translated = await TranslateTextAsync(token, above);
     //            if (translated != null)
     //            {
-    //                Translations.Add((dim, translated, "above", dim.Id));
+    //                Translations.Add((dim, translated, "above", dim.ObjectId));
     //            }
     //        }
 
@@ -183,7 +183,7 @@ namespace YMplugins.Services.Translator
     //            var translated = await TranslateTextAsync(token, below);
     //            if (translated != null)
     //            {
-    //                Translations.Add((dim, translated, "below", dim.Id));
+    //                Translations.Add((dim, translated, "below", dim.ObjectId));
     //            }
     //        }
 
@@ -193,7 +193,7 @@ namespace YMplugins.Services.Translator
     //            var translated = await TranslateTextAsync(token, prefix);
     //            if (translated != null)
     //            {
-    //                Translations.Add((dim, translated, "prefix", dim.Id));
+    //                Translations.Add((dim, translated, "prefix", dim.ObjectId));
     //            }
     //        }
 
@@ -203,7 +203,7 @@ namespace YMplugins.Services.Translator
     //            var translated = await TranslateTextAsync(token, suffix);
     //            if (translated != null)
     //            {
-    //                Translations.Add((dim, translated, "suffix", dim.Id));
+    //                Translations.Add((dim, translated, "suffix", dim.ObjectId));
     //            }
     //        }
 
@@ -213,7 +213,7 @@ namespace YMplugins.Services.Translator
     //            var translated = await TranslateTextAsync(token, valueOverride);
     //            if (translated != null)
     //            {
-    //                Translations.Add((dim, translated, "value", dim.Id));
+    //                Translations.Add((dim, translated, "value", dim.ObjectId));
 
     //            }
     //        }
@@ -233,14 +233,14 @@ namespace YMplugins.Services.Translator
 
     //            var translated = await TranslateTextAsync(token, value);
     //            if (translated == null || value == translated) { continue; }
-    //            Translations.Add((parameter, translated, string.Empty, element.Id));
+    //            Translations.Add((parameter, translated, string.Empty, element.ObjectId));
     //        }
 
     //        var name = element.Name;
     //        var translated_name = await TranslateTextAsync(token, name);
     //        if (translated_name != null)
     //        {
-    //            Translations.Add((element, translated_name, "name", element.Id));
+    //            Translations.Add((element, translated_name, "name", element.ObjectId));
     //        }
     //    }
 
@@ -360,7 +360,7 @@ namespace YMplugins.Services.Translator
     //                        break;
 
     //                    case ElementType elementType:
-    //                        typeIds.Add(elementType.Id);
+    //                        typeIds.Add(elementType.ObjectId);
     //                        break;
 
     //                    case ScheduleSheetInstance scheduleInstance:
@@ -375,7 +375,7 @@ namespace YMplugins.Services.Translator
     //                        translationTasks.Add(Task.Run(async () =>
     //                        {
     //                            token.ThrowIfCancellationRequested();
-    //                            await TranslateScheduleAsync(doc, viewSchedule.Id, token);
+    //                            await TranslateScheduleAsync(doc, viewSchedule.ObjectId, token);
     //                        }));
     //                        break;
 

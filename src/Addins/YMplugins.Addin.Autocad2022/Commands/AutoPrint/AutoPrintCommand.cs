@@ -1,10 +1,5 @@
-﻿using System;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Runtime;
-using Dreambuild.AutoCAD;
-using Gile.AutoCAD.Extension;
 using SimpleInjector;
 using System.Collections.Generic;
 using YMplugins.Contracts;
@@ -46,10 +41,6 @@ namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
             window.ShowDialog();
         }
 
-        
-        
-
-
         private IEnumerable<BlockReference> GetPaperSpaceBlockReferences(Database db)
         {
             Transaction tr = db.TransactionManager.TopTransaction;
@@ -74,7 +65,5 @@ namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
                 }
             }
         }
-
-
     }
 }

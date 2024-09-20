@@ -56,6 +56,5 @@ namespace YMplugins.Models.DbCad
                 return layers;
             }
         }
-
     }
 }

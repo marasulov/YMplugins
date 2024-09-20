@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Input;
 using YMplugins.Contracts;
 using YMplugins.ViewModels.VM;
 
