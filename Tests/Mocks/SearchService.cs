@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using YMplugins.Contracts;
@@ -16,30 +17,29 @@ namespace Mocks
         {
             _nameService = nameService;
         }
-        public IEnumerable<PrintInfo> FindObjects(string blockName)
+        public ObservableCollection<PrintInfo> FindObjects(SearchData data)
         {
-            //if (data.SelectedPrintByOption == PrintByOption.ByBlock)
-            //{
-            //    // Логика поиска блоков
-            //    return FindBlocks(data);
-            //}
+            if (data.SelectedPrintByOption == PrintByOption.ByBlock)
+            {
+                // Логика поиска блоков
+                return FindBlocks(data);
+            }
             //else if (data.SelectedPrintByOption == PrintByOption.ByPolyline)
             //{
             //    // Логика поиска полилиний
             //    return FindPolylines(data);
             //}
 
-            //return Enumerable.Empty<PrintInfo>();
-            return FindBlocks(blockName);
+            return default;
         }
 
-        private IEnumerable<PrintInfo> FindBlocks(string blockname)
+        private ObservableCollection<PrintInfo> FindBlocks(SearchData data)
         {
-            var fileName = _nameService
-            var layers = new List<PrintInfo>();
+            var layers = new ObservableCollection<PrintInfo>();
             for (int i = 0; i < 50; i++)
             {
-                var newHoleDto = new PrintInfo(i, $"{blockname} + {i}", $"формат + {blockname} + {i}");
+                //var fileName = _nameService.GenerateFileName(default,0);
+                var newHoleDto = new PrintInfo(i, $"{data.SelectedBlockName} + {i}", $"формат + {data.SelectedBlockName} + {i}","fileName.ToString()");
                 
                 layers.Add(newHoleDto);
             }
@@ -48,11 +48,20 @@ namespace Mocks
             
         }
 
-        private IEnumerable<int> FindPolylines(PrintData data)
+        private IEnumerable<int> FindPolylines(SearchData data)
         {
             // Используем AutoCAD API для поиска полилиний
             return new List<int>();
         }
 
+        public ObservableCollection<PrintInfo> FindObjects()
+        {
+            var printInfos = new ObservableCollection<PrintInfo>();
+            for (int i = 0; i < 50; i++)
+            {
+                printInfos.Add(new PrintInfo(i,$"space for {i}", $"format for {i}", ""));
+            }
+            return printInfos;
+        }
     }
 }

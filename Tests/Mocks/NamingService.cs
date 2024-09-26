@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
@@ -7,16 +8,46 @@ namespace Mocks
 {
     public class NamingService : INamingService
     {
-        //TODO 
-        public string GenerateFileName(PrintData data, IEnumerable<int> objectsToPrint)
+
+        //TODO
+
+        //public string GenerateFileName(IEnumerable<SearchData> data, int objectToPrint, int numerationValue)
+        //{
+        //    var prefix = data.Prefix;
+        //    var suffix = data.Suffix;
+
+        //    string fileName = default;
+
+        //    foreach (var printInfo in objectsToPrint)
+        //    {
+        //        var filename = prefix + data.AttributeValue + suffix;
+        //        if (data.IsCheckedNumbering)
+        //        {
+
+        //            filename = prefix + data.AttributeValue + suffix;
+        //        }
+
+        //        fileName = _namingService.GenerateFileName(data, printInfo.ObjectId, numerationValue);
+        //    }
+
+           
+
+        //    return filename;
+
+        //}
+        public List<PrintInfo> GenerateFileName(IEnumerable<PrintInfo> printInfos, int numerationValue)
         {
-            var prefix = data.Prefix;
-            var suffix = data.Suffix;
+            foreach (var printInfo in printInfos)
+            {
+                printInfo.FileName = printInfo.FileName + numerationValue;
+            }
 
-            // Создаем имя файла на основе атрибутов блоков или данных полилиний
-            var baseName = objectsToPrint;
-
-            return $"{prefix}_{baseName}_{suffix}";
+            return printInfos.ToList();
         }
+    }
+
+    public interface IGetAttributeValueService
+    {
+        public string GetValue(int blockId, string atrributeName);
     }
 }

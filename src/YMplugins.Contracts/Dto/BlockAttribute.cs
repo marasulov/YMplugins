@@ -40,5 +40,7 @@ namespace YMplugins.Contracts.Dto
             this.AttributeName = attrName;
             this.AttributeValue = attrValue;
         }
+
+       
     }
 }

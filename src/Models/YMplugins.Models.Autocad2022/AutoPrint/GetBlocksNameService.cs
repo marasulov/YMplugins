@@ -1,16 +1,16 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
 using Gile.AutoCAD.Extension;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using YMplugins.Contracts;
 
 namespace YMplugins.Models.Autocad2022.AutoPrint
 {
     public class GetBlocksNameService : IGetBlocksNameService
     {
-        public List<string> GetBlocksName()
+        public ObservableCollection<string> GetBlocksName()
         {
-            List<string> blockNames = new List<string>();
+            ObservableCollection<string> blockNames = new ObservableCollection<string>();
             using (Transaction trans = Active.Database.TransactionManager.StartTransaction())
             {
                 //get the blockTable and iterate through all blockDef
@@ -34,27 +34,6 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
             }
 
             return blockNames;
-        }
-
-        public static ObjectId[] SelectBlocksWithFilter(bool onlySelectedPages = false)
-        {
-            var sFilter = new SelectionFilter(new TypedValue[2] { new(0, "INSERT"), new(66, 1) });
-            var selResult = Active.Editor.SelectAll(sFilter);
-
-            if (onlySelectedPages)
-            {
-                var psOptions = new PromptSelectionOptions();
-                psOptions.MessageForAdding = "\nSelect stamp block : ";
-                psOptions.MessageForRemoval = "\nRemove from selection : ";
-
-                selResult = Active.Editor.GetSelection(psOptions, sFilter);
-            }
-
-            if (selResult.Status != PromptStatus.OK)
-                return null;
-
-            var selSet = selResult.Value;
-            return selSet.GetObjectIds();
         }
 
         /// <summary>

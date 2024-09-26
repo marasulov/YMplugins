@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.ObjectModel;
 
 namespace YMplugins.Contracts
 {
     public interface IGetBlocksNameService
     {
-        List<string> GetBlocksName();
+        ObservableCollection<string> GetBlocksName();
     }
 }

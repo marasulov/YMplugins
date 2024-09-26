@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using YMplugins.Contracts;
 
 namespace Mocks
@@ -6,9 +7,9 @@ namespace Mocks
     public class GetBlocksNameService : IGetBlocksNameService
 
     {
-        public List<string> GetBlocksName()
+        public ObservableCollection<string> GetBlocksName()
         {
-            var blocks = new List<string>();
+            var blocks = new ObservableCollection<string>();
             for (int i = 0; i < 50; i++)
             {
                 var newHoleDto = "blockname" + i;

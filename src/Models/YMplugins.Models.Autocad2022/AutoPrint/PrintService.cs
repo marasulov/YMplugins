@@ -1,8 +1,7 @@
-﻿using System.Diagnostics;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
 
-namespace Mocks
+namespace YMplugins.Models.Autocad2022.AutoPrint
 {
     public class PrintService : IPrintService
     {
@@ -17,12 +16,12 @@ namespace Mocks
             _printEngine = printEngine;
         }
 
-        public void Print(SearchData data)
+        public void Print(PrintInfo data)
         {
-            var blockname = data.SelectedBlockName;
-            var objectsToPrint = _searchService.FindObjects(data);
-
-            var printInfos = _namingService.GenerateFileName(objectsToPrint, 0);
+            
+            //var objectsToPrint = _searchService.FindObjects(data);
+            
+            //var printInfos = _namingService.GenerateFileName(objectsToPrint, 0);
 
 
 

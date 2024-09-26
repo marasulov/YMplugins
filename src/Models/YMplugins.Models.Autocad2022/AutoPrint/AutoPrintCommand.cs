@@ -29,7 +29,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
         //    container.Register<IGetBlocksNameService, GetBlocksNameService>();
         //    container.Register<IGetLayersService, GetLayerService>();
         //    container.Register<ISelectBlockService, SelectBlockService>();
-        //    container.Register<IAttributesService, AttributesService>();
+        //    container.Register<IAttributesService, AttributeService>();
 
         //    var window = container
         //        .GetInstance<AutoPrintView>();

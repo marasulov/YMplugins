@@ -22,15 +22,15 @@ namespace YMplugins.ViewModels.Commands
         {
             var vm = (AutoPrintVm)parameter;
 
-            var printData = new PrintData
+            var printData = new SearchData
             {
                 SelectedPrintByOption = vm.SelectedPrintByOption,
                 SelectedPrintingOrder = vm.SelectedPrintingOrder,
                 IsSearchOnModel = vm.IsSearchOnModel,
                 IsSearchOnLayouts = vm.IsSearchOnLayout,
                 SelectedBlockName = vm.SelectedBlockOnScreen,
-                AttributeName = vm.SelectedAttr,
-                NumerationStartValue = vm.RenumberStartValue,
+                AttributeName = vm.SelectedAttr.AttributeName,
+                NumerationStartValue = vm.NumerationStartValue,
                 Prefix = vm.Prefix,
                 Suffix = vm.Suffix
             };

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using YMplugins.Contracts.Dto;
 
 namespace YMplugins.Contracts
 {
     public interface ISearchService
     {
-        IEnumerable<PrintInfo> FindObjects(string blockName);
+        ObservableCollection<PrintInfo> FindObjects(SearchData searchData);
     }
 }

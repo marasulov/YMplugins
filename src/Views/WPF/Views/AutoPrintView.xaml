@@ -8,7 +8,8 @@
         xmlns:converters="clr-namespace:YMplugins.Views.Converters"
         d:DataContext="{d:DesignInstance {x:Type  vms:AutoPrintVm}, IsDesignTimeCreatable=False}"
         mc:Ignorable="d"
-        Title="AutoPrintView" Height="530" Width="800" Style="{DynamicResource WindowElementStyle}">
+        Name="AutoPrint"
+        Title="AutoPrintView" Height="700" Width="800" Style="{DynamicResource WindowElementStyle}">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -17,21 +18,22 @@
                 <ResourceDictionary Source="../Resources/TextBoxTemplates.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Ваш конвертер -->
             <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
         </ResourceDictionary>
     </Window.Resources>
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <!-- Header -->
-            <RowDefinition Height="Auto" />
+            <!-- Naming -->
             <!-- Options -->
             <RowDefinition Height="Auto" />
 
-            <RowDefinition Height="*" />
-            <!-- Naming -->
+            <RowDefinition Height="*"/>
+
+            <RowDefinition Height="Auto" />
+
+
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -44,8 +46,6 @@
         <GroupBox Header="Print by" Grid.Row="0" Grid.Column="0" Margin="1">
             <StackPanel>
                 <StackPanel>
-                    <!--<RadioButton Name="ByBlockRadioButton" Content="By Block" GroupName="PrintBy" IsChecked="True" Margin="0,0,0,5" />
-                    <RadioButton Name="ByPolylineRadioButton" Content="By Polyline" GroupName="PrintBy" Margin="0,0,0,5" />-->
                     <RadioButton Content="By Block"
                                  Name="ByBlockRadioButton"
                                  IsChecked="{Binding SelectedPrintByOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=ByBlock}" />
@@ -187,23 +187,26 @@
                 </StackPanel>
 
                 <TextBlock Text="Numeration:" />
-                <TextBox  Name="numberingTextbox"
-
-                          Text="{Binding Path= RenumberStartValue ,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox Name="numberingCheckbox"
+                              IsChecked="{Binding IsCheckedNumbering, UpdateSourceTrigger=PropertyChanged}"
+                              Margin="0,0,10,0" />
+                    <TextBox  Name="numberingTextbox"
+                          Text="{Binding Path= NumerationStartValue ,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                           Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                           materialDesign:TextFieldAssist.HasClearButton="True"
                           IsEnabled="{Binding IsChecked, ElementName=numberingCheckbox}"
                           Margin="8 0 8 0">
-                    <materialDesign:HintAssist.Hint>
-                        <StackPanel
+                        <materialDesign:HintAssist.Hint>
+                            <StackPanel
                             Orientation="Horizontal"
                             Margin="-2 0 0 0">
-                            <TextBlock
+                                <TextBlock
                                 Text="Enter numbering start value" Cursor="" />
-                        </StackPanel>
-                    </materialDesign:HintAssist.Hint>
-                </TextBox>
-
+                            </StackPanel>
+                        </materialDesign:HintAssist.Hint>
+                    </TextBox>
+                </StackPanel>
                 <TextBox Tag="Prefix:"
                          ToolTip="Enter prefix"
                          Text="{Binding Path=Prefix}"
@@ -215,43 +218,44 @@
                          Text="{Binding Path=Suffix}"
                          Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                          Template="{StaticResource TextBoxWithHintTemplate}" />
-
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <TextBlock Margin="2 20" Text="File name sample:" HorizontalAlignment="Left" />
-                    <TextBlock Margin="2 20" Text="{Binding FileName}" HorizontalAlignment="Center" />
-                </Grid>
             </StackPanel>
         </GroupBox>
 
-
         <!-- DataGrid для отображения данных блока -->
         <GroupBox Grid.Row="1" Grid.ColumnSpan="3" Grid.Column="0">
-            <DataGrid ItemsSource="{Binding BlockDataCollection}" 
-                      AutoGenerateColumns="False"
-                      IsReadOnly="True"
-                      CanUserAddRows="False"
-                      Margin="10"
-                      Height="200" 
-                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <DataGrid ItemsSource="{Binding BlockDataCollection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  CanUserAddRows="False"
+                  Margin="5"
+                  MaxHeight="500"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <DataGrid.Columns>
                     <!-- Пример колонок -->
-                    <DataGridTextColumn Header="Block Name" Binding="{Binding ObjectId}" Width="*" />
-                    <DataGridTextColumn Header="Layer" Binding="{Binding Space}" Width="*" />
-                    <DataGridTextColumn Header="Attribute" Binding="{Binding Format}" Width="*" />
+                    <DataGridTextColumn Header="Id" Binding="{Binding ObjectId}" Width="Auto" />
+                    <DataGridTextColumn Header="Layer" Binding="{Binding Space}" Width="Auto" />
+                    <DataGridTextColumn Header="Format" Binding="{Binding Format}" Width="*" />
+                    <DataGridTextColumn Header="FileName" Binding="{Binding FileName}" Width="*" />
+                    <DataGridTemplateColumn Header="Zoom">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding ElementName = AutoPrint,
+                                    Path= DataContext.ZoomToPointCommand}" 
+                                    CommandParameter="{Binding  ObjectId}" 
+                                    Content="Show"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </GroupBox>
-       
 
         <!-- Кнопки внизу -->
-        <DockPanel LastChildFill="True" VerticalAlignment="Center" Grid.Row="2" Grid.Column="1">
-            <Button Content="OK"  DockPanel.Dock="Right" Margin="5" Command="{Binding PrintCommand}" CommandParameter="{Binding }" />
+        <DockPanel LastChildFill="True" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="1">
             <Button Content="Cancel" DockPanel.Dock="Right" Margin="5" />
+            <Button Content="Print"  DockPanel.Dock="Right" Margin="5" Command="{Binding PrintCommand}" CommandParameter="{Binding }" />
+            
         </DockPanel>
-        <DataGrid Grid.Row="3" Grid.ColumnSpan="3" ></DataGrid>
+
     </Grid>
 </Window>

@@ -10,11 +10,13 @@
     <PackageReference Include="AutoCAD.NET.Interfaces" Version="24.4.20296.1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </PackageReference>
+    <PackageReference Include="SimpleInjector" Version="5.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Services\YMplugins.Services\YMplugins.Services.csproj" />
     <ProjectReference Include="..\..\ViewModels\YMplugins.ViewModels.csproj" />
+    <ProjectReference Include="..\..\Views\WPF\YMplugins.Views.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +26,7 @@
     <Reference Include="Gile.AutoCAD.Extension">
       <HintPath>D:\from comp\docs\repos\TransmittalCreator\TransmittalCreator\bin\Debug\Gile.AutoCAD.Extension.dll</HintPath>
       <Private>True</Private>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
   </ItemGroup>
 

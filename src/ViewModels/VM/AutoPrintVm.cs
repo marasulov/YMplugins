@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Collections.ObjectModel;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
 using YMplugins.Contracts.Dto.Enums;
@@ -10,16 +10,19 @@ namespace YMplugins.ViewModels.VM
 {
     public class AutoPrintVm : BaseViewModel
     {
-        private List<string> _blocksNames;
+        private ObservableCollection<string> _blocksNames;
         private List<string> _layers;
-        private IEnumerable<BlockAttribute> _attributes;
-
+        private List<BlockAttribute> _attributes;
         private bool _canExecute = true;
         private string _selectedBlockOnScreen;
+        private readonly ZoomToPointCommand _zoomToPointCommand;
         private IAttributesService _attributesService;
         private readonly ISearchService _searchService;
+        private ObservableCollection<PrintInfo> _blockDataCollection;
+        private BlockAttribute _selectedAttr;
+        private bool _isUpdatingAttributes;
+        private int _numerationStartValue;
 
-        private IEnumerable<PrintInfo> _blockDataCollection;
         //private string _selectedBlock;
 
         public AutoPrintVm(
@@ -28,6 +31,7 @@ namespace YMplugins.ViewModels.VM
             GetAttributesCommand getAttributesCommand,
             PrintCommand printCommand,
             SelectBlockCommand selectBlockCommand,
+            ZoomToPointCommand zoomToPointCommand,
             IAttributesService attributesService, ISearchService searchService)
         {
             _attributesService = attributesService;
@@ -39,6 +43,7 @@ namespace YMplugins.ViewModels.VM
             GetAttributesCommand = getAttributesCommand;
             PrintCommand = printCommand;
             SelectBlockCommand = selectBlockCommand;
+            ZoomToPointCommand = zoomToPointCommand;
         }
 
         private void GetLayersCommandOnResultObtained(List<string> obj)
@@ -46,12 +51,12 @@ namespace YMplugins.ViewModels.VM
             Layers = obj;
         }
 
-        private void BlocksCommand_ResultObtained(List<string> obj)
+        private void BlocksCommand_ResultObtained(ObservableCollection<string> obj)
         {
             BlocksNames = obj;
         }
 
-        public List<string> BlocksNames
+        public ObservableCollection<string> BlocksNames
         {
             get => _blocksNames;
             set
@@ -61,18 +66,31 @@ namespace YMplugins.ViewModels.VM
             }
         }
 
-        //public string SelectedBlock
-        //{
-        //    get => _selectedBlock;
-        //    set
-        //    {
-        //        Set(ref _selectedBlock, value);
-
-        //    }
-        //}
-
         // Свойство для выбора между блоком и полилинией
-        public PrintByOption SelectedPrintByOption { get; set; }
+        private PrintByOption _selectedPrintByOption;
+        private string _prefix;
+        private string _suffix;
+
+        public PrintByOption SelectedPrintByOption
+        {
+            get => _selectedPrintByOption;
+            set
+            {
+                if (Set(ref _selectedPrintByOption, value))
+                {
+                    if (_selectedPrintByOption == PrintByOption.ByPolyline)
+                    {
+                        BlockDataCollection.Clear();  
+                    }
+                    else if (_selectedPrintByOption == PrintByOption.ByBlock)
+                    {
+                        UpdateAttributes();
+                        UpdateBlockCollection();
+                    }
+
+                }
+            }
+        }
 
         // Свойство для выбора порядка печати
         public PrintingOrder SelectedPrintingOrder { get; set; }
@@ -84,16 +102,19 @@ namespace YMplugins.ViewModels.VM
             set => Set(ref _layers, value);
         }
 
-        public IEnumerable<BlockAttribute> Attributes
+        public List<BlockAttribute> Attributes
         {
             get => _attributes;
             set => Set(ref _attributes, value);
         }
 
-        public IEnumerable<PrintInfo> BlockDataCollection
+        public ObservableCollection<PrintInfo> BlockDataCollection
         {
             get => _blockDataCollection;
-            set => Set(ref _blockDataCollection, value);
+            set
+            {
+                Set(ref _blockDataCollection, value);
+            }
         }
 
         public string SelectedBlockOnScreen
@@ -101,47 +122,112 @@ namespace YMplugins.ViewModels.VM
             get => _selectedBlockOnScreen;
             set
             {
-                Set(ref _selectedBlockOnScreen, value);
-                //if (value != null)
-                //{
-                //    _attributesService.GetAttributesForBlock(value);
-                //}
-
-                UpdateAttributes();
+                if (!Set(ref _selectedBlockOnScreen, value)) return;
+                UpdateAttributes(); 
+                UpdateBlockCollection();
             }
         }
 
         public Action CloseAction { get; set; }
         public Action OpenAction { get; set; }
-
         public GetBlocksNameCommand GetBlocksNameCommand { get; }
-
         public SelectBlockCommand SelectBlockCommand { get; }
-
         public GetLayersCommand GetLayersCommand { get; }
-
         public GetAttributesCommand GetAttributesCommand { get; }
-
         public PrintCommand PrintCommand { get; }
-        public string SelectedAttr { get; set; }
-        public string Prefix { get; set; }
-        public string Suffix { get; set; }
+        public ZoomToPointCommand ZoomToPointCommand { get; }
+
+        public BlockAttribute SelectedAttr
+        {
+            get => _selectedAttr;
+            set
+            {
+                if (Set(ref _selectedAttr, value))
+                {
+                    UpdateBlockCollection();
+                }
+            } 
+        }
+        public string Prefix
+        {
+            get => _prefix;
+            set
+            {
+                Set(ref _prefix, value);
+                
+                UpdateBlockCollection();
+            }
+        }
+
+        public string Suffix
+        {
+            get => _suffix;
+            set
+            {
+                Set(ref _suffix, value);
+                
+                UpdateBlockCollection();
+            }
+        }
         public bool IsSearchOnModel { get; set; } = true;
         public bool IsSearchOnLayout { get; set; }
-        public int RenumberStartValue { get; set; }
 
-        public object FileName { get; }
+        public int NumerationStartValue
+        {
+            get =>_numerationStartValue;
+            set
+            {
+                if (_numerationStartValue == value)
+                {
+                    return;
+                }
+
+                if (IsCheckedNumbering & value == null)
+                {
+                    _numerationStartValue = 0;
+                }
+                else
+                {
+                    _numerationStartValue = value;
+                }
+                OnPropertyChanged();
+                UpdateBlockCollection();
+            }
+        }
+        public bool IsCheckedNumbering { get; set; }
+
 
         private void UpdateAttributes()
         {
-            if (string.IsNullOrEmpty(_selectedBlockOnScreen))
-            {
-                Attributes = Enumerable.Empty<BlockAttribute>();
+            if (_isUpdatingAttributes || string.IsNullOrEmpty(_selectedBlockOnScreen))
                 return;
-            }
 
             Attributes = _attributesService.GetAttributesForBlock(_selectedBlockOnScreen);
-            BlockDataCollection = _searchService.FindObjects(SelectedBlockOnScreen);
+            
+
+            var printData = new SearchData
+            {
+                SelectedPrintByOption = SelectedPrintByOption,
+                SelectedPrintingOrder = SelectedPrintingOrder,
+                IsSearchOnModel = IsSearchOnModel,
+                IsSearchOnLayouts = IsSearchOnLayout,
+                SelectedBlockName = SelectedBlockOnScreen,
+                AttributeName = SelectedAttr?.AttributeName,
+                NumerationStartValue = NumerationStartValue,
+                Prefix = Prefix,
+                Suffix = Suffix
+            };
+            BlockDataCollection = _searchService.FindObjects(printData);
+            _isUpdatingAttributes = false;
+        }
+
+        private void UpdateBlockCollection()
+        {
+            if (SelectedAttr != null && BlockDataCollection != null)
+            {
+                BlockDataCollection = new ObservableCollection<PrintInfo>(
+                    _attributesService.GetPrintInfosForBlock(BlockDataCollection, SelectedAttr.AttributeName, NumerationStartValue, Prefix, Suffix));
+            }
         }
     }
 }

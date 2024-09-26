@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.Runtime;
 using SimpleInjector;
 using System.Collections.Generic;
 using YMplugins.Contracts;
+using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.AutoPrint;
 using YMplugins.ViewModels.Commands;
 using YMplugins.ViewModels.VM;
@@ -27,9 +28,19 @@ namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
             container.Register<AutoPrintView>();
 
             container.Register<IGetBlocksNameService, GetBlocksNameService>();
+            container.Register<IPrintService, PrintService>();
+            container.Register<INamingService, NamingService>();
+            container.Register<IPrintEngine, PrintEngine>();
+            container.Register<BlockSearchService>();
+            container.Register<SearchData>();
+
+
+
+            container.Register<ISearchService, SearchService>();
+
             container.Register<IGetLayersService, GetLayersService>();
             container.Register<ISelectBlockService, SelectBlockService>();
-            container.Register<IAttributesService, AttributesService>();
+            container.Register<IAttributesService, AttributeService>();
 
             var window = container
                 .GetInstance<AutoPrintView>();

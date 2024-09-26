@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using YMplugins.Contracts;
 using YMplugins.ViewModels.VM;
 
@@ -18,7 +19,7 @@ namespace YMplugins.ViewModels.Commands
         {
             return parameter is AutoPrintVm;
         }
-        public event Action<List<string>> ResultObtained;
+        public event Action<ObservableCollection<string>> ResultObtained;
         public override void Execute(object parameter)
         {
 

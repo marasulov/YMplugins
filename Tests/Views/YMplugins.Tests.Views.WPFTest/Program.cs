@@ -19,6 +19,7 @@ namespace YMplugins.Tests.Views.WPFTest
             container.Register<GetLayersCommand>();
             container.Register<PrintCommand>();
             container.Register<SelectBlockCommand>();
+            container.Register<ZoomToPointCommand>();
             container.Register<AutoPrintVm>();
             container.Register<AutoPrintView>();
 
@@ -30,6 +31,8 @@ namespace YMplugins.Tests.Views.WPFTest
             container.Register<ISearchService, SearchService>();
             container.Register<INamingService, NamingService>();
             container.Register<IPrintEngine, PrintEngine>();
+            container.Register<IZoomEntity, ZoomService>();
+
 
             var window = container
                 .GetInstance<AutoPrintView>();
