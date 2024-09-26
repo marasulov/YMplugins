@@ -4,6 +4,6 @@ namespace YMplugins.Contracts
 {
     public interface IPrintService
     {
-        void Print(PrintInfo data);
+        void Print(PrintInfo[] data);
     }
 }

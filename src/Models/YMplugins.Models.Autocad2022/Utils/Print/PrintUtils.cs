@@ -1,15 +1,9 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.PlottingServices;
 using Gile.AutoCAD.Extension;
-using System;
-using System.IO;
-using System.Text.RegularExpressions;
 using YMplugins.Contracts.Dto;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-using ErrorStatus = Autodesk.AutoCAD.Runtime.ErrorStatus;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
-using PlotType = Autodesk.AutoCAD.DatabaseServices.PlotType;
 
 namespace YMplugins.Models.Autocad2022.Utils.Print
 {

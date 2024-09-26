@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.PlottingServices;
 using System.IO;
+using System.Text.RegularExpressions;
 using YMplugins.Contracts.Dto;
 using PlotType = Autodesk.AutoCAD.DatabaseServices.PlotType;
 
@@ -37,7 +38,8 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
 
             bool isHor = _printModel.IsFormatHorizontal();
             CanonNameResolver resolver = new CanonNameResolver();
-            
+
+            //TODO сделать поиск канонического имени
             string canonName = resolver.GetCanonNameByWidthAndHeight(_printModel);
 
             acPlSetVdr.SetPlotWindowArea(acPlSet, points);
@@ -46,7 +48,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
             acPlSetVdr.SetUseStandardScale(acPlSet, false);
             acPlSetVdr.SetStdScaleType(acPlSet, StdScaleType.ScaleToFit);
             acPlSetVdr.SetPlotCentered(acPlSet, true);
-            acPlSetVdr.SetPlotConfigurationName(acPlSet, "DWG_To_PDF_Autoprint.pc3", canonName);
+            acPlSetVdr.SetPlotConfigurationName(acPlSet, "DWG_To_PDF_Uzle.pc3", canonName);
 
             acPlInfo.OverrideSettings = acPlSet;
 
@@ -81,7 +83,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
                     {
                         acPlProgDlg.OnBeginPlot();
                         acPlProgDlg.IsVisible = true;
-
+                        //TODO имя надо сделать
                         string filename = Path.Combine(Path.GetDirectoryName(_document.Name), pdfFileName) + ".pdf";
                         acPlEng.BeginPlot(acPlProgDlg, null);
                         acPlEng.BeginDocument(acPlInfo, _document.Name, null, 1, true, filename);

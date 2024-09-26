@@ -77,11 +77,13 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
                         var blockPostion = blockRef.Position;
                         var blockScale = blockRef.ScaleFactors.X;
                         var blockPointPosition = new PointDTO(blockPostion.X, blockPostion.Y, blockPostion.Z);
+                        var blockDimension = new PointDTO(blockPointPosition.X + blockWidth,
+                            blockPointPosition.Y + blockHeight, blockPointPosition.Z);
                         var format = FormatFinder.FindClosestFormat(blockWidth, blockHeight);
 #if DEBUG
                         Active.Editor.WriteMessage($"format {format}");
 #endif
-                        PrintInfo blockData = new PrintInfo(blockRef.Id.Handle.Value, spaceName, format, blockHeight, blockWidth, blockScale, blockPointPosition);
+                        PrintInfo blockData = new PrintInfo(blockRef.Id.Handle.Value, spaceName,format,blockDimension,blockScale, blockWidth, blockHeight, blockPointPosition);
 
                         blockList.Add(blockData);
                     }

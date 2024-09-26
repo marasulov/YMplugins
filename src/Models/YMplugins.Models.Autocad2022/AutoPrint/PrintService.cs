@@ -1,5 +1,6 @@
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
+using YMplugins.Models.Autocad2022.Utils.Print;
 
 namespace YMplugins.Models.Autocad2022.AutoPrint
 {
@@ -16,7 +17,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
             _printEngine = printEngine;
         }
 
-        public void Print(PrintInfo data)
+        public void Print(PrintInfo[] data)
         {
             
             //var objectsToPrint = _searchService.FindObjects(data);
@@ -24,7 +25,13 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
             //var printInfos = _namingService.GenerateFileName(objectsToPrint, 0);
 
 
+            foreach (PrintInfo info in data)
+            {
+                var printUtils = new PrintUtils();
+                printUtils.PlotCurrentLayout(info);
+            }
 
+            
             //_printEngine.PrintObjects(objectsToPrint, fileName, data);
         }
     }

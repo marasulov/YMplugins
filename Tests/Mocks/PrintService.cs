@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
 
@@ -17,16 +18,24 @@ namespace Mocks
             _printEngine = printEngine;
         }
 
-        public void Print(SearchData data)
+        public void Print(PrintInfo[] data)
         {
-            var blockname = data.SelectedBlockName;
-            var objectsToPrint = _searchService.FindObjects(data);
+            foreach (var printInfo in data)
+            {
+                Console.WriteLine(printInfo.FileName);
+                
+            }
 
-            var printInfos = _namingService.GenerateFileName(objectsToPrint, 0);
+            //var blockname = data.SelectedBlockName;
+            //var objectsToPrint = _searchService.FindObjects(data);
+
+            //var printInfos = _namingService.GenerateFileName(objectsToPrint, 0);
 
 
 
             //_printEngine.PrintObjects(objectsToPrint, fileName, data);
         }
+
+       
     }
 }

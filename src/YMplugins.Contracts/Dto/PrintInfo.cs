@@ -14,13 +14,15 @@ namespace YMplugins.Contracts.Dto
         public double Width { get; set; }
         public double ScaleX { get; set; }
 
-        public PrintInfo(long objectId, string space, string format, PointDTO dimension,  double scaleX, PointDTO position, string fileName  = "")
+        public PrintInfo(long objectId, string space, string format, PointDTO dimension, double scaleX, double width, double height, PointDTO position, string fileName  = "")
         {
             ObjectId = objectId;
             Space = space;
             Format = format;
             Dimension = dimension;
             ScaleX = scaleX;
+            Width = width;
+            Height = height;
             Position = position;
             FileName = fileName;
         }
