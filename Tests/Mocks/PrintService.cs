@@ -36,6 +36,9 @@ namespace Mocks
             //_printEngine.PrintObjects(objectsToPrint, fileName, data);
         }
 
-       
+        string[] IPrintService.Print(PrintInfo[] data)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

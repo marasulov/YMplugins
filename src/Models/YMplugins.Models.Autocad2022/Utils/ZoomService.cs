@@ -67,7 +67,7 @@ public class ZoomService : IZoomEntity
                     Active.Editor.CurrentUserCoordinateSystem.Inverse()
                 );
 
-                ZoomWin(Active.Editor, extents.MinPoint, extents.MaxPoint);
+                Active.Editor.ZoomWindow(extents.MinPoint, extents.MaxPoint);
                 // Get the current view from the viewport table record
                 //ViewTableRecord view =
                 //    trans.GetObject(Active.Database.CurrentViewportTableRecordId, OpenMode.ForWrite) as ViewTableRecord;
@@ -86,31 +86,29 @@ public class ZoomService : IZoomEntity
             else
             {
                 // Handle cases where the object is not a BlockReference or Polyline
-                Console.WriteLine("The entity is neither a BlockReference nor a Polyline.");
+                Active.Editor.WriteMessage("The entity is neither a BlockReference nor a Polyline.");
             }
         }
     }
 
-    private static void ZoomWin(Editor ed, Point3d min, Point3d max
- )
+    //private static void ZoomWin(Editor ed, Point3d min, Point3d max)
+    //{
+    //    Point2d min2d = new Point2d(min.X, min.Y);
 
-    {
-        Point2d min2d = new Point2d(min.X, min.Y);
+    //    Point2d max2d = new Point2d(max.X, max.Y);
 
-        Point2d max2d = new Point2d(max.X, max.Y);
+    //    ViewTableRecord view =
 
-        ViewTableRecord view =
+    //        new ViewTableRecord();
 
-            new ViewTableRecord();
+    //    view.CenterPoint =
 
-        view.CenterPoint =
+    //        min2d + ((max2d - min2d) / 2.0);
 
-            min2d + ((max2d - min2d) / 2.0);
+    //    view.Height = max2d.Y - min2d.Y;
 
-        view.Height = max2d.Y - min2d.Y;
+    //    view.Width = max2d.X - min2d.X;
 
-        view.Width = max2d.X - min2d.X;
-
-        ed.SetCurrentView(view);
-    }
+    //    ed.SetCurrentView(view);
+    //}
 }

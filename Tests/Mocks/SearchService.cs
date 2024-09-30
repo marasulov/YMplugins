@@ -39,8 +39,8 @@ namespace Mocks
             for (int i = 0; i < 50; i++)
             {
                 //var fileName = _nameService.GenerateFileName(default,0);
-                var newHoleDto = new PrintInfo(i, $"{data.SelectedBlockName} + {i}", $"формат + {data.SelectedBlockName} + {i}","fileName.ToString()");
-                
+                var newHoleDto = new PrintInfo(i, $"space for {i}", $"format for {i}", new PointDTO(5, 6, 5), 1, 1, 1, new PointDTO(2, 3, 4), "");
+
                 layers.Add(newHoleDto);
             }
 
@@ -59,7 +59,7 @@ namespace Mocks
             var printInfos = new ObservableCollection<PrintInfo>();
             for (int i = 0; i < 50; i++)
             {
-                printInfos.Add(new PrintInfo(i,$"space for {i}", $"format for {i}", ""));
+                printInfos.Add(new PrintInfo(i,$"space for {i}", $"format for {i}", new PointDTO(5,6,5),1,1,1, new PointDTO(2,3,4), ""));
             }
             return printInfos;
         }

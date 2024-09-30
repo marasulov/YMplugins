@@ -4,6 +4,7 @@
     <TargetFramework>net48</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release;Autocad;Test</Configurations>
    
   </PropertyGroup>
 
@@ -40,5 +41,9 @@
   <ItemGroup>
     <Resource Include="Icons\translation.png" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /y /r &quot;$(TargetDir)*.dll&quot; &quot;%25appdata%25\Autodesk\ApplicationPlugins\YMplugins.bundle\Contents\&quot;" />
+  </Target>
 
 </Project>

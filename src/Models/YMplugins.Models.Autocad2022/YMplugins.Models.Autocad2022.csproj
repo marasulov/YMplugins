@@ -4,6 +4,7 @@
     <TargetFramework>net48</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release;Autocad;Test</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,6 +28,7 @@
     <ProjectReference Include="..\..\Services\YMplugins.Services\YMplugins.Services.csproj" />
     <ProjectReference Include="..\..\ViewModels\YMplugins.ViewModels.csproj" />
     <ProjectReference Include="..\..\Views\WPF\YMplugins.Views.csproj" />
+    <ProjectReference Include="..\YMplugins.Models.DbCad\YMplugins.Models.DbCad.csproj" />
   </ItemGroup>
 
   <ItemGroup>

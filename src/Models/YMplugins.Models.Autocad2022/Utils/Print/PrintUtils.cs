@@ -146,13 +146,13 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
         //    return printStatus;
         //}
 
-        public bool PlotCurrentLayout(PrintInfo printModel)
+        public string PlotCurrentLayout(PrintInfo printModel)
         {
             var acDoc = Active.Document;
             var acCurDb = acDoc.Database;
 
             Application.SetSystemVariable("BACKGROUNDPLOT", 0);
-            bool printStatus = false;
+            string fileName = default;
 
             try
             {
@@ -169,17 +169,17 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
                 acPlInfoVdr.Validate(acPlInfo);
 
                 // Execute the plot
-                printStatus = plotHelper.ExecutePlot(acPlInfo, printModel.FileName);
+                fileName = plotHelper.ExecutePlot(acPlInfo, printModel.FileName);
 
                 acTrans.Commit();
             }
             catch (Exception e)
             {
                 Application.ShowAlertDialog($"{e.Message} : {printModel.Height} - {printModel.Width} not found in printer settings");
-                printStatus = false;
+                fileName = "";
             }
 
-            return printStatus;
+            return fileName;
         }
     }
 }

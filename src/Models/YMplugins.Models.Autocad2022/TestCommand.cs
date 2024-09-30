@@ -13,6 +13,9 @@ using YMplugins.ViewModels.VM;
 using SimpleInjector;
 using YMplugins.Views.Views;
 using YMplugins.Models.Autocad2022.Utils;
+using YMplugins.Services;
+using YMplugins.Views;
+using YMplugins.Views.Services;
 
 namespace YMplugins.Models.Autocad2022
 {
@@ -40,15 +43,16 @@ namespace YMplugins.Models.Autocad2022
             container.Register<BlockSearchService>();
             container.Register<SearchData>();
 
-
-
             container.Register<ISearchService, SearchService>();
             container.Register<IZoomEntity, ZoomService>();
             container.Register<IGetLayersService, GetLayersService>();
             container.Register<ISelectBlockService, SelectBlockService>();
             container.Register<IAttributesService, AttributeService>();
+            container.Register<ICombinePdfService, CombinePdfService>();
+            container.Register<IAutoCadFileService, AutoCadFileService>();
+            container.Register<INotifyService, NotifyService>();
 
-            var window = container
+           var window = container
                 .GetInstance<AutoPrintView>();
 
             var context = (AutoPrintVm)window.DataContext;

@@ -8,7 +8,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
 {
     public class CanonNameResolver
     {
-        public string GetCanonNameByWidthAndHeight(PrintInfo printInfo, double tolerance = 5.0)
+        public string GetCanonNameByWidthAndHeight(PrintInfo printInfo, double tolerance = 10.0)
         {
             var standartCopier = new StandartCopier();
             var pConfig = PlotConfigManager.SetCurrentConfig(standartCopier.Pc3Source);

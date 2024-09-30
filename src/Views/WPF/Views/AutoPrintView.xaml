@@ -57,6 +57,31 @@
                     <CheckBox IsChecked="{Binding IsSearchOnModel}">Search on model</CheckBox>
                     <CheckBox IsChecked="{Binding IsSearchOnLayout}">Search on layouts</CheckBox>
                 </StackPanel>
+                <StackPanel>
+                    <CheckBox Name="combineCheckBox" IsChecked="{Binding IsCombinePdf, UpdateSourceTrigger=PropertyChanged}">Combine pdfs</CheckBox>
+                </StackPanel>
+                <StackPanel>
+                    <!--<TextBox Tag="Output file name:"
+                             ToolTip="Enter file name"
+                             Text="{Binding Path= OutputFileName}"
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             Template="{StaticResource TextBoxWithHintTemplate}" />-->
+                    <TextBox  Name="outputFileTextbox"
+                              Text="{Binding Path=  OutputFileName ,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                              Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                              materialDesign:TextFieldAssist.HasClearButton="True"
+                              IsEnabled="{Binding IsChecked, ElementName=combineCheckBox}"
+                              Margin="8 0 8 0">
+                        <materialDesign:HintAssist.Hint>
+                            <StackPanel
+                                Orientation="Horizontal"
+                                Margin="-2 0 0 0">
+                                <TextBlock
+                                    Text="Enter output file name" Cursor="" />
+                            </StackPanel>
+                        </materialDesign:HintAssist.Hint>
+                    </TextBox>
+                </StackPanel>
             </StackPanel>
         </GroupBox>
 

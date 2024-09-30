@@ -4,9 +4,16 @@
     <TargetFramework>net48</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release;Autocad;Test</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoCAD.NET.Interfaces" Version="24.4.20296.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Gile.AutoCAD.Extension">
+      <HintPath>D:\from comp\docs\repos\TransmittalCreator\TransmittalCreator\bin\Debug\Gile.AutoCAD.Extension.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

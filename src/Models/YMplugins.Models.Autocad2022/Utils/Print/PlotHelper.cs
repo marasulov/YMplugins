@@ -70,10 +70,10 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
             return acPlProgDlg;
         }
 
-        public bool ExecutePlot(PlotInfo acPlInfo, string pdfFileName)
+        public string ExecutePlot(PlotInfo acPlInfo, string pdfFileName)
         {
             bool printStatus = false;
-
+            string filename = pdfFileName;
             if (PlotFactory.ProcessPlotState == ProcessPlotState.NotPlotting)
             {
                 using (var acPlEng = PlotFactory.CreatePublishEngine())
@@ -84,7 +84,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
                         acPlProgDlg.OnBeginPlot();
                         acPlProgDlg.IsVisible = true;
                         //TODO имя надо сделать
-                        string filename = Path.Combine(Path.GetDirectoryName(_document.Name), pdfFileName) + ".pdf";
+                        filename = Path.Combine(Path.GetDirectoryName(_document.Name), pdfFileName) + ".pdf";
                         acPlEng.BeginPlot(acPlProgDlg, null);
                         acPlEng.BeginDocument(acPlInfo, _document.Name, null, 1, true, filename);
 
@@ -107,7 +107,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
                 }
             }
 
-            return printStatus;
+            return filename;
         }
     }
 }

@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <LangVersion>Latest</LangVersion>
     <OutputType>WinExe</OutputType>
+    <Configurations>Debug;Release;Autocad;Test</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

@@ -19,15 +19,23 @@ namespace Mocks
             return blocks;
         }
 
-        public ObservableCollection<PrintInfo> GetPrintInfosForBlock(ObservableCollection<PrintInfo> printInfos, string selectedAttribute, int numerationStartValue, string prefix = "", string suffix = "")
+
+        public ObservableCollection<PrintInfo> GetPrintInfosForBlock(ObservableCollection<PrintInfo> printInfos, string selectedAttribute, int numerationStartValue, string prefix, string suffix, bool isCheckedNumbering)
         {
 
             foreach (var printInfo in printInfos)
             {
                 printInfo.FileName = $"{prefix}{printInfo.ObjectId}{selectedAttribute}{suffix}";
                 if (numerationStartValue == null) continue;
-                printInfo.FileName = $"{prefix}{printInfo.ObjectId}{selectedAttribute}{numerationStartValue}{suffix}";
-                numerationStartValue++;
+                if (isCheckedNumbering)
+                {
+                    printInfo.FileName = $"{prefix}{printInfo.ObjectId}{selectedAttribute}{numerationStartValue}{suffix}";
+                    numerationStartValue++;
+                }
+                else
+                {
+                    printInfo.FileName = $"{prefix}{printInfo.ObjectId}{selectedAttribute}{suffix}";
+                }
 
             }
             return printInfos;

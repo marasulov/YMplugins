@@ -74,9 +74,9 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
                         var blockExtents = blockRef.GeometricExtents;
                         var blockWidth = blockExtents.MaxPoint.X - blockExtents.MinPoint.X;
                         var blockHeight = blockExtents.MaxPoint.Y - blockExtents.MinPoint.Y;
-                        var blockPostion = blockRef.Position;
+                        var position = blockRef.Position;
                         var blockScale = blockRef.ScaleFactors.X;
-                        var blockPointPosition = new PointDTO(blockPostion.X, blockPostion.Y, blockPostion.Z);
+                        var blockPointPosition = new PointDTO(position.X, position.Y, position.Z);
                         var blockDimension = new PointDTO(blockPointPosition.X + blockWidth,
                             blockPointPosition.Y + blockHeight, blockPointPosition.Z);
                         var format = FormatFinder.FindClosestFormat(blockWidth, blockHeight);

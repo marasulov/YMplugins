@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Eventing.Reader;
 using Dreambuild.AutoCAD;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
@@ -39,7 +40,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
             return blockAttributes;
         }
 
-        public ObservableCollection<PrintInfo> GetPrintInfosForBlock(ObservableCollection<PrintInfo> printInfos, string selectedAttribute, int numerationStartValue, string prefix, string suffix)
+        public ObservableCollection<PrintInfo> GetPrintInfosForBlock(ObservableCollection<PrintInfo> printInfos, string selectedAttribute, int numerationStartValue, string prefix, string suffix, bool isCheckedNumbering)
         {
             Document doc = Application.DocumentManager.MdiActiveDocument;
             Database db = doc.Database;
@@ -54,8 +55,16 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
                     ObjectId objId = db.GetObjectId(false, handle, 0);
                     var blref = GetBlockById(objId, tr);
                     var attrValue = blref.GetBlockAttribute(selectedAttribute);
-                    printInfo.FileName = prefix + attrValue + suffix + numerationStartValue;
-                    numerationStartValue++;
+                    if (isCheckedNumbering)
+                    {
+                        printInfo.FileName = prefix + attrValue + suffix + numerationStartValue;
+                        numerationStartValue++;
+                    }
+                    else
+                    {
+                        printInfo.FileName = prefix + attrValue + suffix;
+                    }
+                    
                 }
 
                 return printInfos;

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.AutoPrint;
+using YMplugins.Models.Autocad2022.Utils;
 using YMplugins.ViewModels.Commands;
 using YMplugins.ViewModels.VM;
 using YMplugins.Views.Views;
@@ -13,44 +14,45 @@ namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
 {
     public class AutoPrintCommand
     {
-        [CommandMethod("Autoprint")]
-        public static void Print()
-        {
-            var container = new Container();
-            container.Options.EnableAutoVerification = false;
+        //[CommandMethod("Autoprint")]
+        //public static void Print()
+        //{
+        //    var container = new Container();
+        //    container.Options.EnableAutoVerification = false;
 
-            container.Register<GetAttributesCommand>();
-            container.Register<GetBlocksNameCommand>();
-            container.Register<GetLayersCommand>();
-            container.Register<PrintCommand>();
-            container.Register<SelectBlockCommand>();
-            container.Register<AutoPrintVm>();
-            container.Register<AutoPrintView>();
+        //    container.Register<GetAttributesCommand>();
+        //    container.Register<GetBlocksNameCommand>();
+        //    container.Register<GetLayersCommand>();
+        //    container.Register<PrintCommand>();
+        //    container.Register<SelectBlockCommand>();
+        //    container.Register<ZoomToPointCommand>();
+        //    container.Register<AutoPrintVm>();
+        //    container.Register<AutoPrintView>();
 
-            container.Register<IGetBlocksNameService, GetBlocksNameService>();
-            container.Register<IPrintService, PrintService>();
-            container.Register<INamingService, NamingService>();
-            container.Register<IPrintEngine, PrintEngine>();
-            container.Register<BlockSearchService>();
-            container.Register<SearchData>();
+        //    container.Register<IGetBlocksNameService, GetBlocksNameService>();
+        //    container.Register<IPrintService, PrintService>();
+        //    container.Register<INamingService, NamingService>();
+        //    container.Register<IPrintEngine, PrintEngine>();
+        //    container.Register<BlockSearchService>();
+        //    container.Register<SearchData>();
 
 
 
-            container.Register<ISearchService, SearchService>();
+        //    container.Register<ISearchService, SearchService>();
+        //    container.Register<IZoomEntity, ZoomService>();
+        //    container.Register<IGetLayersService, GetLayersService>();
+        //    container.Register<ISelectBlockService, SelectBlockService>();
+        //    container.Register<IAttributesService, AttributeService>();
 
-            container.Register<IGetLayersService, GetLayersService>();
-            container.Register<ISelectBlockService, SelectBlockService>();
-            container.Register<IAttributesService, AttributeService>();
+        //    var window = container
+        //        .GetInstance<AutoPrintView>();
 
-            var window = container
-                .GetInstance<AutoPrintView>();
+        //    var context = (AutoPrintVm)window.DataContext;
+        //    context.GetBlocksNameCommand.Execute(null);
+        //    context.GetLayersCommand.Execute(null);
 
-            var context = (AutoPrintVm)window.DataContext;
-            context.GetBlocksNameCommand.Execute(null);
-            context.GetLayersCommand.Execute(null);
-
-            window.ShowDialog();
-        }
+        //    window.ShowDialog();
+        //}
 
         private IEnumerable<BlockReference> GetPaperSpaceBlockReferences(Database db)
         {

@@ -70,6 +70,8 @@ namespace YMplugins.ViewModels.VM
         private PrintByOption _selectedPrintByOption;
         private string _prefix;
         private string _suffix;
+        private bool _isCheckedNumbering;
+        private string _outputFileName;
 
         public PrintByOption SelectedPrintByOption
         {
@@ -80,7 +82,7 @@ namespace YMplugins.ViewModels.VM
                 {
                     if (_selectedPrintByOption == PrintByOption.ByPolyline)
                     {
-                        BlockDataCollection.Clear();  
+                        BlockDataCollection.Clear();
                     }
                     else if (_selectedPrintByOption == PrintByOption.ByBlock)
                     {
@@ -123,7 +125,7 @@ namespace YMplugins.ViewModels.VM
             set
             {
                 if (!Set(ref _selectedBlockOnScreen, value)) return;
-                UpdateAttributes(); 
+                UpdateAttributes();
                 UpdateBlockCollection();
             }
         }
@@ -146,7 +148,7 @@ namespace YMplugins.ViewModels.VM
                 {
                     UpdateBlockCollection();
                 }
-            } 
+            }
         }
         public string Prefix
         {
@@ -154,7 +156,7 @@ namespace YMplugins.ViewModels.VM
             set
             {
                 Set(ref _prefix, value);
-                
+
                 UpdateBlockCollection();
             }
         }
@@ -165,7 +167,7 @@ namespace YMplugins.ViewModels.VM
             set
             {
                 Set(ref _suffix, value);
-                
+
                 UpdateBlockCollection();
             }
         }
@@ -174,7 +176,7 @@ namespace YMplugins.ViewModels.VM
 
         public int NumerationStartValue
         {
-            get =>_numerationStartValue;
+            get => _numerationStartValue;
             set
             {
                 if (_numerationStartValue == value)
@@ -194,8 +196,28 @@ namespace YMplugins.ViewModels.VM
                 UpdateBlockCollection();
             }
         }
-        public bool IsCheckedNumbering { get; set; }
 
+        public bool IsCheckedNumbering
+        {
+            get => _isCheckedNumbering;
+            set
+            {
+                Set(ref _isCheckedNumbering, value);
+                UpdateBlockCollection();
+            }
+
+        }
+
+        public bool IsCombinePdf { get; set; }
+
+        public string OutputFileName
+        {
+            get => _outputFileName;
+            set
+            {
+                Set(ref _outputFileName, value);
+            }
+        }
 
         private void UpdateAttributes()
         {
@@ -203,7 +225,7 @@ namespace YMplugins.ViewModels.VM
                 return;
 
             Attributes = _attributesService.GetAttributesForBlock(_selectedBlockOnScreen);
-            
+
 
             var printData = new SearchData
             {
@@ -215,7 +237,8 @@ namespace YMplugins.ViewModels.VM
                 AttributeName = SelectedAttr?.AttributeName,
                 NumerationStartValue = NumerationStartValue,
                 Prefix = Prefix,
-                Suffix = Suffix
+                Suffix = Suffix,
+                IsCheckedNumbering = IsCheckedNumbering
             };
             BlockDataCollection = _searchService.FindObjects(printData);
             _isUpdatingAttributes = false;
@@ -226,7 +249,8 @@ namespace YMplugins.ViewModels.VM
             if (SelectedAttr != null && BlockDataCollection != null)
             {
                 BlockDataCollection = new ObservableCollection<PrintInfo>(
-                    _attributesService.GetPrintInfosForBlock(BlockDataCollection, SelectedAttr.AttributeName, NumerationStartValue, Prefix, Suffix));
+                    _attributesService.GetPrintInfosForBlock(BlockDataCollection, SelectedAttr.AttributeName,
+                        NumerationStartValue, Prefix, Suffix, IsCheckedNumbering));
             }
         }
     }

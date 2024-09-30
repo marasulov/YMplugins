@@ -13,8 +13,9 @@ namespace YMplugins.Contracts.Dto
         public double Height { get; set; }
         public double Width { get; set; }
         public double ScaleX { get; set; }
+        //public bool IsCheckedNumbering { get; set; }
 
-        public PrintInfo(long objectId, string space, string format, PointDTO dimension, double scaleX, double width, double height, PointDTO position, string fileName  = "")
+        public PrintInfo(long objectId, string space, string format, PointDTO dimension, double scaleX, double width, double height, PointDTO position, /*bool isCheckedNumbering, */string fileName  = "")
         {
             ObjectId = objectId;
             Space = space;
@@ -24,6 +25,7 @@ namespace YMplugins.Contracts.Dto
             Width = width;
             Height = height;
             Position = position;
+           // IsCheckedNumbering = isCheckedNumbering;
             FileName = fileName;
         }
 
