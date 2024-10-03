@@ -1,10 +1,10 @@
-﻿using YMplugins.ViewModels.Commands;
-using YMplugins.ViewModels.VM;
-using YMplugins.Views.Views;
+﻿using Mocks;
 using SimpleInjector;
 using System;
-using Mocks;
 using YMplugins.Contracts;
+using YMplugins.ViewModels.Commands;
+using YMplugins.ViewModels.VM;
+using YMplugins.Views.Views;
 
 namespace WS.Views.WPF
 {
@@ -20,7 +20,7 @@ namespace WS.Views.WPF
             container.Register<PrintCommand>();
             container.Register<AutoPrintVm>();
             container.Register<AutoPrintView>();
-            
+
             container.Register<IGetBlocksNameService, GetBlocksNameService>();
 
             var window = container

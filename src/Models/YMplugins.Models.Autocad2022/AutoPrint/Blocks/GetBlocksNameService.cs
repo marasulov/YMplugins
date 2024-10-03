@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using YMplugins.Contracts;
 
-namespace YMplugins.Models.Autocad2022.AutoPrint
+namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 {
     public class GetBlocksNameService : IGetBlocksNameService
     {

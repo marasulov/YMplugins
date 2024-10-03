@@ -1,11 +1,10 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Gile.AutoCAD.Extension;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.Utils;
 
-namespace YMplugins.Models.Autocad2022.AutoPrint
+namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 {
     public class BlockSearchService
     {
@@ -64,48 +63,28 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
             {
                 Entity ent = (Entity)trans.GetObject(entId, OpenMode.ForRead);
 
-                if (ent is BlockReference blockRef)
-                {
-                    var blockRefName = blockRef.GetEffectiveName();
-                    //GetEffectiveBlockName(blockRef, trans);
+                if (ent is not BlockReference blockRef) continue;
+                var blockRefName = blockRef.GetEffectiveName();
 
-                    if (blockRefName == blockName)
-                    {
-                        var blockExtents = blockRef.GeometricExtents;
-                        var blockWidth = blockExtents.MaxPoint.X - blockExtents.MinPoint.X;
-                        var blockHeight = blockExtents.MaxPoint.Y - blockExtents.MinPoint.Y;
-                        var position = blockRef.Position;
-                        var blockScale = blockRef.ScaleFactors.X;
-                        var blockPointPosition = new PointDTO(position.X, position.Y, position.Z);
-                        var blockDimension = new PointDTO(blockPointPosition.X + blockWidth,
-                            blockPointPosition.Y + blockHeight, blockPointPosition.Z);
-                        var format = FormatFinder.FindClosestFormat(blockWidth, blockHeight);
+                if (blockRefName != blockName) continue;
+                var blockExtents = blockRef.GeometricExtents;
+                var blockWidth = blockExtents.MaxPoint.X - blockExtents.MinPoint.X;
+                var blockHeight = blockExtents.MaxPoint.Y - blockExtents.MinPoint.Y;
+                var position = blockRef.Position;
+                var blockScale = blockRef.ScaleFactors.X;
+                var blockPointPosition = new PointDTO(position.X, position.Y, position.Z);
+                var blockDimension = new PointDTO(blockPointPosition.X + blockWidth,
+                    blockPointPosition.Y + blockHeight, blockPointPosition.Z);
+                var format = FormatFinder.FindClosestFormat(blockWidth, blockHeight);
 #if DEBUG
-                        Active.Editor.WriteMessage($"format {format}");
+                Active.Editor.WriteMessage($"format {format}");
 #endif
-                        PrintInfo blockData = new PrintInfo(blockRef.Id.Handle.Value, spaceName,format,blockDimension,blockScale, blockWidth, blockHeight, blockPointPosition, true);
+                PrintInfo blockData = new PrintInfo(blockRef.Id.Handle.Value, spaceName, format, blockScale, blockWidth, blockHeight, blockPointPosition, true);
 
-                        blockList.Add(blockData);
-                    }
-                }
+                blockList.Add(blockData);
             }
 
             return blockList;
-        }
-
-        // Function to get the effective name of the block (handles dynamic blocks)
-        private string GetEffectiveBlockName(BlockReference blockRef, Transaction trans)
-        {
-            // If the block is dynamic, get its effective name
-            if (blockRef.IsDynamicBlock)
-            {
-                BlockTableRecord dynamicBTR = (BlockTableRecord)trans.GetObject(blockRef.DynamicBlockTableRecord, OpenMode.ForRead);
-                return dynamicBTR.Name; // Get the effective dynamic block name
-            }
-            else
-            {
-                return blockRef.Name; // Regular block name
-            }
         }
     }
 }

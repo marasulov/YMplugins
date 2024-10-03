@@ -114,10 +114,8 @@
                         <ComboBox Width="200" Margin="0,0,0,10"
                       ItemsSource="{Binding BlocksNames}"
                       SelectedItem="{Binding SelectedBlockOnScreen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                      SelectedIndex="0"
-                      />
+                      SelectedIndex="0"/>
                         <Button Content="Select on screen" Command="{Binding SelectBlockCommand }"  CommandParameter="{Binding }" />
-                        <!--<TextBlock Text="{Binding SelectedBlockOnScreen}" />-->
                     </StackPanel>
 
                     <!-- Комбобокс для Polyline -->
@@ -137,10 +135,10 @@
 
                         <TextBlock Text="Select layer" />
                         <ComboBox Width="200" Margin="0,0,0,10" 
-                      ItemsSource="{Binding  Layers}" 
+                      ItemsSource="{Binding  Layers}"
+                      SelectedItem="{Binding SelectedLayerOnScreen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       SelectedIndex="0" />
-                        <Button Content="Select on screen" Command="{Binding SelectBlockCommand}" />
-                        <!--<TextBlock Text="{Binding SelectedBlockOnScreen}" />-->
+                        <Button Content="Select on layer screen" Command="{Binding SelectedLayerOnScreen}"  CommandParameter="{Binding }" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
@@ -254,7 +252,7 @@
                        ContentStringFormat="Blocks found {0}"/>-->
                 <Label Content="{Binding HeaderContent}" />
             </GroupBox.Header >
-            <DataGrid ItemsSource="{Binding BlockDataCollection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+            <DataGrid ItemsSource="{Binding PrintDataCollection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                       Name="PrintCollection"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
@@ -298,7 +296,7 @@
             <Button Content="Cancel"  Margin="5" />
             <Button Content="Print" Margin="5" Command="{Binding PrintCommand}" CommandParameter="{Binding }" />
         </StackPanel>
-        <TextBlock Grid.Row="3" 
+        <TextBlock Grid.Row="3" Grid.Column="0"
                    Text="{Binding Error}" 
                    Foreground="Red" 
                    TextWrapping="Wrap" 

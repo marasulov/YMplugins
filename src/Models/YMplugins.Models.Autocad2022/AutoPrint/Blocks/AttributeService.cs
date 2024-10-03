@@ -3,18 +3,17 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Eventing.Reader;
-using Dreambuild.AutoCAD;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
+using YMplugins.Models.DbCad;
 
-namespace YMplugins.Models.Autocad2022.AutoPrint
+namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 {
     public class AttributeService : IAttributesService
     {
         public List<BlockAttribute>? GetAttributesForBlock(string selectedBlockName)
         {
-            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Document doc = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument;
             Database db = doc.Database;
             var ed = doc.Editor;
             List<BlockAttribute> blockAttributes = new List<BlockAttribute>();
@@ -42,18 +41,18 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
 
         public ObservableCollection<PrintInfo> GetPrintInfosForBlock(ObservableCollection<PrintInfo> printInfos, string selectedAttribute, int numerationStartValue, string prefix, string suffix, bool isCheckedNumbering)
         {
-            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Document doc = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument;
             Database db = doc.Database;
             var ed = doc.Editor;
 
             using (Transaction tr = db.TransactionManager.StartTransaction())
             {
-                
                 foreach (var printInfo in printInfos)
                 {
                     Handle handle = new Handle(printInfo.ObjectId);
                     ObjectId objId = db.GetObjectId(false, handle, 0);
                     var blref = GetBlockById(objId, tr);
+
                     var attrValue = blref.GetBlockAttribute(selectedAttribute);
                     if (isCheckedNumbering)
                     {
@@ -64,7 +63,6 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
                     {
                         printInfo.FileName = prefix + attrValue + suffix;
                     }
-                    
                 }
 
                 return printInfos;

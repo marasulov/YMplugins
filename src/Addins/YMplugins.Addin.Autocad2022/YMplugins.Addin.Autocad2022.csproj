@@ -29,10 +29,6 @@
       <Private>False</Private>
       
     </Reference>
-    <Reference Include="AutoCADCommands">
-      <HintPath>D:\sharp\Projects for learning\AcadLibs\AutoCADCodePack\bin\r23\AutoCADCommands.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Gile.AutoCAD.Extension">
       <HintPath>D:\from comp\docs\repos\TransmittalCreator\TransmittalCreator\bin\Debug\Gile.AutoCAD.Extension.dll</HintPath>
       <Private>True</Private>
@@ -42,9 +38,5 @@
   <ItemGroup>
     <Resource Include="Icons\translation.png" />
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /y /r &quot;$(TargetDir)*.dll&quot; &quot;%25appdata%25\Autodesk\ApplicationPlugins\YMplugins.bundle\Contents\&quot;" />
-  </Target>
 
 </Project>

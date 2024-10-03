@@ -7,6 +7,7 @@ namespace YMplugins.ViewModels.Commands
     public class SelectBlockCommand : CommandBase
     {
         private ISelectBlockService _selectBlockService;
+
         public SelectBlockCommand(ISelectBlockService selectBlockService)
         {
             _selectBlockService = selectBlockService;
@@ -16,6 +17,7 @@ namespace YMplugins.ViewModels.Commands
         {
             return parameter is AutoPrintVm;
         }
+
         public override void Execute(object parameter)
         {
             //var holesVm = (AutoPrintVm)parameter;

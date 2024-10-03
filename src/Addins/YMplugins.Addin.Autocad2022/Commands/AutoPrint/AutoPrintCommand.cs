@@ -3,6 +3,8 @@ using SimpleInjector;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.AutoPrint;
+using YMplugins.Models.Autocad2022.AutoPrint.Blocks;
+using YMplugins.Models.Autocad2022.AutoPrint.Layers;
 using YMplugins.Models.Autocad2022.Utils;
 using YMplugins.Services;
 using YMplugins.ViewModels.Commands;
@@ -14,7 +16,7 @@ namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
 {
     public class AutoPrintCommand
     {
-        [CommandMethod("Autoprint")]
+        //[CommandMethod("Autoprint")]
         public static void Print()
         {
             var container = new Container();

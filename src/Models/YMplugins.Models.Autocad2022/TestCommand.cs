@@ -1,13 +1,14 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using SimpleInjector;
-using System;
-using System.Collections.Generic;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.AutoPrint;
+using YMplugins.Models.Autocad2022.AutoPrint.Blocks;
+using YMplugins.Models.Autocad2022.AutoPrint.Layers;
 using YMplugins.Models.Autocad2022.Utils;
 using YMplugins.Services;
 using YMplugins.ViewModels.Commands;
@@ -19,50 +20,48 @@ namespace YMplugins.Models.Autocad2022
 {
     public class TestCommands
     {
-        //[CommandMethod("Autoprint2")]
-        //public static void Print()
-        //{
-        //    var container = new Container();
-        //    container.Options.EnableAutoVerification = false;
+        [CommandMethod("Autoprint")]
+        public static void Print()
+        {
+            var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
-        //    container.Register<GetAttributesCommand>();
-        //    container.Register<GetBlocksNameCommand>();
-        //    container.Register<GetLayersCommand>();
-        //    container.Register<PrintCommand>();
-        //    container.Register<SelectBlockCommand>();
-        //    container.Register<ZoomToPointCommand>();
-        //    container.Register<AutoPrintVm>(Lifestyle.Transient);
-        //    container.Register<AutoPrintView>(Lifestyle.Transient);
+            container.Register<GetAttributesCommand>();
+            container.Register<GetBlocksNameCommand>();
+            container.Register<GetLayersCommand>();
+            container.Register<PrintCommand>();
+            container.Register<SelectBlockCommand>();
+            container.Register<ZoomToPointCommand>();
+            container.Register<AutoPrintVm>(Lifestyle.Transient);
+            container.Register<AutoPrintView>(Lifestyle.Transient);
 
-        //    container.Register<LoadingWindow>(Lifestyle.Transient);
+            container.Register<LoadingWindow>(Lifestyle.Transient);
 
-        //    container.Register<IGetBlocksNameService, GetBlocksNameService>();
-        //    container.Register<IPrintService, PrintService>();
-        //    container.Register<INamingService, NamingService>();
-        //    container.Register<BlockSearchService>();
-        //    container.Register<SearchData>();
+            container.Register<IGetBlocksNameService, GetBlocksNameService>();
+            container.Register<IPrintService, PrintService>();
+            container.Register<INamingService, NamingService>();
+            container.Register<BlockSearchService>();
+            container.Register<SearchData>();
 
-        //    container.Register<ISearchService, SearchService>();
-        //    container.Register<IZoomEntity, ZoomService>();
-        //    container.Register<IGetLayersService, GetLayersService>();
-        //    container.Register<ISelectBlockService, SelectBlockService>();
-        //    container.Register<IAttributesService, AttributeService>();
-        //    container.Register<ICombinePdfService, CombinePdfService>();
-        //    container.Register<IAutoCadFileService, AutoCadFileService>();
-        //    container.Register<INotifyService, NotifyService>();
+            container.Register<ISearchService, SearchService>();
+            container.Register<IZoomEntity, ZoomService>();
+            container.Register<IGetLayersService, GetLayersService>();
+            container.Register<ISelectBlockService, SelectBlockService>();
+            container.Register<IAttributesService, AttributeService>();
+            container.Register<ICombinePdfService, CombinePdfService>();
+            container.Register<IAutoCadFileService, AutoCadFileService>();
+            container.Register<INotifyService, NotifyService>();
 
-        //    container.Register<IWindowService, WindowService>();
+            container.Register<IWindowService, WindowService>();
 
+            var window = container.GetInstance<AutoPrintView>();
+            var context = (AutoPrintVm)window.DataContext;
 
-        //    var window = container.GetInstance<AutoPrintView>();
-        //    var context = (AutoPrintVm)window.DataContext;
+            context.GetBlocksNameCommand.Execute(null);
+            context.GetLayersCommand.Execute(null);
 
-        //    context.GetBlocksNameCommand.Execute(null);
-        //    context.GetLayersCommand.Execute(null);
-
-        //    window.ShowDialog();
-        //}
-
+            window.ShowDialog();
+        }
 
         //[CommandMethod("SearchBlocksByName")]
         //public void SearchBlocksByName()
@@ -215,8 +214,129 @@ namespace YMplugins.Models.Autocad2022
         //    return false;
         //}
 
+        [CommandMethod("GetPolylinePosition")]
+        public static void GetPolylinePosition()
+        {
+            Document acDoc = Application.DocumentManager.MdiActiveDocument;
+            Editor acEd = acDoc.Editor;
+            Database acCurDb = acDoc.Database;
 
+            // Запрашиваем пользователя выбрать объект
+            PromptEntityOptions peo = new PromptEntityOptions("\nВыберите полилинию: ");
+            peo.SetRejectMessage("\nЭто не полилиния. Попробуйте снова.");
+            peo.AddAllowedClass(typeof(Polyline), true);
 
+            PromptEntityResult per = acEd.GetEntity(peo);
+            if (per.Status != PromptStatus.OK)
+            {
+                acEd.WriteMessage("\nВыбор отменен.");
+                return;
+            }
+
+            using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
+            {
+                // Получаем выбранный объект
+                Entity ent = acTrans.GetObject(per.ObjectId, OpenMode.ForRead) as Entity;
+
+                if (ent is Polyline)
+                {
+                    Polyline polyline = ent as Polyline;
+
+                    // Получение первой точки полилинии
+                    Point2d firstPoint = GetFirstPoint(polyline);
+                    acEd.WriteMessage($"\nПервая точка полилинии: X = {firstPoint.X}, Y = {firstPoint.Y}");
+
+                    // Или получение центроида полилинии
+                    Point2d centroid = GetCentroid(polyline);
+                    acEd.WriteMessage($"\nЦентроид полилинии: X = {centroid.X}, Y = {centroid.Y}");
+                }
+
+                acTrans.Commit();
+            }
+        }
+
+        public static Point2d GetCentroid(Polyline polyline)
+        {
+            double sumX = 0, sumY = 0;
+            int vertexCount = polyline.NumberOfVertices;
+
+            // Проходим по всем вершинам полилинии
+            for (int i = 0; i < vertexCount; i++)
+            {
+                Point2d vertex = polyline.GetPoint2dAt(i);
+                sumX += vertex.X;
+                sumY += vertex.Y;
+            }
+
+            // Возвращаем среднюю точку по X и Y
+            return new Point2d(sumX / vertexCount, sumY / vertexCount);
+        }
+
+        public static Point2d GetFirstPoint(Polyline polyline)
+        {
+            return polyline.GetPoint2dAt(0); // Получение первой точки
+        }
+
+        [CommandMethod("SelectAndGetDimensions")]
+        public static void SelectAndGetDimensions()
+        {
+            Document acDoc = Application.DocumentManager.MdiActiveDocument;
+            Editor acEd = acDoc.Editor;
+            Database acCurDb = acDoc.Database;
+
+            // Запрашиваем пользователя выбрать объект
+            PromptEntityOptions peo = new PromptEntityOptions("\nВыберите полилинию: ");
+            peo.SetRejectMessage("\nЭто не полилиния. Попробуйте снова.");
+            peo.AddAllowedClass(typeof(Polyline), true);
+
+            // Получаем результат выбора
+            PromptEntityResult per = acEd.GetEntity(peo);
+            if (per.Status != PromptStatus.OK)
+            {
+                acEd.WriteMessage("\nВыбор отменен.");
+                return;
+            }
+
+            // Открываем транзакцию и обрабатываем выбранную полилинию
+            using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
+            {
+                // Получаем выбранный объект
+                Entity ent = acTrans.GetObject(per.ObjectId, OpenMode.ForRead) as Entity;
+
+                // Передаем объект полилинии в метод для расчета длины и ширины
+                if (ent is Polyline)
+                {
+                    Polyline polyline = ent as Polyline;
+                    (double length, double width) = GetDimensions(polyline);
+
+                    // Выводим результаты
+                    acEd.WriteMessage($"\nДлина: {length}, Ширина: {width}");
+                }
+
+                acTrans.Commit();
+            }
+        }
+
+        public static (double length, double width) GetDimensions(Polyline polyline)
+        {
+            double minX = double.MaxValue, minY = double.MaxValue;
+            double maxX = double.MinValue, maxY = double.MinValue;
+
+            for (int i = 0; i < polyline.NumberOfVertices; i++)
+            {
+                Point2d vertex = polyline.GetPoint2dAt(i);
+
+                if (vertex.X < minX) minX = vertex.X;
+                if (vertex.X > maxX) maxX = vertex.X;
+                if (vertex.Y < minY) minY = vertex.Y;
+                if (vertex.Y > maxY) maxY = vertex.Y;
+            }
+
+            double length = maxX - minX;
+            double width = maxY - minY;
+
+            return (length, width);
+        }
 
         [CommandMethod("FindBlockByNameWithAttributes")]
         public void FindBlockByNameWithAttributes()
@@ -372,7 +492,5 @@ namespace YMplugins.Models.Autocad2022
                 ed.WriteMessage($"\n  - Attribute: {attRef.Tag}, Value: {attRef.TextString}");
             }
         }
-
     }
 }
-

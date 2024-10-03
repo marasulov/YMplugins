@@ -3,14 +3,14 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using YMplugins.Contracts;
 
-namespace YMplugins.Models.Autocad2022.AutoPrint
+namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 {
     public class SelectBlockService : ISelectBlockService
     {
         public string SelectBlock()
         {
             // Get the active document and database
-            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Document doc = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument;
             Database db = doc.Database;
             string blockName = default;
             using (Transaction tr = db.TransactionManager.StartTransaction())

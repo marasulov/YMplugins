@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Gile.AutoCAD.Extension;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.Utils.Print;
@@ -15,14 +14,12 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
         public PrintService(ICombinePdfService fileCombineService)
         {
             _fileCombineService = fileCombineService;
-            
         }
 
         public string[] Print(PrintInfo[] data)
         {
-            
             //var objectsToPrint = _searchService.FindObjects(data);
-            
+
             //var printInfos = _namingService.GenerateFileName(objectsToPrint, 0);
 
             List<string> fileNames = new List<string>();
@@ -35,8 +32,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
             }
             return fileNames.ToArray();
 
-           
-           //_printEngine.PrintObjects(objectsToPrint, fileName, data);
+            //_printEngine.PrintObjects(objectsToPrint, fileName, data);
         }
     }
 }

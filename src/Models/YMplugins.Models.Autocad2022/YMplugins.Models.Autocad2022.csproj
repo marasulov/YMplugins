@@ -32,9 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="AutoCADCommands">
-      <HintPath>D:\sharp\Projects for learning\AcadLibs\AutoCADCodePack\bin\r23\AutoCADCommands.dll</HintPath>
-    </Reference>
     <Reference Include="Gile.AutoCAD.Extension">
       <HintPath>D:\from comp\docs\repos\TransmittalCreator\TransmittalCreator\bin\Debug\Gile.AutoCAD.Extension.dll</HintPath>
       <Private>True</Private>

@@ -1,7 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using System.Collections.Generic;
 
-namespace YMplugins.Models.Autocad2022.AutoPrint
+namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 {
     public class DynamicBlockService
     {

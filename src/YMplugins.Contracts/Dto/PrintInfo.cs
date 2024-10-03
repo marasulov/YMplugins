@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using YMplugins.Contracts.Dto.Enums;
 
 namespace YMplugins.Contracts.Dto
 {
@@ -13,8 +12,7 @@ namespace YMplugins.Contracts.Dto
         public string Format { get; set; }
         public string FileName { get; set; }
         public PointDTO Position { get; set; }
-        public PointDTO Dimension { get; set; }
-        public double Height { get; set; }
+        public double Length { get; set; }
         public double Width { get; set; }
         public double ScaleX { get; set; }
 
@@ -27,18 +25,17 @@ namespace YMplugins.Contracts.Dto
                 OnPropertyChanged();
             }
         }
+
         //public bool IsCheckedNumbering { get; set; }
 
-
-        public PrintInfo(long objectId, string space, string format, PointDTO dimension, double scaleX, double width, double height, PointDTO position, bool isPrint, string fileName = "")
+        public PrintInfo(long objectId, string space, string format, double scaleX, double width, double length, PointDTO position, bool isPrint, string fileName = "")
         {
             ObjectId = objectId;
             Space = space;
             Format = format;
-            Dimension = dimension;
             ScaleX = scaleX;
             Width = width;
-            Height = height;
+            Length = length;
             Position = position;
             IsPrint = isPrint;
             FileName = fileName;
@@ -46,7 +43,7 @@ namespace YMplugins.Contracts.Dto
 
         public bool IsFormatHorizontal()
         {
-            return Width > Height;
+            return Width > Length;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

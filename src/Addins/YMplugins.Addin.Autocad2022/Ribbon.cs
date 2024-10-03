@@ -1,7 +1,5 @@
-﻿
-using System.IO;
+﻿using System.IO;
 using YMplugins.Addin.Autocad2022.Commands.Translator;
-using YMplugins.Models.Autocad2022.Utils.Print;
 using YMplugins.Services.Translator;
 
 namespace YMplugins.Addin.Autocad2022
@@ -39,11 +37,10 @@ namespace YMplugins.Addin.Autocad2022
 
                 if ((assembly != null) | (assembly1 != null)) Active.Editor.WriteMessage("style dlls not load");
 
+                //var standartCopier = new StandartCopier();
+                //var isConfFileCopied = standartCopier.CopyParamsFiles();
 
-                var standartCopier = new StandartCopier();
-                var isConfFileCopied = standartCopier.CopyParamsFiles();
-
-                if (!isConfFileCopied) Active.Editor.WriteMessage("файлы не скопированы");
+                //if (!isConfFileCopied) Active.Editor.WriteMessage("файлы не скопированы");
             }
 
             internal class ProxyDomain : MarshalByRefObject
@@ -63,10 +60,9 @@ namespace YMplugins.Addin.Autocad2022
 
             public void Terminate()
             {
-
             }
 
-            void ComponentManager_ItemInitialized(object sender, RibbonItemEventArgs e)
+            private void ComponentManager_ItemInitialized(object sender, RibbonItemEventArgs e)
             {
                 // Проверяем, что лента загружена
                 if (ComponentManager.Ribbon != null)
@@ -80,7 +76,7 @@ namespace YMplugins.Addin.Autocad2022
                 }
             }
 
-            void BuildRibbonTab()
+            private void BuildRibbonTab()
             {
                 // Если лента еще не загружена
                 if (!isLoaded())
@@ -92,7 +88,7 @@ namespace YMplugins.Addin.Autocad2022
                 }
             }
 
-            bool isLoaded()
+            private bool isLoaded()
             {
                 bool _loaded = false;
                 RibbonControl ribCntrl = ComponentManager.Ribbon;
@@ -113,7 +109,8 @@ namespace YMplugins.Addin.Autocad2022
             /* Удаление своей вкладки с ленты
              * В данном примере не используем
              */
-            void RemoveRibbonTab()
+
+            private void RemoveRibbonTab()
             {
                 try
                 {
@@ -144,18 +141,17 @@ namespace YMplugins.Addin.Autocad2022
              * Будем следить за системной переменной WSCURRENT (текущее рабочее пространство),
              * чтобы наша вкладка не "терялась" при изменение рабочего пространства
              */
-            void acadApp_SystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
+
+            private void acadApp_SystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
             {
                 if (e.Name.Equals("WSCURRENT")) BuildRibbonTab();
             }
 
-
             // Создание нашей вкладки
-            void CreateRibbonTab()
+            private void CreateRibbonTab()
             {
                 try
                 {
-
                     RibbonControl ribCntrl = ComponentManager.Ribbon;
 
                     RibbonTab ribTab = new RibbonTab();
@@ -277,8 +273,6 @@ namespace YMplugins.Addin.Autocad2022
 
                     //RibbonPanelBreak panelBreak = new RibbonPanelBreak();
                     //ribSourcePanel.Items.Add(panelBreak);
-
-
                 }
                 catch (System.Exception ex)
                 {
@@ -314,7 +308,6 @@ namespace YMplugins.Addin.Autocad2022
 
                 ribSourcePanel.Items.Add(ribBtn);
             }
-
 
             private BitmapImage LoadImage(string ImageName)
             {
@@ -362,7 +355,8 @@ namespace YMplugins.Addin.Autocad2022
             /* Собственный обраотчик команд
             * Это один из вариантов вызова команды по нажатию кнопки
             */
-            class RibbonCommandHandler : ICommand
+
+            private class RibbonCommandHandler : ICommand
             {
                 public bool CanExecute(object parameter)
                 {
@@ -514,8 +508,5 @@ namespace YMplugins.Addin.Autocad2022
                 _languageModeMap.Add("Yiddish", "yi");
             }
         }
-
-
-
     }
 }

@@ -1,10 +1,6 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using YMplugins.Contracts;
 using YMplugins.ViewModels.VM;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace YMplugins.ViewModels.Commands
 {
@@ -31,7 +27,7 @@ namespace YMplugins.ViewModels.Commands
         //    try
         //    {
         //        var vm = (AutoPrintVm)parameter;
-        //        var printData = vm.BlockDataCollection.ToArray();
+        //        var printData = vm.PrintDataCollection.ToArray();
 
         //        var fileNames = await Task.Run(() => _printService.Print(printData));
         //        var joinedBubbleTexts = string.Join("\n", fileNames);
@@ -50,7 +46,6 @@ namespace YMplugins.ViewModels.Commands
         //    }
         //    finally
         //    {
-
         //        _windowService.CloseLoadingWindow();
         //    }
         //}
@@ -59,27 +54,32 @@ namespace YMplugins.ViewModels.Commands
         {
             var vm = (AutoPrintVm)parameter;
             vm.Error = string.Empty;
-
-            if (vm.BlockDataCollection == null || !vm.BlockDataCollection.Any())
+            if (vm.PrintDataCollection == null || !vm.PrintDataCollection.Any())
             {
                 vm.Error = string.Join("\n", "Block not selected");
                 return;
             }
 
-            
-            var emptyFileNameBlocks = vm.BlockDataCollection.Where(b => string.IsNullOrWhiteSpace(b.FileName)).ToList();
+            var emptyFileNameBlocks = vm.PrintDataCollection.Where(b => string.IsNullOrWhiteSpace(b.FileName)).ToList();
             if (emptyFileNameBlocks.Any())
             {
                 vm.Error = "File name is absent.";
                 return;
             }
 
+            //if (vm.SelectedPrintByOption == PrintByOption.ByBlock)
+            //{
+            //}
+            //else
+            //{
+            //}
+
             vm.CloseAction?.Invoke();
-            var printData = vm.BlockDataCollection.Where(x => x.IsPrint).ToArray();
+            var printData = vm.PrintDataCollection.Where(x => x.IsPrint).ToArray();
             var fileNames = _printService.Print(printData);
             var joinedBubbleTexts = string.Join("\n", fileNames);
             if (vm.IsCombinePdf)
-                joinedBubbleTexts =_combinePdfService.Combine(fileNames,  string.Join("",vm.OutputFileName, ".pdf"));
+                joinedBubbleTexts = _combinePdfService.Combine(fileNames, string.Join("", vm.OutputFileName, ".pdf"));
 
             _notifyService.Notify(joinedBubbleTexts);
         }

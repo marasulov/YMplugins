@@ -33,7 +33,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
             var acPlSetVdr = PlotSettingsValidator.Current;
 
             var blockPosition = new Point2d(_printModel.Position.X, _printModel.Position.Y);
-            var blockDimension = new Point2d(blockPosition.X + _printModel.Width, blockPosition.Y + _printModel.Height);
+            var blockDimension = new Point2d(blockPosition.X + _printModel.Width, blockPosition.Y + _printModel.Length);
             var points = new Extents2d(blockPosition, blockDimension);
 
             bool isHor = _printModel.IsFormatHorizontal();

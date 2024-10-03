@@ -15,6 +15,7 @@ namespace YMplugins.Contracts.Dto
         public string Prefix { get; set; }
         public string Suffix { get; set; }
         public PrintingOrder SelectedPrintingOrder { get; set; }
+        public string SelectedLayer { get; set; }
 
         //public SearchData(PrintByOption selectedPrintByOption, bool isSearchOnModel, bool isSearchOnLayouts, string selectedBlockName, string attributeName, bool isCheckedNumbering, int numerationStartValue, string prefix, string suffix, PrintingOrder selectedPrintingOrder)
         //{

@@ -75,7 +75,7 @@ public class ZoomService : IZoomEntity
                 //// Adjust the view center and height based on the entity's extents
                 //view.CenterPoint = new Point2d((extents.MinPoint.X + extents.MaxPoint.X) / 2,
                 //    (extents.MinPoint.Y + extents.MaxPoint.Y) / 2);
-                //view.Height = extents.MaxPoint.Y - extents.MinPoint.Y;
+                //view.Length = extents.MaxPoint.Y - extents.MinPoint.Y;
 
                 //// Optionally, adjust the width (aspect ratio)
                 //view.Width = extents.MaxPoint.X - extents.MinPoint.X;
@@ -105,7 +105,7 @@ public class ZoomService : IZoomEntity
 
     //        min2d + ((max2d - min2d) / 2.0);
 
-    //    view.Height = max2d.Y - min2d.Y;
+    //    view.Length = max2d.Y - min2d.Y;
 
     //    view.Width = max2d.X - min2d.X;
 

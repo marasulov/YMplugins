@@ -17,10 +17,9 @@ namespace YMplugins.ViewModels.VM
         private List<BlockAttribute> _attributes;
         private bool _canExecute = true;
         private string _selectedBlockOnScreen;
-        private readonly ZoomToPointCommand _zoomToPointCommand;
         private IAttributesService _attributesService;
         private readonly ISearchService _searchService;
-        private ObservableCollection<PrintInfo> _blockDataCollection;
+        private ObservableCollection<PrintInfo> _printDataCollection;
         private BlockAttribute _selectedAttr;
         private bool _isUpdatingAttributes;
         private int _numerationStartValue;
@@ -31,7 +30,6 @@ namespace YMplugins.ViewModels.VM
         private bool _isCheckedNumbering;
         private string _outputFileName;
         private bool _isAllPrintSelected = true;
-
 
         //private string _selectedBlock;
 
@@ -54,7 +52,7 @@ namespace YMplugins.ViewModels.VM
             PrintCommand = printCommand;
             SelectBlockCommand = selectBlockCommand;
             ZoomToPointCommand = zoomToPointCommand;
-            //BlockDataCollection.CollectionChanged += (s, e) => UpdateSelectedPrintCount();
+            //PrintDataCollection.CollectionChanged += (s, e) => UpdateSelectedPrintCount();
         }
 
         private void GetLayersCommandOnResultObtained(List<string> obj)
@@ -86,14 +84,13 @@ namespace YMplugins.ViewModels.VM
                 {
                     if (_selectedPrintByOption == PrintByOption.ByPolyline)
                     {
-                        BlockDataCollection.Clear();
+                        PrintDataCollection?.Clear();
                     }
                     else if (_selectedPrintByOption == PrintByOption.ByBlock)
                     {
                         UpdateAttributes();
                         UpdateBlockCollection();
                     }
-
                 }
             }
         }
@@ -101,11 +98,14 @@ namespace YMplugins.ViewModels.VM
         // Свойство для выбора порядка печати
         public PrintingOrder SelectedPrintingOrder { get; set; }
 
-
         public List<string> Layers
         {
             get => _layers;
-            set => Set(ref _layers, value);
+            set
+            {
+                Set(ref _layers, value);
+                SearchPolylinesInLayer();
+            }
         }
 
         public List<BlockAttribute> Attributes
@@ -114,39 +114,37 @@ namespace YMplugins.ViewModels.VM
             set => Set(ref _attributes, value);
         }
 
-        //public ObservableCollection<PrintInfo> BlockDataCollection
+        //public ObservableCollection<PrintInfo> PrintDataCollection
         //{
-        //    get => _blockDataCollection;
+        //    get => _printDataCollection;
         //    set
         //    {
-        //        Set(ref _blockDataCollection, value);
+        //        Set(ref _printDataCollection, value);
         //        OnPropertyChanged(nameof(HeaderContent));
-        //    } 
+        //    }
         //}
 
-        public ObservableCollection<PrintInfo> BlockDataCollection
+        public ObservableCollection<PrintInfo> PrintDataCollection
         {
-            get => _blockDataCollection;
+            get => _printDataCollection;
             set
             {
-                if (_blockDataCollection != value)
+                if (_printDataCollection != value)
                 {
-                    if (_blockDataCollection != null)
+                    if (_printDataCollection != null)
                     {
-                        foreach (var item in _blockDataCollection)
+                        foreach (var item in _printDataCollection)
                         {
-                            // Отписываемся от старых элементов
                             item.PropertyChanged -= OnBlockDataPropertyChanged;
                         }
                     }
 
-                    _blockDataCollection = value;
+                    _printDataCollection = value;
 
-                    if (_blockDataCollection != null)
+                    if (_printDataCollection != null)
                     {
-                        foreach (var item in _blockDataCollection)
+                        foreach (var item in _printDataCollection)
                         {
-                            // Подписываемся на новые элементы
                             item.PropertyChanged += OnBlockDataPropertyChanged;
                         }
                     }
@@ -157,8 +155,6 @@ namespace YMplugins.ViewModels.VM
             }
         }
 
-
-
         private void OnBlockDataPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(PrintInfo.IsPrint))
@@ -166,7 +162,6 @@ namespace YMplugins.ViewModels.VM
                 UpdateSelectedPrintCount(); // Обновляем счетчик при изменении IsPrint
             }
         }
-
 
         public string SelectedBlockOnScreen
         {
@@ -176,6 +171,15 @@ namespace YMplugins.ViewModels.VM
                 if (!Set(ref _selectedBlockOnScreen, value)) return;
                 UpdateAttributes();
                 UpdateBlockCollection();
+            }
+        }
+
+        public string SelectedLayerOnScreen
+        {
+            get => _selectedLayerOnScreen;
+            set
+            {
+                SearchPolylinesInLayer();
             }
         }
 
@@ -199,6 +203,7 @@ namespace YMplugins.ViewModels.VM
                 }
             }
         }
+
         public string Prefix
         {
             get => _prefix;
@@ -220,6 +225,7 @@ namespace YMplugins.ViewModels.VM
                 UpdateBlockCollection();
             }
         }
+
         public bool IsSearchOnModel { get; set; } = true;
         public bool IsSearchOnLayout { get; set; }
 
@@ -254,7 +260,6 @@ namespace YMplugins.ViewModels.VM
                 Set(ref _isCheckedNumbering, value);
                 UpdateBlockCollection();
             }
-
         }
 
         public bool IsCombinePdf { get; set; }
@@ -262,10 +267,7 @@ namespace YMplugins.ViewModels.VM
         public string OutputFileName
         {
             get => _outputFileName;
-            set
-            {
-                Set(ref _outputFileName, value);
-            }
+            set => Set(ref _outputFileName, value);
         }
 
         public bool IsAllPrintSelected
@@ -275,8 +277,8 @@ namespace YMplugins.ViewModels.VM
             {
                 _isAllPrintSelected = value;
                 OnPropertyChanged();
-                
-                foreach (var printInfo in BlockDataCollection)
+
+                foreach (var printInfo in PrintDataCollection)
                 {
                     printInfo.IsPrint = value;
                 }
@@ -287,6 +289,7 @@ namespace YMplugins.ViewModels.VM
 
         private int _selectedPrintCount;
         private string _error;
+        private string _selectedLayerOnScreen;
 
         public int SelectedPrintCount
         {
@@ -303,20 +306,17 @@ namespace YMplugins.ViewModels.VM
         }
 
         public string HeaderContent =>
-            $"Blocks found {BlockDataCollection?.Count ?? 0} | Selected for Printing: {SelectedPrintCount}";
+            $"Blocks found {PrintDataCollection?.Count ?? 0} | Selected for Printing: {SelectedPrintCount}";
 
         public string Error
         {
-            get=>_error;
-            set
-            {
-                Set(ref _error, value);
-            }
+            get => _error;
+            set => Set(ref _error, value);
         }
 
         private void UpdateSelectedPrintCount()
         {
-            SelectedPrintCount = BlockDataCollection.Count(b => b.IsPrint);
+            if (PrintDataCollection != null) SelectedPrintCount = PrintDataCollection.Count(b => b.IsPrint);
         }
 
         private void UpdateAttributes()
@@ -326,8 +326,7 @@ namespace YMplugins.ViewModels.VM
 
             Attributes = _attributesService.GetAttributesForBlock(_selectedBlockOnScreen);
 
-
-            var printData = new SearchData
+            var searchData = new SearchData
             {
                 SelectedPrintByOption = SelectedPrintByOption,
                 SelectedPrintingOrder = SelectedPrintingOrder,
@@ -338,21 +337,42 @@ namespace YMplugins.ViewModels.VM
                 NumerationStartValue = NumerationStartValue,
                 Prefix = Prefix,
                 Suffix = Suffix,
-                IsCheckedNumbering = IsCheckedNumbering
+                IsCheckedNumbering = IsCheckedNumbering,
+                SelectedLayer = SelectedLayerOnScreen
             };
-            BlockDataCollection = _searchService.FindObjects(printData);
+
+            PrintDataCollection = _searchService.FindObjects(searchData);
             _isUpdatingAttributes = false;
         }
 
         private void UpdateBlockCollection()
         {
-            if (SelectedAttr != null && BlockDataCollection != null)
+            if (SelectedAttr != null && PrintDataCollection != null)
             {
-                BlockDataCollection = new ObservableCollection<PrintInfo>(
-                    _attributesService.GetPrintInfosForBlock(BlockDataCollection, SelectedAttr.AttributeName,
+                PrintDataCollection = new ObservableCollection<PrintInfo>(
+                    _attributesService.GetPrintInfosForBlock(PrintDataCollection, SelectedAttr.AttributeName,
                         NumerationStartValue, Prefix, Suffix, IsCheckedNumbering));
             }
             UpdateSelectedPrintCount();
+        }
+
+        private void SearchPolylinesInLayer()
+        {
+            var searchData = new SearchData
+            {
+                SelectedPrintByOption = SelectedPrintByOption,
+                SelectedPrintingOrder = SelectedPrintingOrder,
+                IsSearchOnModel = IsSearchOnModel,
+                IsSearchOnLayouts = IsSearchOnLayout,
+                SelectedBlockName = SelectedBlockOnScreen,
+                AttributeName = SelectedAttr?.AttributeName,
+                NumerationStartValue = NumerationStartValue,
+                Prefix = Prefix,
+                Suffix = Suffix,
+                IsCheckedNumbering = IsCheckedNumbering,
+                SelectedLayer = SelectedLayerOnScreen
+            };
+            PrintDataCollection = _searchService.FindObjects(searchData);
         }
     }
 }
