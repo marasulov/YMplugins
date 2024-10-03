@@ -2,130 +2,131 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
+using SimpleInjector;
 using System;
 using System.Collections.Generic;
-
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.AutoPrint;
-using YMplugins.ViewModels.Commands;
-using YMplugins.ViewModels.VM;
-using SimpleInjector;
-using YMplugins.Views.Views;
 using YMplugins.Models.Autocad2022.Utils;
 using YMplugins.Services;
-using YMplugins.Views;
+using YMplugins.ViewModels.Commands;
+using YMplugins.ViewModels.VM;
 using YMplugins.Views.Services;
+using YMplugins.Views.Views;
 
 namespace YMplugins.Models.Autocad2022
 {
     public class TestCommands
     {
-        [CommandMethod("Autoprint")]
-        public static void Print()
-        {
-            var container = new Container();
-            container.Options.EnableAutoVerification = false;
+        //[CommandMethod("Autoprint2")]
+        //public static void Print()
+        //{
+        //    var container = new Container();
+        //    container.Options.EnableAutoVerification = false;
 
-            container.Register<GetAttributesCommand>();
-            container.Register<GetBlocksNameCommand>();
-            container.Register<GetLayersCommand>();
-            container.Register<PrintCommand>();
-            container.Register<SelectBlockCommand>();
-            container.Register<ZoomToPointCommand>();
-            container.Register<AutoPrintVm>();
-            container.Register<AutoPrintView>();
+        //    container.Register<GetAttributesCommand>();
+        //    container.Register<GetBlocksNameCommand>();
+        //    container.Register<GetLayersCommand>();
+        //    container.Register<PrintCommand>();
+        //    container.Register<SelectBlockCommand>();
+        //    container.Register<ZoomToPointCommand>();
+        //    container.Register<AutoPrintVm>(Lifestyle.Transient);
+        //    container.Register<AutoPrintView>(Lifestyle.Transient);
 
-            container.Register<IGetBlocksNameService, GetBlocksNameService>();
-            container.Register<IPrintService, PrintService>();
-            container.Register<INamingService, NamingService>();
-            container.Register<IPrintEngine, PrintEngine>();
-            container.Register<BlockSearchService>();
-            container.Register<SearchData>();
+        //    container.Register<LoadingWindow>(Lifestyle.Transient);
 
-            container.Register<ISearchService, SearchService>();
-            container.Register<IZoomEntity, ZoomService>();
-            container.Register<IGetLayersService, GetLayersService>();
-            container.Register<ISelectBlockService, SelectBlockService>();
-            container.Register<IAttributesService, AttributeService>();
-            container.Register<ICombinePdfService, CombinePdfService>();
-            container.Register<IAutoCadFileService, AutoCadFileService>();
-            container.Register<INotifyService, NotifyService>();
+        //    container.Register<IGetBlocksNameService, GetBlocksNameService>();
+        //    container.Register<IPrintService, PrintService>();
+        //    container.Register<INamingService, NamingService>();
+        //    container.Register<BlockSearchService>();
+        //    container.Register<SearchData>();
 
-           var window = container
-                .GetInstance<AutoPrintView>();
+        //    container.Register<ISearchService, SearchService>();
+        //    container.Register<IZoomEntity, ZoomService>();
+        //    container.Register<IGetLayersService, GetLayersService>();
+        //    container.Register<ISelectBlockService, SelectBlockService>();
+        //    container.Register<IAttributesService, AttributeService>();
+        //    container.Register<ICombinePdfService, CombinePdfService>();
+        //    container.Register<IAutoCadFileService, AutoCadFileService>();
+        //    container.Register<INotifyService, NotifyService>();
 
-            var context = (AutoPrintVm)window.DataContext;
-            context.GetBlocksNameCommand.Execute(null);
-            context.GetLayersCommand.Execute(null);
-
-            window.ShowDialog();
-        }
+        //    container.Register<IWindowService, WindowService>();
 
 
-        [CommandMethod("SearchBlocksByName")]
-        public void SearchBlocksByName()
-        {
-            Document doc = Application.DocumentManager.MdiActiveDocument;
-            Database db = doc.Database;
-            Editor ed = doc.Editor;
+        //    var window = container.GetInstance<AutoPrintView>();
+        //    var context = (AutoPrintVm)window.DataContext;
 
-            // Prompt user for block name
-            PromptResult pr = ed.GetString("\nEnter block name to search for: ");
-            if (pr.Status != PromptStatus.OK) return;
-            string blockName = pr.StringResult;
+        //    context.GetBlocksNameCommand.Execute(null);
+        //    context.GetLayersCommand.Execute(null);
 
-            using (doc.LockDocument())
-            {
-                // Search in Model Space
-                List<BlockReference> modelBlocks = SearchSpaceByName(db, SymbolUtilityServices.GetBlockModelSpaceId(db), blockName);
-                ed.WriteMessage($"\nFound {modelBlocks.Count} dynamic blocks named '{blockName}' in Model Space");
+        //    window.ShowDialog();
+        //}
 
-                // Search in all Layout spaces
-                List<BlockReference> layoutBlocks = new List<BlockReference>();
-                using (Transaction tr = db.TransactionManager.StartTransaction())
-                {
-                    DBDictionary layouts = tr.GetObject(db.LayoutDictionaryId, OpenMode.ForRead) as DBDictionary;
-                    foreach (DBDictionaryEntry entry in layouts)
-                    {
-                        Layout layout = tr.GetObject(entry.Value, OpenMode.ForRead) as Layout;
-                        if (!layout.ModelType)  // Skip Model Space layout
-                        {
-                            BlockTableRecord btr = tr.GetObject(layout.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
-                            layoutBlocks.AddRange(SearchSpaceByName(db, btr.ObjectId, blockName));
-                        }
-                    }
-                    tr.Commit();
-                }
-                ed.WriteMessage($"\nFound {layoutBlocks.Count} dynamic blocks named '{blockName}' in all Layouts");
 
-                int totalBlocks = modelBlocks.Count + layoutBlocks.Count;
-                ed.WriteMessage($"\nTotal dynamic blocks named '{blockName}' found: {totalBlocks}");
-            }
-        }
+        //[CommandMethod("SearchBlocksByName")]
+        //public void SearchBlocksByName()
+        //{
+        //    Document doc = Application.DocumentManager.MdiActiveDocument;
+        //    Database db = doc.Database;
+        //    Editor ed = doc.Editor;
 
-        private List<BlockReference> SearchSpaceByName(Database db, ObjectId spaceId, string blockName)
-        {
-            List<BlockReference> blockRefs = new List<BlockReference>();
-            using (Transaction tr = db.TransactionManager.StartTransaction())
-            {
-                BlockTableRecord space = tr.GetObject(spaceId, OpenMode.ForRead) as BlockTableRecord;
-                foreach (ObjectId id in space)
-                {
-                    Entity ent = tr.GetObject(id, OpenMode.ForRead) as Entity;
-                    if (ent is BlockReference blockRef)
-                    {
-                        BlockTableRecord btr = tr.GetObject(blockRef.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
-                        if (btr.Name.Equals(blockName, StringComparison.OrdinalIgnoreCase) && blockRef.IsDynamicBlock)
-                        {
-                            blockRefs.Add(blockRef);
-                        }
-                    }
-                }
-                tr.Commit();
-            }
-            return blockRefs;
-        }
+        //    // Prompt user for block name
+        //    PromptResult pr = ed.GetString("\nEnter block name to search for: ");
+        //    if (pr.Status != PromptStatus.OK) return;
+        //    string blockName = pr.StringResult;
+
+        //    using (doc.LockDocument())
+        //    {
+        //        // Search in Model Space
+        //        List<BlockReference> modelBlocks = SearchSpaceByName(db, SymbolUtilityServices.GetBlockModelSpaceId(db), blockName);
+        //        ed.WriteMessage($"\nFound {modelBlocks.Count} dynamic blocks named '{blockName}' in Model Space");
+
+        //        // Search in all Layout spaces
+        //        List<BlockReference> layoutBlocks = new List<BlockReference>();
+        //        using (Transaction tr = db.TransactionManager.StartTransaction())
+        //        {
+        //            DBDictionary layouts = tr.GetObject(db.LayoutDictionaryId, OpenMode.ForRead) as DBDictionary;
+        //            foreach (DBDictionaryEntry entry in layouts)
+        //            {
+        //                Layout layout = tr.GetObject(entry.Value, OpenMode.ForRead) as Layout;
+        //                if (!layout.ModelType)  // Skip Model Space layout
+        //                {
+        //                    BlockTableRecord btr = tr.GetObject(layout.BlockTableRecordId, OpenMode.ForRead) as BlockTableRecord;
+        //                    layoutBlocks.AddRange(SearchSpaceByName(db, btr.ObjectId, blockName));
+        //                }
+        //            }
+        //            tr.Commit();
+        //        }
+        //        ed.WriteMessage($"\nFound {layoutBlocks.Count} dynamic blocks named '{blockName}' in all Layouts");
+
+        //        int totalBlocks = modelBlocks.Count + layoutBlocks.Count;
+        //        ed.WriteMessage($"\nTotal dynamic blocks named '{blockName}' found: {totalBlocks}");
+        //    }
+        //}
+
+        //private List<BlockReference> SearchSpaceByName(Database db, ObjectId spaceId, string blockName)
+        //{
+        //    List<BlockReference> blockRefs = new List<BlockReference>();
+        //    using (Transaction tr = db.TransactionManager.StartTransaction())
+        //    {
+        //        BlockTableRecord space = tr.GetObject(spaceId, OpenMode.ForRead) as BlockTableRecord;
+        //        foreach (ObjectId id in space)
+        //        {
+        //            Entity ent = tr.GetObject(id, OpenMode.ForRead) as Entity;
+        //            if (ent is BlockReference blockRef)
+        //            {
+        //                BlockTableRecord btr = tr.GetObject(blockRef.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
+        //                if (btr.Name.Equals(blockName, StringComparison.OrdinalIgnoreCase) && blockRef.IsDynamicBlock)
+        //                {
+        //                    blockRefs.Add(blockRef);
+        //                }
+        //            }
+        //        }
+        //        tr.Commit();
+        //    }
+        //    return blockRefs;
+        //}
 
         //[CommandMethod("FindBlockByNameInSpace")]
         //public void FindBlockByNameInSpace()

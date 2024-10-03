@@ -1,6 +1,7 @@
 ﻿
 using System.IO;
 using YMplugins.Addin.Autocad2022.Commands.Translator;
+using YMplugins.Models.Autocad2022.Utils.Print;
 using YMplugins.Services.Translator;
 
 namespace YMplugins.Addin.Autocad2022
@@ -39,10 +40,10 @@ namespace YMplugins.Addin.Autocad2022
                 if ((assembly != null) | (assembly1 != null)) Active.Editor.WriteMessage("style dlls not load");
 
 
-                //var standartCopier = new StandartCopier();
-                //var isConfFileCopied = standartCopier.CopyParamsFiles();
+                var standartCopier = new StandartCopier();
+                var isConfFileCopied = standartCopier.CopyParamsFiles();
 
-                //if (!isConfFileCopied) Active.Editor.WriteMessage("файлы не скопированы");
+                if (!isConfFileCopied) Active.Editor.WriteMessage("файлы не скопированы");
             }
 
             internal class ProxyDomain : MarshalByRefObject

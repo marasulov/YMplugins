@@ -5,7 +5,7 @@ using YMplugins.Contracts.Dto;
 
 namespace Mocks
 {
-    public class AttributesService : IAttributesService
+    public class AttributeService : IAttributesService
     {
         public List<BlockAttribute>? GetAttributesForBlock(string selectedBlockName)
         {

@@ -8,7 +8,7 @@ namespace Build
     internal class Program
     {
         private static string _projectName = "YMPlugins";
-        private static string _version = "1.0.2";
+        private static string _version = "2.0.0";
 
         static void Main(string[] args)
         {

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
 using YMplugins.Contracts.Dto.Enums;
@@ -23,6 +25,14 @@ namespace YMplugins.ViewModels.VM
         private bool _isUpdatingAttributes;
         private int _numerationStartValue;
 
+        private PrintByOption _selectedPrintByOption;
+        private string _prefix;
+        private string _suffix;
+        private bool _isCheckedNumbering;
+        private string _outputFileName;
+        private bool _isAllPrintSelected = true;
+
+
         //private string _selectedBlock;
 
         public AutoPrintVm(
@@ -44,6 +54,7 @@ namespace YMplugins.ViewModels.VM
             PrintCommand = printCommand;
             SelectBlockCommand = selectBlockCommand;
             ZoomToPointCommand = zoomToPointCommand;
+            //BlockDataCollection.CollectionChanged += (s, e) => UpdateSelectedPrintCount();
         }
 
         private void GetLayersCommandOnResultObtained(List<string> obj)
@@ -65,13 +76,6 @@ namespace YMplugins.ViewModels.VM
                 UpdateAttributes();
             }
         }
-
-        // Свойство для выбора между блоком и полилинией
-        private PrintByOption _selectedPrintByOption;
-        private string _prefix;
-        private string _suffix;
-        private bool _isCheckedNumbering;
-        private string _outputFileName;
 
         public PrintByOption SelectedPrintByOption
         {
@@ -110,14 +114,59 @@ namespace YMplugins.ViewModels.VM
             set => Set(ref _attributes, value);
         }
 
+        //public ObservableCollection<PrintInfo> BlockDataCollection
+        //{
+        //    get => _blockDataCollection;
+        //    set
+        //    {
+        //        Set(ref _blockDataCollection, value);
+        //        OnPropertyChanged(nameof(HeaderContent));
+        //    } 
+        //}
+
         public ObservableCollection<PrintInfo> BlockDataCollection
         {
             get => _blockDataCollection;
             set
             {
-                Set(ref _blockDataCollection, value);
+                if (_blockDataCollection != value)
+                {
+                    if (_blockDataCollection != null)
+                    {
+                        foreach (var item in _blockDataCollection)
+                        {
+                            // Отписываемся от старых элементов
+                            item.PropertyChanged -= OnBlockDataPropertyChanged;
+                        }
+                    }
+
+                    _blockDataCollection = value;
+
+                    if (_blockDataCollection != null)
+                    {
+                        foreach (var item in _blockDataCollection)
+                        {
+                            // Подписываемся на новые элементы
+                            item.PropertyChanged += OnBlockDataPropertyChanged;
+                        }
+                    }
+
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(HeaderContent)); // Обновляем заголовок при изменении коллекции
+                }
             }
         }
+
+
+
+        private void OnBlockDataPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(PrintInfo.IsPrint))
+            {
+                UpdateSelectedPrintCount(); // Обновляем счетчик при изменении IsPrint
+            }
+        }
+
 
         public string SelectedBlockOnScreen
         {
@@ -219,6 +268,57 @@ namespace YMplugins.ViewModels.VM
             }
         }
 
+        public bool IsAllPrintSelected
+        {
+            get => _isAllPrintSelected;
+            set
+            {
+                _isAllPrintSelected = value;
+                OnPropertyChanged();
+                
+                foreach (var printInfo in BlockDataCollection)
+                {
+                    printInfo.IsPrint = value;
+                }
+
+                UpdateSelectedPrintCount();
+            }
+        }
+
+        private int _selectedPrintCount;
+        private string _error;
+
+        public int SelectedPrintCount
+        {
+            get => _selectedPrintCount;
+            set
+            {
+                if (_selectedPrintCount != value)
+                {
+                    _selectedPrintCount = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(HeaderContent));
+                }
+            }
+        }
+
+        public string HeaderContent =>
+            $"Blocks found {BlockDataCollection?.Count ?? 0} | Selected for Printing: {SelectedPrintCount}";
+
+        public string Error
+        {
+            get=>_error;
+            set
+            {
+                Set(ref _error, value);
+            }
+        }
+
+        private void UpdateSelectedPrintCount()
+        {
+            SelectedPrintCount = BlockDataCollection.Count(b => b.IsPrint);
+        }
+
         private void UpdateAttributes()
         {
             if (_isUpdatingAttributes || string.IsNullOrEmpty(_selectedBlockOnScreen))
@@ -252,6 +352,7 @@ namespace YMplugins.ViewModels.VM
                     _attributesService.GetPrintInfosForBlock(BlockDataCollection, SelectedAttr.AttributeName,
                         NumerationStartValue, Prefix, Suffix, IsCheckedNumbering));
             }
+            UpdateSelectedPrintCount();
         }
     }
 }

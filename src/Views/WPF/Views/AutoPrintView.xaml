@@ -32,6 +32,7 @@
             <RowDefinition Height="*"/>
 
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
 
 
         </Grid.RowDefinitions>
@@ -248,13 +249,19 @@
 
         <!-- DataGrid для отображения данных блока -->
         <GroupBox Grid.Row="1" Grid.ColumnSpan="3" Grid.Column="0">
+            <GroupBox.Header>
+                <!--<Label Content="{Binding ElementName=PrintCollection, Path=Items.Count}"
+                       ContentStringFormat="Blocks found {0}"/>-->
+                <Label Content="{Binding HeaderContent}" />
+            </GroupBox.Header >
             <DataGrid ItemsSource="{Binding BlockDataCollection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                  AutoGenerateColumns="False"
-                  IsReadOnly="True"
-                  CanUserAddRows="False"
-                  Margin="5"
-                  MaxHeight="500"
-                  ScrollViewer.VerticalScrollBarVisibility="Auto">
+                      Name="PrintCollection"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"
+                      Margin="5"
+                      MaxHeight="500"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <DataGrid.Columns>
                     <!-- Пример колонок -->
                     <DataGridTextColumn Header="Id" Binding="{Binding ObjectId}" Width="Auto" />
@@ -271,16 +278,30 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.Header>
+                            <CheckBox Content="Printing" 
+                                      IsChecked="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.IsAllPrintSelected, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged }" />
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsPrint, UpdateSourceTrigger=PropertyChanged}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </GroupBox>
 
         <!-- Кнопки внизу -->
-        <DockPanel LastChildFill="True" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="1">
-            <Button Content="Cancel" DockPanel.Dock="Right" Margin="5" />
-            <Button Content="Print"  DockPanel.Dock="Right" Margin="5" Command="{Binding PrintCommand}" CommandParameter="{Binding }" />
-            
-        </DockPanel>
-
+        <StackPanel HorizontalAlignment="Center" Grid.Row="2" Grid.Column="1">
+            <Button Content="Cancel"  Margin="5" />
+            <Button Content="Print" Margin="5" Command="{Binding PrintCommand}" CommandParameter="{Binding }" />
+        </StackPanel>
+        <TextBlock Grid.Row="3" 
+                   Text="{Binding Error}" 
+                   Foreground="Red" 
+                   TextWrapping="Wrap" 
+                   Margin="5"/>
     </Grid>
 </Window>

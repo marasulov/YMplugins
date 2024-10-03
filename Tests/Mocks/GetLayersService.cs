@@ -5,7 +5,7 @@ using YMplugins.Contracts;
 
 namespace Mocks
 {
-    public class GetLayerService :IGetLayersService
+    public class GetLayersService :IGetLayersService
     {
         public List<string> GetLayers()
         {

@@ -83,7 +83,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
 #if DEBUG
                         Active.Editor.WriteMessage($"format {format}");
 #endif
-                        PrintInfo blockData = new PrintInfo(blockRef.Id.Handle.Value, spaceName,format,blockDimension,blockScale, blockWidth, blockHeight, blockPointPosition);
+                        PrintInfo blockData = new PrintInfo(blockRef.Id.Handle.Value, spaceName,format,blockDimension,blockScale, blockWidth, blockHeight, blockPointPosition, true);
 
                         blockList.Add(blockData);
                     }

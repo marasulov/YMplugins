@@ -7,25 +7,21 @@ namespace YMplugins.Views.Services
 {
     public class WindowService : IWindowService
     {
-        private readonly Func<AutoPrintView> _viewFactory;
-        private Window _loadingWindow;
+        private LoadingWindow _loadingWindow;
 
-        public WindowService(Func<AutoPrintView> viewFactory)
-        {
-            _viewFactory = viewFactory;
-        }
+       
 
         public void ShowLoadingWindow()
         {
-            _loadingWindow = _viewFactory.Invoke();
-            _loadingWindow.Owner = Application.Current.MainWindow;
+            _loadingWindow = new LoadingWindow();
+            _loadingWindow.Owner = Application.Current.MainWindow; // Устанавливаем владельцем основное окно
             _loadingWindow.Show();
         }
 
         public void CloseLoadingWindow()
         {
             _loadingWindow?.Close();
-            _loadingWindow = null;
+            
         }
     }
 }

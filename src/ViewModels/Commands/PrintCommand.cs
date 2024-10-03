@@ -24,40 +24,64 @@ namespace YMplugins.ViewModels.Commands
             _windowService = windowService;
         }
 
-        public bool CanExecute(object parameter)
+        //public override async void Execute(object parameter)
+        //{
+        //    _windowService.ShowLoadingWindow();
+
+        //    try
+        //    {
+        //        var vm = (AutoPrintVm)parameter;
+        //        var printData = vm.BlockDataCollection.ToArray();
+
+        //        var fileNames = await Task.Run(() => _printService.Print(printData));
+        //        var joinedBubbleTexts = string.Join("\n", fileNames);
+
+        //        if (vm.IsCombinePdf)
+        //        {
+        //            joinedBubbleTexts = Path.Combine(_combinePdfService.Combine(fileNames, vm.OutputFileName), ".pdf");
+        //        }
+
+        //        _notifyService.Notify("Работа завершена!");
+        //        _notifyService.Notify(joinedBubbleTexts);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _notifyService.Notify($"Произошла ошибка: {ex.Message}");
+        //    }
+        //    finally
+        //    {
+
+        //        _windowService.CloseLoadingWindow();
+        //    }
+        //}
+
+        public override void Execute(object parameter)
         {
-            return parameter is AutoPrintVm;
-        }
+            var vm = (AutoPrintVm)parameter;
+            vm.Error = string.Empty;
 
-        public override async void Execute(object parameter)
-        {
-            _windowService.ShowLoadingWindow();
-
-            try
+            if (vm.BlockDataCollection == null || !vm.BlockDataCollection.Any())
             {
-                var vm = (AutoPrintVm)parameter;
-                var printData = vm.BlockDataCollection.ToArray();
-
-                var fileNames = await Task.Run(() => _printService.Print(printData));
-                var joinedBubbleTexts = string.Join("\n", fileNames);
-
-                if (vm.IsCombinePdf)
-                {
-                    joinedBubbleTexts = Path.Combine(_combinePdfService.Combine(fileNames, vm.OutputFileName), ".pdf");
-                }
-
-                _notifyService.Notify("Работа завершена!");
-                _notifyService.Notify(joinedBubbleTexts);
+                vm.Error = string.Join("\n", "Block not selected");
+                return;
             }
-            catch (Exception ex)
+
+            
+            var emptyFileNameBlocks = vm.BlockDataCollection.Where(b => string.IsNullOrWhiteSpace(b.FileName)).ToList();
+            if (emptyFileNameBlocks.Any())
             {
-                _notifyService.Notify($"Произошла ошибка: {ex.Message}");
+                vm.Error = "File name is absent.";
+                return;
             }
-            finally
-            {
-                
-                _windowService.CloseLoadingWindow();
-            }
+
+            vm.CloseAction?.Invoke();
+            var printData = vm.BlockDataCollection.Where(x => x.IsPrint).ToArray();
+            var fileNames = _printService.Print(printData);
+            var joinedBubbleTexts = string.Join("\n", fileNames);
+            if (vm.IsCombinePdf)
+                joinedBubbleTexts =_combinePdfService.Combine(fileNames,  string.Join("",vm.OutputFileName, ".pdf"));
+
+            _notifyService.Notify(joinedBubbleTexts);
         }
     }
 }
