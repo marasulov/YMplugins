@@ -31,7 +31,15 @@ namespace YMplugins.Models.Autocad2022.Utils.Extensions
 
         public static Point2d GetFirstPoint(this Polyline polyline)
         {
-            return polyline.GetPoint2dAt(0);
+            //return polyline.GetPoint2dAt(0);
+            var p1 = polyline.GeometricExtents.MinPoint;
+            return new Point2d(p1.X, p1.Y);
+        }
+
+        public static Point2d GetLastPoint(this Polyline polyline)
+        {
+            var p1 = polyline.GeometricExtents.MaxPoint;
+            return new Point2d(p1.X, p1.Y);
         }
     }
 }

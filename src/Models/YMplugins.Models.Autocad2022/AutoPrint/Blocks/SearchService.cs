@@ -41,29 +41,28 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
         //    return Enumerable.Empty<PrintInfo>();
         //}
 
-        public ObservableCollection<PrintInfo> FindObjects(SearchData data)
+        public List<PrintInfo> FindObjects(SearchData data)
         {
-            var results = new ObservableCollection<PrintInfo>();
+            var results = new List<PrintInfo>();
 
             if (data.SelectedPrintByOption == PrintByOption.ByBlock)
             {
                 var blockName = data.SelectedBlockName;
-                results = new ObservableCollection<PrintInfo>(FindBlocksByBlockName(blockName, data));
+                results = new List<PrintInfo>(FindBlocksByBlockName(data));
             }
             else if (data.SelectedPrintByOption == PrintByOption.ByPolyline)
             {
-                var layerName = _searchData.SelectedLayer;
-                results = new ObservableCollection<PrintInfo>(FindPolylinesByLayer(layerName, data));
+                
+                results = new List<PrintInfo>(FindPolylinesByLayer(data));
             }
 
             return results;
         }
 
-        private List<PrintInfo> FindBlocksByBlockName(string blockName, SearchData data)
+        private List<PrintInfo> FindBlocksByBlockName(SearchData data)
         {
-            // Используем AutoCAD API для поиска блоков
-            // В зависимости от параметров `IsSearchOnModel` и `IsSearchOnLayouts`
             var blocks = new List<PrintInfo>();
+            string blockName = data.SelectedBlockName;
             if (data.IsSearchOnLayouts)
             {
                 blocks = _blockSearchService.SearchBlocksInSpace(Active.Database, blockName, "Layout", "");
@@ -75,8 +74,9 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             return blocks;
         }
 
-        private List<PrintInfo> FindPolylinesByLayer(string layerName, SearchData data)
+        private List<PrintInfo> FindPolylinesByLayer(SearchData data)
         {
+            string layerName = data.SelectedLayer;
             var polylines = new List<PrintInfo>();
 
             if (data.IsSearchOnLayouts)
@@ -110,7 +110,9 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                     {
                         var polyline = entity as Polyline;
                         Point2d firstPoint = polyline.GetFirstPoint();
+                        Point2d secondPoint = polyline.GetLastPoint();
                         var position = new PointDTO(firstPoint.X, firstPoint.Y, 0);
+                        var position2 = new PointDTO(secondPoint.X, secondPoint.Y, 0);
                         (double length, double width) = DbCad.PolylineExtension.GetDimensions(polyline);
                         var format = FormatFinder.FindClosestFormat(length, width);
                         polylines.Add(
@@ -122,6 +124,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                                 width,
                                 length,
                                 position,
+                                position2,
                                 true)
 
                         );

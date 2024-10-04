@@ -7,9 +7,9 @@ namespace Mocks
     public class GetBlocksNameService : IGetBlocksNameService
 
     {
-        public ObservableCollection<string> GetBlocksName()
+        public List<string> GetBlocksName()
         {
-            var blocks = new ObservableCollection<string>();
+            var blocks = new List<string>();
             for (int i = 0; i < 50; i++)
             {
                 var newHoleDto = "blockname" + i;

@@ -9,7 +9,7 @@
         d:DataContext="{d:DesignInstance {x:Type  vms:AutoPrintVm}, IsDesignTimeCreatable=False}"
         mc:Ignorable="d"
         Name="AutoPrint"
-        Title="AutoPrintView" Height="700" Width="800" Style="{DynamicResource WindowElementStyle}">
+        Title="Print to Pdf" Height="700" Width="850" Style="{DynamicResource WindowElementStyle}">
 
     <Window.Resources>
         <ResourceDictionary>

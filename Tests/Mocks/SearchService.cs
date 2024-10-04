@@ -17,25 +17,25 @@ namespace Mocks
         {
             _nameService = nameService;
         }
-        public ObservableCollection<PrintInfo> FindObjects(SearchData data)
+        public List<PrintInfo> FindObjects(SearchData data)
         {
             if (data.SelectedPrintByOption == PrintByOption.ByBlock)
             {
                 // Логика поиска блоков
                 return FindBlocks(data);
             }
-            //else if (data.SelectedPrintByOption == PrintByOption.ByPolyline)
-            //{
-            //    // Логика поиска полилиний
-            //    return FindPolylines(data);
-            //}
+            else if (data.SelectedPrintByOption == PrintByOption.ByPolyline)
+            {
+                // Логика поиска полилиний
+                return FindPolylines(data);
+            }
 
             return default;
         }
 
-        private ObservableCollection<PrintInfo> FindBlocks(SearchData data)
+        private List<PrintInfo> FindBlocks(SearchData data)
         {
-            var layers = new ObservableCollection<PrintInfo>();
+            var layers = new List<PrintInfo>();
             for (int i = 0; i < 50; i++)
             {
                 //var fileName = _nameService.GenerateFileName(default,0);
@@ -48,10 +48,18 @@ namespace Mocks
             
         }
 
-        private IEnumerable<int> FindPolylines(SearchData data)
+        private List<PrintInfo> FindPolylines(SearchData data)
         {
-            // Используем AutoCAD API для поиска полилиний
-            return new List<int>();
+            var layers = new List<PrintInfo>();
+            for (int i = 0; i < 50; i++)
+            {
+                //var fileName = _nameService.GenerateFileName(default,0);
+                var newHoleDto = new PrintInfo(i, $"space for {data.SelectedLayer}", $"format for {i}", 1, 1, 1, new PointDTO(2, 3, 4), true);
+
+                layers.Add(newHoleDto);
+            }
+
+            return layers;
         }
 
         public ObservableCollection<PrintInfo> FindObjects()

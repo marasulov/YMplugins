@@ -19,8 +19,7 @@ namespace Mocks
             return blocks;
         }
 
-
-        public ObservableCollection<PrintInfo> GetPrintInfosForBlock(ObservableCollection<PrintInfo> printInfos, string selectedAttribute, int numerationStartValue, string prefix, string suffix, bool isCheckedNumbering)
+        public List<PrintInfo> GetPrintInfosForBlock(List<PrintInfo> printInfos, string selectedAttribute, int numerationStartValue, string prefix, string suffix, bool isCheckedNumbering)
         {
 
             foreach (var printInfo in printInfos)

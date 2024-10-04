@@ -19,7 +19,7 @@ namespace YMplugins.ViewModels.Commands
         {
             return parameter is AutoPrintVm;
         }
-        public event Action<ObservableCollection<string>> ResultObtained;
+        public event Action<List<string>> ResultObtained;
         public override void Execute(object parameter)
         {
 

@@ -8,9 +8,9 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 {
     public class GetBlocksNameService : IGetBlocksNameService
     {
-        public ObservableCollection<string> GetBlocksName()
+        public List<string> GetBlocksName()
         {
-            ObservableCollection<string> blockNames = new ObservableCollection<string>();
+            List<string> blockNames = new List<string>();
             using (Transaction trans = Active.Database.TransactionManager.StartTransaction())
             {
                 //get the blockTable and iterate through all blockDef
