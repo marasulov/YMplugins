@@ -2,8 +2,8 @@
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.PlottingServices;
+using System;
 using System.IO;
-using System.Text.RegularExpressions;
 using YMplugins.Contracts.Dto;
 using PlotType = Autodesk.AutoCAD.DatabaseServices.PlotType;
 
@@ -74,7 +74,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
         public string ExecutePlot(PlotInfo acPlInfo, string pdfFileName)
         {
             bool printStatus = false;
-            string filename = pdfFileName;
+            string filename = RemoveInvalidFileNameChars(pdfFileName);
             if (PlotFactory.ProcessPlotState == ProcessPlotState.NotPlotting)
             {
                 using (var acPlEng = PlotFactory.CreatePublishEngine())
@@ -85,7 +85,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
                         acPlProgDlg.OnBeginPlot();
                         acPlProgDlg.IsVisible = true;
                         //TODO имя надо сделать
-                        filename = Path.Combine(Path.GetDirectoryName(_document.Name), pdfFileName) + ".pdf";
+                        filename = Path.Combine(Path.GetDirectoryName(_document.Name), filename) + ".pdf";
                         acPlEng.BeginPlot(acPlProgDlg, null);
                         acPlEng.BeginDocument(acPlInfo, _document.Name, null, 1, true, filename);
 
@@ -102,13 +102,18 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
                         acPlProgDlg.PlotProgressPos = 100;
                         acPlProgDlg.OnEndPlot();
                         acPlEng.EndPlot(null);
-
-                        printStatus = true;
                     }
                 }
             }
 
             return filename;
+        }
+
+        public static string RemoveInvalidFileNameChars(string fileName)
+        {
+            char[] invalidChars = Path.GetInvalidFileNameChars();
+
+            return string.Join("_", fileName.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries));
         }
     }
 }
