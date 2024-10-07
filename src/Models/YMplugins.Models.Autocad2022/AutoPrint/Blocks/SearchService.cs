@@ -2,12 +2,12 @@
 using Autodesk.AutoCAD.Geometry;
 using Gile.AutoCAD.Extension;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
 using YMplugins.Contracts.Dto.Enums;
 using YMplugins.Models.Autocad2022.Utils;
 using YMplugins.Models.Autocad2022.Utils.Extensions;
+using PolylineExtension = YMplugins.Models.Autocad2022.Utils.Extensions.PolylineExtension;
 
 namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 {
@@ -110,21 +110,22 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                     {
                         var polyline = entity as Polyline;
                         Point2d firstPoint = polyline.GetFirstPoint();
-                        Point2d secondPoint = polyline.GetLastPoint();
                         var position = new PointDTO(firstPoint.X, firstPoint.Y, 0);
-                        var position2 = new PointDTO(secondPoint.X, secondPoint.Y, 0);
-                        (double length, double width) = DbCad.PolylineExtension.GetDimensions(polyline);
-                        var format = FormatFinder.FindClosestFormat(length, width);
+                        (Point2d minPoint, Point2d maxPoint) = PolylineExtension.GetDimensions(polyline);
+                        var xDim = maxPoint.X - minPoint.X;
+                        var yDim = maxPoint.Y - minPoint.Y;
+
+                        var format = FormatFinder.FindClosestFormat(xDim, yDim);
+                        Active.Editor.WriteMessage($"в полилинии xdim {xDim}, ydim {yDim}");
                         polylines.Add(
                             new PrintInfo(
                                 objId.Handle.Value,
                                 spaceName,
                                 format,
                                 1,
-                                width,
-                                length,
+                                xDim,
+                                yDim,
                                 position,
-                                position2,
                                 true)
 
                         );

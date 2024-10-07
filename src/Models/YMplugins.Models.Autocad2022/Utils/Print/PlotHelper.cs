@@ -33,7 +33,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
             var acPlSetVdr = PlotSettingsValidator.Current;
 
             var blockPosition = new Point2d(_printModel.Position.X, _printModel.Position.Y);
-            var blockDimension = new Point2d(blockPosition.X + _printModel.Width, blockPosition.Y + _printModel.Length);
+            var blockDimension = new Point2d(blockPosition.X + _printModel.XDim, blockPosition.Y + _printModel.YDmim);
             //var blockDimension = new Point2d(_printModel.Position2.X, _printModel.Position2.Y);
             var points = new Extents2d(blockPosition, blockDimension);
 
@@ -73,7 +73,6 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
 
         public string ExecutePlot(PlotInfo acPlInfo, string pdfFileName)
         {
-            bool printStatus = false;
             string filename = RemoveInvalidFileNameChars(pdfFileName);
             if (PlotFactory.ProcessPlotState == ProcessPlotState.NotPlotting)
             {

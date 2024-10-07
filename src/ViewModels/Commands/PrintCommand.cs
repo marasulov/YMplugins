@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using YMplugins.Contracts;
+using YMplugins.Contracts.Dto.Enums;
 using YMplugins.ViewModels.VM;
 
 namespace YMplugins.ViewModels.Commands
@@ -76,6 +77,14 @@ namespace YMplugins.ViewModels.Commands
 
             vm.CloseAction?.Invoke();
             var printData = vm.PrintDataCollection.Where(x => x.IsPrint).ToArray();
+            if (vm.SelectedPrintingOrder == PrintingOrder.ByX)
+            {
+                printData = vm.PrintDataCollection.OrderBy(x => x.Position.X).ToArray();
+            }
+            else if (vm.SelectedPrintingOrder == PrintingOrder.ByY)
+            {
+                printData = vm.PrintDataCollection.OrderByDescending(x => x.Position.Y).ToArray();
+            }
             var fileNames = _printService.Print(printData);
             var joinedBubbleTexts = string.Join("\n", fileNames);
             if (vm.IsCombinePdf)

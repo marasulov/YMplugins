@@ -16,7 +16,7 @@ namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
 {
     public class AutoPrintCommand
     {
-        //[CommandMethod("Autoprint")]
+        [CommandMethod("Autoprint")]
         public static void Print()
         {
             var container = new Container();
@@ -49,7 +49,6 @@ namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
             container.Register<INotifyService, NotifyService>();
 
             container.Register<IWindowService, WindowService>();
-
 
             var window = container.GetInstance<AutoPrintView>();
             var context = (AutoPrintVm)window.DataContext;

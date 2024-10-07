@@ -43,8 +43,8 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
         //            var acPlSetVdr = PlotSettingsValidator.Current;
 
         //            var blockPosition = new Point2d(printModel.Position.X, printModel.Position.Y);
-        //            var blockDimension = new Point2d(blockPosition.X + printModel.Width,
-        //                blockPosition.Y + printModel.Length);
+        //            var blockDimension = new Point2d(blockPosition.X + printModel.XDim,
+        //                blockPosition.Y + printModel.YDmim);
         //            var points = new Extents2d(blockPosition, blockDimension);
 
         //            var isHor = IsFormatHorizontal(printModel);
@@ -61,7 +61,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
         //            acPlSetVdr.SetStdScaleType(acPlSet, StdScaleType.ScaleToFit);
         //            // Center the plot
         //            acPlSetVdr.SetPlotCentered(acPlSet, true);
-        //            //acPlSetVdr.SetClosestMediaName(acPlSet,printModel.Width,printModel.Length,PlotPaperUnit.Millimeters,true);
+        //            //acPlSetVdr.SetClosestMediaName(acPlSet,printModel.XDim,printModel.YDmim,PlotPaperUnit.Millimeters,true);
         //            //string curCanonName = PdfCreator.GetLocalNameByAtrrValue(formatValue);
         //            acPlSetVdr.SetPlotConfigurationName(acPlSet, "DWG_To_PDF_Autoprint.pc3", canonName);
         //            //acPlSetVdr.SetCanonicalMediaName(acPlSet, canonName);
@@ -139,7 +139,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
         //    {
         //        if (e.ErrorStatus == (ErrorStatus)Autodesk.AutoCAD.BoundaryRepresentation.ErrorStatus.InvalidInput)
         //            Application.ShowAlertDialog(
-        //                $"{e.Message} : {printModel.Length} - {printModel.Width} не найден в настройках принтера");
+        //                $"{e.Message} : {printModel.YDmim} - {printModel.XDim} не найден в настройках принтера");
         //        printStatus = false;
         //    }
 
@@ -175,7 +175,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
             }
             catch (Exception e)
             {
-                Application.ShowAlertDialog($"{e.Message} : {printModel.Length} - {printModel.Width} not found in printer settings");
+                Application.ShowAlertDialog($"{e.Message} : {printModel.YDmim} - {printModel.XDim} not found in printer settings");
                 fileName = "";
             }
 

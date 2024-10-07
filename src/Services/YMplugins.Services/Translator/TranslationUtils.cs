@@ -140,7 +140,7 @@ namespace YMplugins.Services.Translator
 
     //        var translatedText = await TranslateBaseAsync(text, token);
 
-    //        Interlocked.Add(ref _characterCount, text.Length);
+    //        Interlocked.Add(ref _characterCount, text.YDmim);
     //        CharacterCount = _characterCount;
 
     //        var finished = Interlocked.Increment(ref _completedTranslationsCount);

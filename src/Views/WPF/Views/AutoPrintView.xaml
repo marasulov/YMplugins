@@ -151,8 +151,8 @@
                                      IsChecked="{Binding SelectedPrintingOrder, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=ByX}" />
                         <RadioButton Content="Y" 
                                      IsChecked="{Binding SelectedPrintingOrder, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=ByY}" />
-                        <RadioButton Content="Select order" 
-                                     IsChecked="{Binding SelectedPrintingOrder, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />
+                        <!--<RadioButton Content="Select order" 
+                                     IsChecked="{Binding SelectedPrintingOrder, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />-->
                     </StackPanel>
                 </StackPanel>
             </GroupBox>

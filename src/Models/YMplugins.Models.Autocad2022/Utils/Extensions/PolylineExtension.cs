@@ -5,7 +5,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Extensions
 {
     public static class PolylineExtension
     {
-        public static (double length, double width) GetDimensions(Polyline polyline)
+        public static (Point2d minPoint, Point2d maxPoint) GetDimensions(Polyline polyline)
         {
             double minX = double.MaxValue, minY = double.MaxValue;
             double maxX = double.MinValue, maxY = double.MinValue;
@@ -22,12 +22,20 @@ namespace YMplugins.Models.Autocad2022.Utils.Extensions
                 if (vertex.Y > maxY) maxY = vertex.Y;
             }
 
-            // Вычисляем длину и ширину
-            double length = maxX - minX;
-            double width = maxY - minY;
+            return (new Point2d(minX, minY), new Point2d(maxX, maxY));
 
-            return (length, width);
+          
         }
+
+
+        //public static (double length, double width) Get()
+        //{
+        //    // Вычисляем длину и ширину
+        //    double length = maxX - minX;
+        //    double width = maxY - minY;
+
+        //    return (length, width);
+        //}
 
         public static Point2d GetFirstPoint(this Polyline polyline)
         {

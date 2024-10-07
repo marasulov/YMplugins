@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Gile.AutoCAD.Extension;
 using YMplugins.Contracts.Dto;
 
 namespace YMplugins.Models.Autocad2022.Utils.Print
@@ -70,15 +71,19 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
         public string GetCanonNameByWidthAndHeight(PrintInfo printInfo, double tolerance = 10.0)
         {
             double width, height;
-            if (printInfo.IsFormatHorizontal())
+            var isHor = printInfo.IsFormatHorizontal();
+            if (isHor)
             {
-                width = Math.Round(printInfo.Width / printInfo.ScaleX);
-                height = Math.Round(printInfo.Length / printInfo.ScaleX);
+                width = Math.Round(printInfo.XDim / printInfo.ScaleX);
+                height = Math.Round(printInfo.YDmim / printInfo.ScaleX);
+                Active.Editor.WriteMessage($"printInfo.IsFormatHorizontal {isHor} {width} - {height}" );
             }
             else
             {
-                width = Math.Round(printInfo.Length / printInfo.ScaleX);
-                height = Math.Round(printInfo.Width / printInfo.ScaleX);
+                
+                width = Math.Round(printInfo.YDmim / printInfo.ScaleX);
+                height = Math.Round(printInfo.XDim / printInfo.ScaleX);
+                Active.Editor.WriteMessage($"printInfo.IsFormatHorizontal {isHor} {width} - {height}");
             }
 
             return FindCanonName(width, height, tolerance);
@@ -119,7 +124,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
         //    var pattern = new Regex(pat, RegexOptions.Compiled | RegexOptions.Singleline);
 
         //    // Получаем ближайший формат с использованием метода FindClosestFormat
-        //    var closestFormat = FormatFinder.FindClosestFormat(printInfo.Width, printInfo.Length);
+        //    var closestFormat = FormatFinder.FindClosestFormat(printInfo.XDim, printInfo.YDmim);
 
         //    if (string.IsNullOrEmpty(closestFormat))
         //    {
@@ -140,13 +145,13 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
         //        // Определяем размеры с учетом ориентации
         //        if (printInfo.IsFormatHorizontal())
         //        {
-        //            curWidth = Math.Round(printInfo.Width / printInfo.ScaleX);
-        //            curHeight = Math.Round(printInfo.Length / printInfo.ScaleX);
+        //            curWidth = Math.Round(printInfo.XDim / printInfo.ScaleX);
+        //            curHeight = Math.Round(printInfo.YDmim / printInfo.ScaleX);
         //        }
         //        else
         //        {
-        //            curWidth = Math.Round(printInfo.Length / printInfo.ScaleX);
-        //            curHeight = Math.Round(printInfo.Width / printInfo.ScaleX);
+        //            curWidth = Math.Round(printInfo.YDmim / printInfo.ScaleX);
+        //            curHeight = Math.Round(printInfo.XDim / printInfo.ScaleX);
         //        }
 
         //        // Сравниваем размеры с учетом допустимой погрешности
@@ -195,13 +200,13 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
 
         //        if (printInfo.IsFormatHorizontal())
         //        {
-        //            curWidth = Math.Round(printInfo.Width / printInfo.ScaleX);
-        //            curHeight = Math.Round(printInfo.Length / printInfo.ScaleX);
+        //            curWidth = Math.Round(printInfo.XDim / printInfo.ScaleX);
+        //            curHeight = Math.Round(printInfo.YDmim / printInfo.ScaleX);
         //        }
         //        else
         //        {
-        //            curWidth = Math.Round(printInfo.Length / printInfo.ScaleX);
-        //            curHeight = Math.Round(printInfo.Width / printInfo.ScaleX);
+        //            curWidth = Math.Round(printInfo.YDmim / printInfo.ScaleX);
+        //            curHeight = Math.Round(printInfo.XDim / printInfo.ScaleX);
         //        }
 
         //        if ((items.Item1 == curWidth) && (items.Item2 == curHeight))

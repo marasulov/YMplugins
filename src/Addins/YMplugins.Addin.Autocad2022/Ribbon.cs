@@ -294,8 +294,8 @@ namespace YMplugins.Addin.Autocad2022
                 RibbonToolTip tt = new RibbonToolTip();
                 RibbonButton ribBtn = new RibbonButton();
                 ribBtn.Id = "translateBtn";
-                ribBtn.Name = "Translate";
-                ribBtn.Text = "Translate";
+                ribBtn.Name = "AutoPrint";
+                ribBtn.Text = "AutoPrint";
                 ribBtn.CommandHandler = commandHandler;
                 ribBtn.CommandParameter = "AutoPrint";
                 ribBtn.Size = RibbonItemSize.Large;

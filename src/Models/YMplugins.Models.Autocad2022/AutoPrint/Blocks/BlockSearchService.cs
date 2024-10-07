@@ -68,18 +68,19 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 
                 if (blockRefName != blockName) continue;
                 var blockExtents = blockRef.GeometricExtents;
-                var blockWidth = blockExtents.MaxPoint.X - blockExtents.MinPoint.X;
-                var blockHeight = blockExtents.MaxPoint.Y - blockExtents.MinPoint.Y;
+                var xDim = blockExtents.MaxPoint.X - blockExtents.MinPoint.X;
+                var yDim = blockExtents.MaxPoint.Y - blockExtents.MinPoint.Y;
                 var position = blockRef.Position;
                 var blockScale = blockRef.ScaleFactors.X;
                 var blockPointPosition = new PointDTO(position.X, position.Y, position.Z);
-                var blockDimension = new PointDTO(blockPointPosition.X + blockWidth,
-                    blockPointPosition.Y + blockHeight, blockPointPosition.Z);
-                var format = FormatFinder.FindClosestFormat(blockWidth, blockHeight);
+                var blockDimension = new PointDTO(blockPointPosition.X + xDim,
+                    blockPointPosition.Y + yDim, blockPointPosition.Z);
+                var format = FormatFinder.FindClosestFormat(xDim, yDim);
+                Active.Editor.WriteMessage($"в полилинии xDim {xDim} по X, yDim {yDim}");
 #if DEBUG
                 Active.Editor.WriteMessage($"format {format}");
 #endif
-                PrintInfo blockData = new PrintInfo(blockRef.Id.Handle.Value, spaceName, format, blockScale, blockWidth, blockHeight, blockPointPosition, true);
+                PrintInfo blockData = new PrintInfo(blockRef.Id.Handle.Value, spaceName, format, blockScale, xDim, yDim, blockPointPosition, true);
 
                 blockList.Add(blockData);
             }
