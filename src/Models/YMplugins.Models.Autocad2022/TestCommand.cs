@@ -4,8 +4,10 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using SimpleInjector;
+using System.Collections.Generic;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
+using YMplugins.Contracts.Dto.Enums;
 using YMplugins.Models.Autocad2022.AutoPrint;
 using YMplugins.Models.Autocad2022.AutoPrint.Blocks;
 using YMplugins.Models.Autocad2022.AutoPrint.Layers;
@@ -41,8 +43,17 @@ namespace YMplugins.Models.Autocad2022
             container.Register<IGetBlocksNameService, GetBlocksNameService>();
             container.Register<IPrintService, PrintService>();
             container.Register<INamingService, NamingService>();
-            container.Register<BlockSearchService>();
             container.Register<SearchData>();
+            
+            container.Register<BlockSearchService>(Lifestyle.Transient); 
+            container.Register<BlockFinder>(Lifestyle.Transient); 
+            container.Register<PolylineFinder>(Lifestyle.Transient);
+
+            container.Register(() => new Dictionary<PrintByOption, IObjectFinder>
+            {
+                { PrintByOption.ByBlock, container.GetInstance<BlockFinder>() },
+                { PrintByOption.ByPolyline, container.GetInstance<PolylineFinder>() }
+            }, Lifestyle.Singleton);
 
             container.Register<ISearchService, SearchService>();
             container.Register<IZoomEntity, ZoomService>();
@@ -51,8 +62,6 @@ namespace YMplugins.Models.Autocad2022
             container.Register<IAttributesService, AttributeService>();
             container.Register<ICombinePdfService, CombinePdfService>();
             container.Register<IAutoCadFileService, AutoCadFileService>();
-            container.Register<IBlockFinder, BlockFinder>();
-            container.Register<IPolylineFinder, PolylineFinder>();
 
             container.Register<INotifyService, NotifyService>();
             container.Register<IWindowService, WindowService>();
@@ -189,7 +198,6 @@ namespace YMplugins.Models.Autocad2022
                             {
                                 found |= SearchBlockInSpace(trans, btr, blockName, $"Layout: {layout.LayoutName}");
                             }
-                           
                         }
                     }
                 }
@@ -344,8 +352,6 @@ namespace YMplugins.Models.Autocad2022
 
             return (length, width);
         }
-
-       
 
         // Function to search for the block in a given space (Model Space or Layout)
         private bool SearchBlockInSpace(Transaction trans, BlockTableRecord space, string blockName, string spaceName)

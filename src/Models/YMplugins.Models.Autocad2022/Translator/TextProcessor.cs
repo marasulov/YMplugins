@@ -1,14 +1,12 @@
-﻿using System;
-using Autodesk.AutoCAD.ApplicationServices;
+﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Gile.AutoCAD.Extension;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows;
 using YMplugins.Services.Translator;
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
-
 
 namespace YMplugins.Models.Acad2022.Services
 {
@@ -82,18 +80,23 @@ namespace YMplugins.Models.Acad2022.Services
                                             case MText mText:
                                                 mText.Contents = ProcessMText(mText, separator, preserveOriginalText);
                                                 break;
+
                                             case DBText dbText:
                                                 ProcessDbText(dbText, separator, preserveOriginalText);
                                                 break;
+
                                             case Table table:
                                                 ProcessTable(table, separator, preserveOriginalText);
                                                 break;
+
                                             case Leader leader:
                                                 ProcessLeader(leader, separator);
                                                 break;
+
                                             case MLeader mLeader:
                                                 ProcessMLeader(mLeader, separator, preserveOriginalText);
                                                 break;
+
                                             case BlockReference blockRef:
                                                 ProcessBlockReference(blockRef, regex);
                                                 break;
@@ -108,16 +111,12 @@ namespace YMplugins.Models.Acad2022.Services
                         {
                             Active.Editor.WriteMessage($"{e.Message} - {e.StackTrace}");
                         }
-                      
-
-
                     }
                 }
             }
 
             _dictionaryService.UpdateDictionaryAndSaveToJson(_dict);
         }
-
 
         private SelectionFilter CreateTextAndTableFilter()
         {
@@ -131,12 +130,11 @@ namespace YMplugins.Models.Acad2022.Services
 
         private string ProcessMText(MText mText, string separator, bool preserveOriginalText = false)
         {
-
             var text = GetClearString(mText.Contents);
 
             //if (ShouldTranslate(text, regex))
             //{
-           return preserveOriginalText ? $"{mText.Contents}{separator}{TranslateText(text)}" : TranslateText(text);
+            return preserveOriginalText ? $"{mText.Contents}{separator}{TranslateText(text)}" : TranslateText(text);
             //}
         }
 
@@ -174,7 +172,6 @@ namespace YMplugins.Models.Acad2022.Services
             {
                 Active.Editor.WriteMessage("The data may be locked, check for locked layers or data in table cells");
             }
-            
         }
 
         private string GetClearString(string source)
@@ -189,7 +186,6 @@ namespace YMplugins.Models.Acad2022.Services
                     string newtext = text.Replace("\r\n", "");
                     text = newtext;
                 }
-
 
                 return text;
             }
@@ -214,7 +210,7 @@ namespace YMplugins.Models.Acad2022.Services
             var mText = mLeader.MText;
             if (mText != null)
             {
-                var text = ProcessMText(mText, separator,preserveOriginalText);
+                var text = ProcessMText(mText, separator, preserveOriginalText);
 
                 mLeader.MText = new MText
                 {
@@ -224,10 +220,8 @@ namespace YMplugins.Models.Acad2022.Services
                     TextStyleId = mText.TextStyleId,
                     Attachment = mText.Attachment
                 };
-
             }
         }
-
 
         private void ProcessAttribute(AttributeReference attRef, string regex)
         {
@@ -280,8 +274,6 @@ namespace YMplugins.Models.Acad2022.Services
 
         private string TranslateText(string text)
         {
-            
-
             if (!_dictionaryService.TextFromJson.ContainsKey(text))
             {
                 string translatedText = default;
@@ -293,12 +285,12 @@ namespace YMplugins.Models.Acad2022.Services
                 {
                     Active.Editor.WriteMessage(e.Message);
                 }
-               
+
                 //if (translatedText != null)
                 //{
                 //    Active.Editor.WriteMessage($"\n{text} не переведен");
                 //}
-                
+
                 return translatedText;
             }
             else
@@ -313,8 +305,5 @@ namespace YMplugins.Models.Acad2022.Services
         {
             return text.All(c => c < 128);
         }
-
-       
     }
-
 }

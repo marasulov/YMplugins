@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace YMplugins.Models.Autocad2022.Utils.Print
+﻿namespace YMplugins.Models.Autocad2022.Utils.Print
 {
     public class Params
     {

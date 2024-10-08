@@ -249,6 +249,7 @@ namespace YMplugins.ViewModels.VM
         public GetAttributesCommand GetAttributesCommand { get; private set; }
         public PrintCommand PrintCommand { get; private set; }
         public ZoomToPointCommand ZoomToPointCommand { get; private set; }
+        public int PlineScale { get; }
 
         private void InitializeCommands(
             GetBlocksNameCommand getBlocksNameCommand,
@@ -318,16 +319,16 @@ namespace YMplugins.ViewModels.VM
                 }
                 if (SelectedPrintByOption == PrintByOption.ByBlock)
                 {
-                    if (SelectedAttr != null && PrintDataCollection != null)
-                    {
+                    //if (SelectedAttr != null && PrintDataCollection != null)
+                    //{
                         PrintDataCollection = new List<PrintInfo>(
-                            _attributesService.GetPrintInfosForBlock(PrintDataCollection, SelectedAttr.AttributeName,
+                            _attributesService.GetPrintInfosForBlock(PrintDataCollection, SelectedAttr?.AttributeName,
                                 NumerationStartValue, Prefix, Suffix, IsCheckedNumbering));
-                    }
-                    else
-                    {
-                        PrintDataCollection = new List<PrintInfo>(NamingPolylines(PrintDataCollection));
-                    }
+                    //}
+                    //else
+                    //{
+                    //    PrintDataCollection = new List<PrintInfo>(NamingPolylines(PrintDataCollection));
+                    //}
 
                 }
 
@@ -358,7 +359,8 @@ namespace YMplugins.ViewModels.VM
                 Prefix = Prefix,
                 Suffix = Suffix,
                 IsCheckedNumbering = IsCheckedNumbering,
-                SelectedLayer = SelectedLayerOnScreen
+                SelectedLayer = SelectedLayerOnScreen, 
+                PlineScale = PlineScale
             };
         }
 

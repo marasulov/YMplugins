@@ -27,7 +27,6 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
                 PmpDestination = Path.Combine(HostApplicationServices.Current.GetEnvironmentVariable("PrinterDescDir"),
                     deserializeObject.Pmp);
 
-
                 var locationFolder = Path.GetDirectoryName(confFile);
                 Pc3Source = Path.Combine(locationFolder, deserializeObject.Pc3);
                 PmpSource = Path.Combine(locationFolder, deserializeObject.Pmp);
@@ -75,7 +74,6 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
 
                 var pmpOnDestInfo = new FileInfo(PmpDestination);
                 var pc3OnDestInfo = new FileInfo(Pc3Destination);
-
 
                 if (pc3SourceInfo.LastWriteTime > pc3OnDestInfo.LastWriteTime)
                 {

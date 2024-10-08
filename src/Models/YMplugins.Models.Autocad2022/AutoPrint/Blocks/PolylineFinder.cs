@@ -1,27 +1,34 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
 using Gile.AutoCAD.Extension;
 using System.Collections.Generic;
-using Autodesk.AutoCAD.Geometry;
 using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.Contracts;
-using YMplugins.Models.Autocad2022.Utils.Extensions;
 using YMplugins.Models.Autocad2022.Utils;
+using YMplugins.Models.Autocad2022.Utils.Extensions;
 using PolylineExtension = YMplugins.Models.Autocad2022.Utils.Extensions.PolylineExtension;
 
 namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 {
-    public class PolylineFinder : IPolylineFinder
+    public class PolylineFinder : IObjectFinder
     {
-        public List<PrintInfo> FindPolylines(SearchData data)
+        private readonly SearchData _data;
+
+        public PolylineFinder(SearchData data)
+        {
+            _data = data;
+        }
+
+        public List<PrintInfo> FindObjects()
         {
             var polylines = new List<PrintInfo>();
-            if (data.IsSearchOnLayouts)
+            if (_data.IsSearchOnLayouts)
             {
-                polylines.AddRange(SearchPolylinesInSpace(Active.Database, data.SelectedLayer, "Layout"));
+                polylines.AddRange(SearchPolylinesInSpace(Active.Database, _data.SelectedLayer, "Layout"));
             }
-            if (data.IsSearchOnModel)
+            if (_data.IsSearchOnModel)
             {
-                polylines.AddRange(SearchPolylinesInSpace(Active.Database, data.SelectedLayer, "Model"));
+                polylines.AddRange(SearchPolylinesInSpace(Active.Database, _data.SelectedLayer, "Model"));
             }
             return polylines;
         }
@@ -79,5 +86,4 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             return (BlockTableRecord)tr.GetObject(paperSpaceId, OpenMode.ForRead);
         }
     }
-
 }

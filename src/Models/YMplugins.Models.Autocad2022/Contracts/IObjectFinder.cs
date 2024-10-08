@@ -3,8 +3,8 @@ using YMplugins.Contracts.Dto;
 
 namespace YMplugins.Models.Autocad2022.Contracts
 {
-    public interface IPolylineFinder
+    public interface IObjectFinder
     {
-        List<PrintInfo> FindPolylines(SearchData data);
+        List<PrintInfo> FindObjects();
     }
 }

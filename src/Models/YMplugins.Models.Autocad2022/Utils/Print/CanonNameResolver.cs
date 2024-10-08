@@ -1,10 +1,10 @@
-﻿using Autodesk.AutoCAD.PlottingServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.PlottingServices;
+using Gile.AutoCAD.Extension;
 using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Gile.AutoCAD.Extension;
 using YMplugins.Contracts.Dto;
 
 namespace YMplugins.Models.Autocad2022.Utils.Print
@@ -12,12 +12,10 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
     public class CanonNameResolver
     {
         private readonly StandartCopier _standartCopier;
-        
 
         public CanonNameResolver()
         {
             _standartCopier = new StandartCopier();
-            
         }
 
         public string FindCanonName(double width, double height, double tolerance = 10.0)
@@ -67,7 +65,6 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
             return !string.IsNullOrEmpty(canonName) ? canonName : "Не найдено подходящее каноническое имя";
         }
 
-
         public string GetCanonNameByWidthAndHeight(PrintInfo printInfo, double tolerance = 10.0)
         {
             double width, height;
@@ -76,11 +73,10 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
             {
                 width = Math.Round(printInfo.XDim / printInfo.ScaleX);
                 height = Math.Round(printInfo.YDim / printInfo.ScaleX);
-                Active.Editor.WriteMessage($"printInfo.IsFormatHorizontal {isHor} {width} - {height}" );
+                Active.Editor.WriteMessage($"printInfo.IsFormatHorizontal {isHor} {width} - {height}");
             }
             else
             {
-                
                 width = Math.Round(printInfo.YDim / printInfo.ScaleX);
                 height = Math.Round(printInfo.XDim / printInfo.ScaleX);
                 Active.Editor.WriteMessage($"printInfo.IsFormatHorizontal {isHor} {width} - {height}");

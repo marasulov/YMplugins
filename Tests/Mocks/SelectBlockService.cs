@@ -4,7 +4,7 @@ namespace Mocks
 {
     public class SelectBlockService : ISelectBlockService
     {
-        public string SelectBlock()
+        public string? SelectBlock()
         {
             return ".ToString()";
         }

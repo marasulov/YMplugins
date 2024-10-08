@@ -7,18 +7,18 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 {
     public class SelectBlockService : ISelectBlockService
     {
-        public string SelectBlock()
+        public string? SelectBlock()
         {
             // Get the active document and database
             Document doc = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument;
             Database db = doc.Database;
-            string blockName = default;
+            string? blockName = default;
             using (Transaction tr = db.TransactionManager.StartTransaction())
             {
                 // Set up the prompt options to select only block references
                 PromptEntityOptions peo = new PromptEntityOptions("\nSelect a block: ");
                 peo.SetRejectMessage("\nOnly block references are allowed.");
-                peo.AddAllowedClass(typeof(BlockReference), false); // Only allow BlockReferences
+                peo.AddAllowedClass(typeof(BlockReference), false);
 
                 // Prompt for the selection
                 PromptEntityResult res = doc.Editor.GetEntity(peo);

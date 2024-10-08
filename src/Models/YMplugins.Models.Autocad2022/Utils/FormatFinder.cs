@@ -5,7 +5,9 @@ namespace YMplugins.Models.Autocad2022.Utils
 {
     public class FormatFinder
     {
-        // Словарь, содержащий все форматы с указанием размеров для книжной и альбомной ориентации
+        /// <summary>
+        /// Словарь, содержащий все форматы с указанием размеров для книжной и альбомной ориентации
+        /// </summary>
         private static readonly Dictionary<string, (double Width, double Height)> GOSTFormats = new()
         {
             // Стандартные форматы
@@ -42,7 +44,7 @@ namespace YMplugins.Models.Autocad2022.Utils
             { "A4x3 г", (297, 210 * 3) }, { "A4x4 г", (297, 210 * 4) },
             { "A4x5 г", (297, 210 * 5) }, { "A4x6 г", (297, 210 * 6) },
             { "A4x7 г", (297, 210 * 7) }, { "A4x8 г", (297, 210 * 8) },
-            { "A4x9 г", (297, 210 * 9) }, 
+            { "A4x9 г", (297, 210 * 9) },
 
             { "A3x3 г", (420, 297 * 3) }, { "A3x4 г", (420, 297 * 4) },
             { "A3x5 г", (420, 297 * 5) }, { "A3x6 г", (420, 297 * 6) },
@@ -59,10 +61,14 @@ namespace YMplugins.Models.Autocad2022.Utils
             { "A0x5 г", (1189, 841 * 5) }, { "A0x6 г", (1189, 841 * 6) },
         };
 
-
         private const double Tolerance = 5.0;
 
-        // Статический метод для поиска формата с учётом кратности
+        /// <summary>
+        /// Статический метод для поиска формата с учётом кратности
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
         public static string FindClosestFormat(double width, double height)
         {
             double normalizedWidth = Math.Min(width, height);
@@ -95,13 +101,17 @@ namespace YMplugins.Models.Autocad2022.Utils
             return closestFormat != null ? closestFormat : "Не найдено подходящего формата";
         }
 
-        // Метод для подсчета разницы между размерами
+        /// <summary>
+        /// Метод для подсчета разницы между размерами
+        /// </summary>
+        /// <param name="width1"></param>
+        /// <param name="height1"></param>
+        /// <param name="width2"></param>
+        /// <param name="height2"></param>
+        /// <returns></returns>
         private static double GetDifference(double width1, double height1, double width2, double height2)
         {
             return Math.Abs(width1 - width2) + Math.Abs(height1 - height2);
         }
-
-
-
     }
 }

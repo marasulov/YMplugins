@@ -23,10 +23,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Extensions
             }
 
             return (new Point2d(minX, minY), new Point2d(maxX, maxY));
-
-          
         }
-
 
         //public static (double length, double width) Get()
         //{

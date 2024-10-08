@@ -1,10 +1,6 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
 using Gile.AutoCAD.Extension;
-using System;
-using Autodesk.AutoCAD.EditorInput;
 using YMplugins.Contracts;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace YMplugins.Models.Autocad2022.Utils;
 
@@ -14,42 +10,6 @@ public class ZoomService : IZoomEntity
     {
         Handle handle = new Handle(id);
         ObjectId objId = Active.Database.GetObjectId(false, handle, 0);
-
-        //using (Transaction trans = Active.Database.TransactionManager.StartTransaction())
-        //{
-        //    // Open the object for reading
-        //    DBObject obj = trans.GetObject(objId, OpenMode.ForRead);
-
-        //    // Get the entity type
-        //    Type entityType = obj.GetType();
-
-        //    // Optionally, you can check the exact type
-        //    if (obj is Line)
-        //    {
-        //        // It's a Line entity
-        //        Console.WriteLine("This is a Line entity.");
-        //    }
-        //    else if (obj is Circle)
-        //    {
-        //        // It's a Circle entity
-        //        Console.WriteLine("This is a Circle entity.");
-        //    }
-        //    else if (obj is BlockReference)
-        //    {
-        //        // It's a BlockReference entity
-        //        Console.WriteLine("This is a BlockReference entity.");
-        //        obj.
-
-        //    }
-        //    else
-        //    {
-        //        // Handle other types or unknown entity types
-        //        Console.WriteLine($"This is a {entityType.Name} entity.");
-        //    }
-
-        //    // Commit the transaction
-        //    trans.Commit();
-        //}
 
         using (Transaction trans = Active.Database.TransactionManager.StartTransaction())
         {
@@ -68,19 +28,7 @@ public class ZoomService : IZoomEntity
                 );
 
                 Active.Editor.ZoomWindow(extents.MinPoint, extents.MaxPoint);
-                // Get the current view from the viewport table record
-                //ViewTableRecord view =
-                //    trans.GetObject(Active.Database.CurrentViewportTableRecordId, OpenMode.ForWrite) as ViewTableRecord;
 
-                //// Adjust the view center and height based on the entity's extents
-                //view.CenterPoint = new Point2d((extents.MinPoint.X + extents.MaxPoint.X) / 2,
-                //    (extents.MinPoint.Y + extents.MaxPoint.Y) / 2);
-                //view.YDim = extents.MaxPoint.Y - extents.MinPoint.Y;
-
-                //// Optionally, adjust the width (aspect ratio)
-                //view.XDim = extents.MaxPoint.X - extents.MinPoint.X;
-
-                // Update the view
                 trans.Commit();
             }
             else
