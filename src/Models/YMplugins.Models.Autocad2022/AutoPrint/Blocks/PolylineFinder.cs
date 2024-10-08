@@ -19,16 +19,16 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             var polylines = new List<PrintInfo>();
             if (data.IsSearchOnLayouts)
             {
-                polylines.AddRange(SearchPolylinesInSpace(Active.Database, data.SelectedLayer, "Layout"));
+                polylines.AddRange(SearchPolylinesInSpace(Active.Database, data.SelectedLayer, "Layout", data.PlineScale));
             }
             if (data.IsSearchOnModel)
             {
-                polylines.AddRange(SearchPolylinesInSpace(Active.Database, data.SelectedLayer, "Model"));
+                polylines.AddRange(SearchPolylinesInSpace(Active.Database, data.SelectedLayer, "Model", data.PlineScale));
             }
             return polylines;
         }
 
-        private List<PrintInfo> SearchPolylinesInSpace(Database db, string layerName, string spaceName)
+        private List<PrintInfo> SearchPolylinesInSpace(Database db, string layerName, string spaceName, double scale)
         {
             var polylines = new List<PrintInfo>();
 
@@ -58,7 +58,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                                 objId.Handle.Value,
                                 spaceName,
                                 format,
-                                1,
+                                scale,
                                 xDim,
                                 yDim,
                                 position,
