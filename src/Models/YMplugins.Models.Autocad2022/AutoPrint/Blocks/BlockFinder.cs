@@ -21,11 +21,11 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             var blocks = new List<PrintInfo>();
             if (data.IsSearchOnLayouts)
             {
-                blocks.AddRange(_blockSearchService.SearchBlocksInSpace(Active.Database, _data.SelectedBlockName, "Layout", ""));
+                blocks.AddRange(_blockSearchService.SearchBlocksInSpace(Active.Database, data.SelectedBlockName, "Layout", ""));
             }
             if (data.IsSearchOnModel)
             {
-                blocks.AddRange(_blockSearchService.SearchBlocksInSpace(Active.Database, _data.SelectedBlockName, "Model", ""));
+                blocks.AddRange(_blockSearchService.SearchBlocksInSpace(Active.Database, data.SelectedBlockName, "Model", ""));
             }
             return blocks;
         }
