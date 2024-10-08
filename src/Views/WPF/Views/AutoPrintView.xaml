@@ -139,7 +139,14 @@
                       SelectedItem="{Binding SelectedLayerOnScreen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       SelectedIndex="0" />
                         <Button Content="Select on layer screen" Command="{Binding SelectedLayerOnScreen}"  CommandParameter="{Binding }" />
+                        
+
+                        <StackPanel >
+                            <TextBlock Text="Enter polyline scale"></TextBlock>
+                            <TextBox Text="{Binding PlineScale}"></TextBox>
+                        </StackPanel>
                     </StackPanel>
+                    
                 </StackPanel>
             </GroupBox>
             <!-- Группа Printing order -->

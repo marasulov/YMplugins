@@ -9,6 +9,7 @@ using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.AutoPrint;
 using YMplugins.Models.Autocad2022.AutoPrint.Blocks;
 using YMplugins.Models.Autocad2022.AutoPrint.Layers;
+using YMplugins.Models.Autocad2022.Contracts;
 using YMplugins.Models.Autocad2022.Utils;
 using YMplugins.Services;
 using YMplugins.ViewModels.Commands;
@@ -50,8 +51,10 @@ namespace YMplugins.Models.Autocad2022
             container.Register<IAttributesService, AttributeService>();
             container.Register<ICombinePdfService, CombinePdfService>();
             container.Register<IAutoCadFileService, AutoCadFileService>();
-            container.Register<INotifyService, NotifyService>();
+            container.Register<IBlockFinder, BlockFinder>();
+            container.Register<IPolylineFinder, PolylineFinder>();
 
+            container.Register<INotifyService, NotifyService>();
             container.Register<IWindowService, WindowService>();
 
             var window = container.GetInstance<AutoPrintView>();
