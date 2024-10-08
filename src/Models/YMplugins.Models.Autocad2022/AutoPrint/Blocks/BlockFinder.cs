@@ -5,7 +5,7 @@ using YMplugins.Models.Autocad2022.Contracts;
 
 namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 {
-    public class BlockFinder : IObjectFinder
+    public class BlockFinder : IBlockFinder
     {
         private readonly BlockSearchService _blockSearchService;
         private readonly SearchData _data;
@@ -16,18 +16,20 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             _data = data;
         }
 
-        public List<PrintInfo> FindObjects()
+        public List<PrintInfo> FindBlocks(SearchData data)
         {
             var blocks = new List<PrintInfo>();
-            if (_data.IsSearchOnLayouts)
+            if (data.IsSearchOnLayouts)
             {
                 blocks.AddRange(_blockSearchService.SearchBlocksInSpace(Active.Database, _data.SelectedBlockName, "Layout", ""));
             }
-            if (_data.IsSearchOnModel)
+            if (data.IsSearchOnModel)
             {
                 blocks.AddRange(_blockSearchService.SearchBlocksInSpace(Active.Database, _data.SelectedBlockName, "Model", ""));
             }
             return blocks;
         }
+
+        
     }
 }

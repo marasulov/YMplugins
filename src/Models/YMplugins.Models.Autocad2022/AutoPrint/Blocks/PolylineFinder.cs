@@ -10,25 +10,20 @@ using PolylineExtension = YMplugins.Models.Autocad2022.Utils.Extensions.Polyline
 
 namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 {
-    public class PolylineFinder : IObjectFinder
+    public class PolylineFinder : IPolylineFinder
     {
-        private readonly SearchData _data;
 
-        public PolylineFinder(SearchData data)
-        {
-            _data = data;
-        }
 
-        public List<PrintInfo> FindObjects()
+      public List<PrintInfo> FindPolylines(SearchData data)
         {
             var polylines = new List<PrintInfo>();
-            if (_data.IsSearchOnLayouts)
+            if (data.IsSearchOnLayouts)
             {
-                polylines.AddRange(SearchPolylinesInSpace(Active.Database, _data.SelectedLayer, "Layout"));
+                polylines.AddRange(SearchPolylinesInSpace(Active.Database, data.SelectedLayer, "Layout"));
             }
-            if (_data.IsSearchOnModel)
+            if (data.IsSearchOnModel)
             {
-                polylines.AddRange(SearchPolylinesInSpace(Active.Database, _data.SelectedLayer, "Model"));
+                polylines.AddRange(SearchPolylinesInSpace(Active.Database, data.SelectedLayer, "Model"));
             }
             return polylines;
         }
@@ -85,5 +80,6 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             var paperSpaceId = bt[BlockTableRecord.PaperSpace];
             return (BlockTableRecord)tr.GetObject(paperSpaceId, OpenMode.ForRead);
         }
+
     }
 }

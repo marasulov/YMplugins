@@ -5,6 +5,6 @@ namespace YMplugins.Models.Autocad2022.Contracts
 {
     public interface IObjectFinder
     {
-        List<PrintInfo> FindObjects();
+        List<PrintInfo> FindObjects(SearchData data);
     }
 }

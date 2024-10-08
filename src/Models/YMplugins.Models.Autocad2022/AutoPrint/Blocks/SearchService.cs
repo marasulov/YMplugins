@@ -9,23 +9,26 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 {
     public class SearchService : ISearchService
     {
-        private readonly Dictionary<PrintByOption, IObjectFinder> _strategies;
+        private readonly IBlockFinder _blockFinder;
+        private readonly IPolylineFinder _polylineFinder;
 
-        public SearchService(Dictionary<PrintByOption, IObjectFinder> strategies)
+        public SearchService(IBlockFinder blockFinder, IPolylineFinder polylineFinder)
         {
-            _strategies = strategies;
+            _blockFinder = blockFinder;
+            _polylineFinder = polylineFinder;
         }
 
         public List<PrintInfo> FindObjects(SearchData data)
         {
-            if (!_strategies.ContainsKey(data.SelectedPrintByOption))
-                throw new ArgumentException("Unsupported search option");
+            if (data.SelectedBlockName == null && data.SelectedLayer == null)
+                return new List<PrintInfo>();
 
-            // Получаем нужный IObjectFinder и вызываем FindObjects
-            var objectFinder = _strategies[data.SelectedPrintByOption];
-
-            // Передаем SearchData через его конструктор, если он его ожидает
-            return objectFinder.FindObjects();
+            return data.SelectedPrintByOption switch
+            {
+                PrintByOption.ByBlock => _blockFinder.FindBlocks(data),
+                PrintByOption.ByPolyline => _polylineFinder.FindPolylines(data),
+                _ => new List<PrintInfo>()
+            };
         }
     }
 }

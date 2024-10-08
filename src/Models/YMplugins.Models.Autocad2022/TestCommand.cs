@@ -43,17 +43,8 @@ namespace YMplugins.Models.Autocad2022
             container.Register<IGetBlocksNameService, GetBlocksNameService>();
             container.Register<IPrintService, PrintService>();
             container.Register<INamingService, NamingService>();
+            container.Register<BlockSearchService>();
             container.Register<SearchData>();
-            
-            container.Register<BlockSearchService>(Lifestyle.Transient); 
-            container.Register<BlockFinder>(Lifestyle.Transient); 
-            container.Register<PolylineFinder>(Lifestyle.Transient);
-
-            container.Register(() => new Dictionary<PrintByOption, IObjectFinder>
-            {
-                { PrintByOption.ByBlock, container.GetInstance<BlockFinder>() },
-                { PrintByOption.ByPolyline, container.GetInstance<PolylineFinder>() }
-            }, Lifestyle.Singleton);
 
             container.Register<ISearchService, SearchService>();
             container.Register<IZoomEntity, ZoomService>();
@@ -62,6 +53,8 @@ namespace YMplugins.Models.Autocad2022
             container.Register<IAttributesService, AttributeService>();
             container.Register<ICombinePdfService, CombinePdfService>();
             container.Register<IAutoCadFileService, AutoCadFileService>();
+            container.Register<IBlockFinder, BlockFinder>();
+            container.Register<IPolylineFinder, PolylineFinder>();
 
             container.Register<INotifyService, NotifyService>();
             container.Register<IWindowService, WindowService>();
