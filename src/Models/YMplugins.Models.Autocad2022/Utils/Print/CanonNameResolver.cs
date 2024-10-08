@@ -75,13 +75,13 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
             if (isHor)
             {
                 width = Math.Round(printInfo.XDim / printInfo.ScaleX);
-                height = Math.Round(printInfo.YDmim / printInfo.ScaleX);
+                height = Math.Round(printInfo.YDim / printInfo.ScaleX);
                 Active.Editor.WriteMessage($"printInfo.IsFormatHorizontal {isHor} {width} - {height}" );
             }
             else
             {
                 
-                width = Math.Round(printInfo.YDmim / printInfo.ScaleX);
+                width = Math.Round(printInfo.YDim / printInfo.ScaleX);
                 height = Math.Round(printInfo.XDim / printInfo.ScaleX);
                 Active.Editor.WriteMessage($"printInfo.IsFormatHorizontal {isHor} {width} - {height}");
             }
@@ -124,7 +124,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
         //    var pattern = new Regex(pat, RegexOptions.Compiled | RegexOptions.Singleline);
 
         //    // Получаем ближайший формат с использованием метода FindClosestFormat
-        //    var closestFormat = FormatFinder.FindClosestFormat(printInfo.XDim, printInfo.YDmim);
+        //    var closestFormat = FormatFinder.FindClosestFormat(printInfo.XDim, printInfo.YDim);
 
         //    if (string.IsNullOrEmpty(closestFormat))
         //    {
@@ -146,11 +146,11 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
         //        if (printInfo.IsFormatHorizontal())
         //        {
         //            curWidth = Math.Round(printInfo.XDim / printInfo.ScaleX);
-        //            curHeight = Math.Round(printInfo.YDmim / printInfo.ScaleX);
+        //            curHeight = Math.Round(printInfo.YDim / printInfo.ScaleX);
         //        }
         //        else
         //        {
-        //            curWidth = Math.Round(printInfo.YDmim / printInfo.ScaleX);
+        //            curWidth = Math.Round(printInfo.YDim / printInfo.ScaleX);
         //            curHeight = Math.Round(printInfo.XDim / printInfo.ScaleX);
         //        }
 
@@ -201,11 +201,11 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
         //        if (printInfo.IsFormatHorizontal())
         //        {
         //            curWidth = Math.Round(printInfo.XDim / printInfo.ScaleX);
-        //            curHeight = Math.Round(printInfo.YDmim / printInfo.ScaleX);
+        //            curHeight = Math.Round(printInfo.YDim / printInfo.ScaleX);
         //        }
         //        else
         //        {
-        //            curWidth = Math.Round(printInfo.YDmim / printInfo.ScaleX);
+        //            curWidth = Math.Round(printInfo.YDim / printInfo.ScaleX);
         //            curHeight = Math.Round(printInfo.XDim / printInfo.ScaleX);
         //        }
 

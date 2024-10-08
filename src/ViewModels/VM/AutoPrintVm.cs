@@ -25,13 +25,16 @@ namespace YMplugins.ViewModels.VM
         private PrintByOption _selectedPrintByOption;
         private string _prefix;
         private string _suffix;
-        private bool _isCheckedNumbering;
+        private bool _isCheckedNumbering = true;
         private string _outputFileName;
         private bool _isAllPrintSelected = true;
         private List<PrintInfo> _printDataCollection;
         private int _selectedPrintCount;
         private string _error;
         private bool _isUpdatingBlockCollection;
+        private bool _isSearchOnLayout;
+        private bool _isSearchOnModel = true;
+        private string _fileName;
 
         public AutoPrintVm(
             GetBlocksNameCommand getBlocksNameCommand,
@@ -50,7 +53,6 @@ namespace YMplugins.ViewModels.VM
                                printCommand, selectBlockCommand, zoomToPointCommand);
         }
 
-        
         public List<string> BlocksNames
         {
             get => _blocksNames;
@@ -102,7 +104,7 @@ namespace YMplugins.ViewModels.VM
 
         public string SelectedLayerOnScreen
         {
-            get=>_selectLayerOnScreen;
+            get => _selectLayerOnScreen;
             set
             {
                 if (Set(ref _selectLayerOnScreen, value))
@@ -156,8 +158,30 @@ namespace YMplugins.ViewModels.VM
             }
         }
 
-        public bool IsSearchOnModel { get; set; } = true;
-        public bool IsSearchOnLayout { get; set; }
+        public bool IsSearchOnModel
+        {
+            get => _isSearchOnModel;
+            set
+            {
+                Set(ref _isSearchOnModel, value);
+                if (SelectedBlockOnScreen == null) return;
+                UpdateAttributes();
+                UpdateBlockCollection();
+            }
+        }
+
+        public bool IsSearchOnLayout
+        {
+            get => _isSearchOnLayout;
+            set
+            {
+                Set(ref _isSearchOnLayout, value);
+                if (SelectedBlockOnScreen == null) return;
+                UpdateAttributes();
+                UpdateBlockCollection();
+            }
+
+        }
 
         public int NumerationStartValue
         {
@@ -194,14 +218,12 @@ namespace YMplugins.ViewModels.VM
         public int SelectedPrintCount
         {
             get => _selectedPrintCount;
-            private set
+            set
             {
-                if (_selectedPrintCount != value)
-                {
-                    _selectedPrintCount = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(HeaderContent));
-                }
+                if (_selectedPrintCount == value) return;
+                _selectedPrintCount = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(HeaderContent));
             }
         }
 
@@ -211,6 +233,12 @@ namespace YMplugins.ViewModels.VM
         {
             get => _error;
             set => Set(ref _error, value);
+        }
+
+        public string FileName
+        {
+            get => _fileName;
+            set => Set(ref _fileName, value);
         }
 
         public Action CloseAction { get; set; }
@@ -288,7 +316,7 @@ namespace YMplugins.ViewModels.VM
                 {
                     PrintDataCollection = new List<PrintInfo>(NamingPolylines(PrintDataCollection));
                 }
-                else
+                if (SelectedPrintByOption == PrintByOption.ByBlock)
                 {
                     if (SelectedAttr != null && PrintDataCollection != null)
                     {
@@ -296,6 +324,11 @@ namespace YMplugins.ViewModels.VM
                             _attributesService.GetPrintInfosForBlock(PrintDataCollection, SelectedAttr.AttributeName,
                                 NumerationStartValue, Prefix, Suffix, IsCheckedNumbering));
                     }
+                    else
+                    {
+                        PrintDataCollection = new List<PrintInfo>(NamingPolylines(PrintDataCollection));
+                    }
+
                 }
 
                 UpdateSelectedPrintCount();
@@ -362,11 +395,15 @@ namespace YMplugins.ViewModels.VM
             if (_selectedPrintByOption == PrintByOption.ByPolyline)
             {
                 PrintDataCollection?.Clear();
+                UpdateSelectedPrintCount();
             }
             else if (_selectedPrintByOption == PrintByOption.ByBlock)
             {
+                PrintDataCollection?.Clear();
+                if (SelectedBlockOnScreen == null) return;
                 UpdateAttributes();
                 UpdateBlockCollection();
+                UpdateSelectedPrintCount();
             }
         }
 

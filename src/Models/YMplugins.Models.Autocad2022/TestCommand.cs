@@ -20,48 +20,48 @@ namespace YMplugins.Models.Autocad2022
 {
     public class TestCommands
     {
-        //[CommandMethod("Autoprint")]
-        //public static void Print()
-        //{
-        //    var container = new Container();
-        //    container.Options.EnableAutoVerification = false;
+        [CommandMethod("Autoprint2")]
+        public static void Print()
+        {
+            var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
-        //    container.Register<GetAttributesCommand>();
-        //    container.Register<GetBlocksNameCommand>();
-        //    container.Register<GetLayersCommand>();
-        //    container.Register<PrintCommand>();
-        //    container.Register<SelectBlockCommand>();
-        //    container.Register<ZoomToPointCommand>();
-        //    container.Register<AutoPrintVm>(Lifestyle.Transient);
-        //    container.Register<AutoPrintView>(Lifestyle.Transient);
+            container.Register<GetAttributesCommand>();
+            container.Register<GetBlocksNameCommand>();
+            container.Register<GetLayersCommand>();
+            container.Register<PrintCommand>();
+            container.Register<SelectBlockCommand>();
+            container.Register<ZoomToPointCommand>();
+            container.Register<AutoPrintVm>(Lifestyle.Transient);
+            container.Register<AutoPrintView>(Lifestyle.Transient);
 
-        //    container.Register<LoadingWindow>(Lifestyle.Transient);
+            container.Register<LoadingWindow>(Lifestyle.Transient);
 
-        //    container.Register<IGetBlocksNameService, GetBlocksNameService>();
-        //    container.Register<IPrintService, PrintService>();
-        //    container.Register<INamingService, NamingService>();
-        //    container.Register<BlockSearchService>();
-        //    container.Register<SearchData>();
+            container.Register<IGetBlocksNameService, GetBlocksNameService>();
+            container.Register<IPrintService, PrintService>();
+            container.Register<INamingService, NamingService>();
+            container.Register<BlockSearchService>();
+            container.Register<SearchData>();
 
-        //    container.Register<ISearchService, SearchService>();
-        //    container.Register<IZoomEntity, ZoomService>();
-        //    container.Register<IGetLayersService, GetLayersService>();
-        //    container.Register<ISelectBlockService, SelectBlockService>();
-        //    container.Register<IAttributesService, AttributeService>();
-        //    container.Register<ICombinePdfService, CombinePdfService>();
-        //    container.Register<IAutoCadFileService, AutoCadFileService>();
-        //    container.Register<INotifyService, NotifyService>();
+            container.Register<ISearchService, SearchService>();
+            container.Register<IZoomEntity, ZoomService>();
+            container.Register<IGetLayersService, GetLayersService>();
+            container.Register<ISelectBlockService, SelectBlockService>();
+            container.Register<IAttributesService, AttributeService>();
+            container.Register<ICombinePdfService, CombinePdfService>();
+            container.Register<IAutoCadFileService, AutoCadFileService>();
+            container.Register<INotifyService, NotifyService>();
 
-        //    container.Register<IWindowService, WindowService>();
+            container.Register<IWindowService, WindowService>();
 
-        //    var window = container.GetInstance<AutoPrintView>();
-        //    var context = (AutoPrintVm)window.DataContext;
+            var window = container.GetInstance<AutoPrintView>();
+            var context = (AutoPrintVm)window.DataContext;
 
-        //    context.GetBlocksNameCommand.Execute(null);
-        //    context.GetLayersCommand.Execute(null);
+            context.GetBlocksNameCommand.Execute(null);
+            context.GetLayersCommand.Execute(null);
 
-        //    window.ShowDialog();
-        //}
+            window.ShowDialog();
+        }
 
         //[CommandMethod("SearchBlocksByName")]
         //public void SearchBlocksByName()
@@ -127,74 +127,78 @@ namespace YMplugins.Models.Autocad2022
         //    return blockRefs;
         //}
 
-        //[CommandMethod("FindBlockByNameInSpace")]
-        //public void FindBlockByNameInSpace()
-        //{
-        //    Document doc = Application.DocumentManager.MdiActiveDocument;
-        //    Database db = doc.Database;
-        //    Editor ed = doc.Editor;
+        [CommandMethod("FindBlockByNameInSpace")]
+        public void FindBlockByNameInSpace()
+        {
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+            Editor ed = doc.Editor;
 
-        //    // Get block name from user
-        //    PromptStringOptions promptOptions = new PromptStringOptions("\nEnter block name to search: ");
-        //    PromptResult result = ed.GetString(promptOptions);
+            // Get block name from user
+            PromptStringOptions promptOptions = new PromptStringOptions("\nEnter block name to search: ");
+            PromptResult result = ed.GetString(promptOptions);
 
-        //    if (result.Status != PromptStatus.OK)
-        //    {
-        //        return;
-        //    }
+            if (result.Status != PromptStatus.OK)
+            {
+                return;
+            }
 
-        //    string blockName = result.StringResult;
+            string blockName = result.StringResult;
 
-        //    // Ask where to search: Model, Layouts, or both
-        //    PromptKeywordOptions spaceOptions = new PromptKeywordOptions("\nSearch in [Model/Layout/Both]: ");
-        //    spaceOptions.Keywords.Add("Model");
-        //    spaceOptions.Keywords.Add("Layout");
-        //    spaceOptions.Keywords.Add("Both");
-        //    spaceOptions.AllowNone = false;
+            // Ask where to search: Model, Layouts, or both
+            PromptKeywordOptions spaceOptions = new PromptKeywordOptions("\nSearch in [Model/Layout/Both]: ");
+            spaceOptions.Keywords.Add("Model");
+            spaceOptions.Keywords.Add("Layout");
+            spaceOptions.Keywords.Add("Both");
+            spaceOptions.AllowNone = false;
 
-        //    PromptResult spaceResult = ed.GetKeywords(spaceOptions);
+            PromptResult spaceResult = ed.GetKeywords(spaceOptions);
 
-        //    if (spaceResult.Status != PromptStatus.OK)
-        //    {
-        //        return;
-        //    }
+            if (spaceResult.Status != PromptStatus.OK)
+            {
+                return;
+            }
 
-        //    using (Transaction trans = db.TransactionManager.StartTransaction())
-        //    {
-        //        BlockTable bt = (BlockTable)trans.GetObject(db.BlockTableId, OpenMode.ForRead);
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                BlockTable bt = (BlockTable)trans.GetObject(db.BlockTableId, OpenMode.ForRead);
 
-        //        bool found = false;
+                bool found = false;
 
-        //        if (spaceResult.StringResult == "Model" || spaceResult.StringResult == "Both")
-        //        {
-        //            // Search in Model Space
-        //            BlockTableRecord modelSpace = (BlockTableRecord)trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead);
-        //            found |= SearchBlockInSpace(trans, modelSpace, blockName, "Model Space");
-        //        }
+                if (spaceResult.StringResult == "Model")
+                {
+                    // Search in Model Space
+                    BlockTableRecord modelSpace = (BlockTableRecord)trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead);
+                    found |= SearchBlockInSpace(trans, modelSpace, blockName, "Model Space");
+                }
 
-        //        if (spaceResult.StringResult == "Layout" || spaceResult.StringResult == "Both")
-        //        {
-        //            // Search in each Layout (Paper Space)
-        //            foreach (ObjectId btrId in bt)
-        //            {
-        //                BlockTableRecord btr = (BlockTableRecord)trans.GetObject(btrId, OpenMode.ForRead);
+                if (spaceResult.StringResult == "Layout")
+                {
+                    // Search in each Layout (Paper Space)
+                    foreach (ObjectId btrId in bt)
+                    {
+                        BlockTableRecord btr = (BlockTableRecord)trans.GetObject(btrId, OpenMode.ForRead);
 
-        //                if (btr.IsLayout)
-        //                {
-        //                    Layout layout = (Layout)trans.GetObject(btr.LayoutId, OpenMode.ForRead);
-        //                    found |= SearchBlockInSpace(trans, btr, blockName, $"Layout: {layout.LayoutName}");
-        //                }
-        //            }
-        //        }
+                        if (btr.IsLayout)
+                        {
+                            Layout layout = (Layout)trans.GetObject(btr.LayoutId, OpenMode.ForRead);
+                            if (layout.LayoutName != "Model")
+                            {
+                                found |= SearchBlockInSpace(trans, btr, blockName, $"Layout: {layout.LayoutName}");
+                            }
+                           
+                        }
+                    }
+                }
 
-        //        if (!found)
-        //        {
-        //            ed.WriteMessage($"\nBlock {blockName} not found.");
-        //        }
+                if (!found)
+                {
+                    ed.WriteMessage($"\nBlock {blockName} not found.");
+                }
 
-        //        trans.Commit();
-        //    }
-        //}
+                trans.Commit();
+            }
+        }
 
         // Function to search for the block in a given space (Model Space or Layout)
         //private bool SearchBlockInSpace(Transaction trans, BlockTableRecord space, string blockName, string spaceName)
@@ -338,74 +342,7 @@ namespace YMplugins.Models.Autocad2022
             return (length, width);
         }
 
-        [CommandMethod("FindBlockByNameWithAttributes")]
-        public void FindBlockByNameWithAttributes()
-        {
-            Document doc = Application.DocumentManager.MdiActiveDocument;
-            Database db = doc.Database;
-            Editor ed = doc.Editor;
-
-            // Get block name from user
-            PromptStringOptions promptOptions = new PromptStringOptions("\nEnter block name to search: ");
-            PromptResult result = ed.GetString(promptOptions);
-
-            if (result.Status != PromptStatus.OK)
-            {
-                return;
-            }
-
-            string blockName = result.StringResult;
-
-            // Ask where to search: Model, Layouts, or both
-            PromptKeywordOptions spaceOptions = new PromptKeywordOptions("\nSearch in [Model/Layout/Both]: ");
-            spaceOptions.Keywords.Add("Model");
-            spaceOptions.Keywords.Add("Layout");
-            spaceOptions.Keywords.Add("Both");
-            spaceOptions.AllowNone = false;
-
-            PromptResult spaceResult = ed.GetKeywords(spaceOptions);
-
-            if (spaceResult.Status != PromptStatus.OK)
-            {
-                return;
-            }
-
-            using (Transaction trans = db.TransactionManager.StartTransaction())
-            {
-                BlockTable bt = (BlockTable)trans.GetObject(db.BlockTableId, OpenMode.ForRead);
-
-                bool found = false;
-
-                if (spaceResult.StringResult == "Model" || spaceResult.StringResult == "Both")
-                {
-                    // Search in Model Space
-                    BlockTableRecord modelSpace = (BlockTableRecord)trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead);
-                    found |= SearchBlockInSpace(trans, modelSpace, blockName, "Model Space");
-                }
-
-                if (spaceResult.StringResult == "Layout" || spaceResult.StringResult == "Both")
-                {
-                    // Search in each Layout (Paper Space)
-                    foreach (ObjectId btrId in bt)
-                    {
-                        BlockTableRecord btr = (BlockTableRecord)trans.GetObject(btrId, OpenMode.ForRead);
-
-                        if (btr.IsLayout)
-                        {
-                            Layout layout = (Layout)trans.GetObject(btr.LayoutId, OpenMode.ForRead);
-                            found |= SearchBlockInSpace(trans, btr, blockName, $"Layout: {layout.LayoutName}");
-                        }
-                    }
-                }
-
-                if (!found)
-                {
-                    ed.WriteMessage($"\nBlock {blockName} not found.");
-                }
-
-                trans.Commit();
-            }
-        }
+       
 
         // Function to search for the block in a given space (Model Space or Layout)
         private bool SearchBlockInSpace(Transaction trans, BlockTableRecord space, string blockName, string spaceName)
@@ -426,16 +363,16 @@ namespace YMplugins.Models.Autocad2022
                         ed.WriteMessage($"\nBlock {blockName} found in {spaceName}.");
 
                         // Get Attributes (name and value) from the block
-                        if (blockRef.AttributeCollection.Count > 0)
-                        {
-                            GetAttributesFromBlock(blockRef);
-                        }
+                        //if (blockRef.AttributeCollection.Count > 0)
+                        //{
+                        //    GetAttributesFromBlock(blockRef);
+                        //}
 
-                        // If it's a dynamic block, list the dynamic properties
-                        if (blockRef.IsDynamicBlock)
-                        {
-                            ListDynamicBlockProperties(blockRef);
-                        }
+                        //// If it's a dynamic block, list the dynamic properties
+                        //if (blockRef.IsDynamicBlock)
+                        //{
+                        //    ListDynamicBlockProperties(blockRef);
+                        //}
 
                         found = true;
                     }

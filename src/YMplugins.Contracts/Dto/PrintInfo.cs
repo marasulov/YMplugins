@@ -12,8 +12,7 @@ namespace YMplugins.Contracts.Dto
         public string Format { get; set; }
         public string FileName { get; set; }
         public PointDTO Position { get; set; }
-        public PointDTO Position2 { get; set; }
-        public double YDmim { get; set; }
+        public double YDim { get; set; }
         public double XDim { get; set; }
         public double ScaleX { get; set; }
 
@@ -29,14 +28,14 @@ namespace YMplugins.Contracts.Dto
 
         //public bool IsCheckedNumbering { get; set; }
 
-        public PrintInfo(long objectId, string space, string format, double scaleX, double xDim, double yDmim, PointDTO position, bool isPrint, string fileName = "")
+        public PrintInfo(long objectId, string space, string format, double scaleX, double xDim, double yDim, PointDTO position, bool isPrint, string fileName = "")
         {
             ObjectId = objectId;
             Space = space;
             Format = format;
             ScaleX = scaleX;
             XDim = xDim;
-            YDmim = yDmim;
+            YDim = yDim;
             Position = position;
             IsPrint = isPrint;
             FileName = fileName;
@@ -44,7 +43,7 @@ namespace YMplugins.Contracts.Dto
 
         public bool IsFormatHorizontal()
         {
-            return XDim > YDmim;
+            return XDim > YDim;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

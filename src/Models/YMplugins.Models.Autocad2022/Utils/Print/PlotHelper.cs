@@ -33,7 +33,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
             var acPlSetVdr = PlotSettingsValidator.Current;
 
             var blockPosition = new Point2d(_printModel.Position.X, _printModel.Position.Y);
-            var blockDimension = new Point2d(blockPosition.X + _printModel.XDim, blockPosition.Y + _printModel.YDmim);
+            var blockDimension = new Point2d(blockPosition.X + _printModel.XDim, blockPosition.Y + _printModel.YDim);
             //var blockDimension = new Point2d(_printModel.Position2.X, _printModel.Position2.Y);
             var points = new Extents2d(blockPosition, blockDimension);
 

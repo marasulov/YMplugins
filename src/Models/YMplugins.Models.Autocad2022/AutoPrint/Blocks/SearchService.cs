@@ -22,55 +22,39 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             _blockSearchService = blockSearchService;
         }
 
-        //public IEnumerable<PrintInfo> FindObjects(string blockName)
-        //{
-        //    if (data.SelectedPrintByOption == PrintByOption.ByBlock)
-        //    {
-        //        var blockName = data.SelectedBlockName;
-
-        //        // Логика поиска блоков
-        //        return FindBlocksByBlockName(blockName);
-        //    }
-        //    else if (data.SelectedPrintByOption == PrintByOption.ByPolyline)
-        //    {
-        //        var layerName = data.SelectedLayer;
-        //        // Логика поиска полилиний
-        //        return FindPolylines(layerName);
-        //    }
-
-        //    return Enumerable.Empty<PrintInfo>();
-        //}
-
         public List<PrintInfo> FindObjects(SearchData data)
         {
             var results = new List<PrintInfo>();
+            if (data.SelectedBlockName == null & data.SelectedLayer == null) return results;
 
-            if (data.SelectedPrintByOption == PrintByOption.ByBlock)
+            switch (data.SelectedPrintByOption)
             {
-                var blockName = data.SelectedBlockName;
-                results = new List<PrintInfo>(FindBlocksByBlockName(data));
-            }
-            else if (data.SelectedPrintByOption == PrintByOption.ByPolyline)
-            {
-                
-                results = new List<PrintInfo>(FindPolylinesByLayer(data));
+                case PrintByOption.ByBlock:
+                    results = new List<PrintInfo>(FindBlocksByBlockName(data));
+                    break;
+                case PrintByOption.ByPolyline:
+                    results = new List<PrintInfo>(FindPolylinesByLayer(data));
+                    break;
             }
 
             return results;
         }
 
-        private List<PrintInfo> FindBlocksByBlockName(SearchData data)
+        private IEnumerable<PrintInfo> FindBlocksByBlockName(SearchData data)
         {
             var blocks = new List<PrintInfo>();
             string blockName = data.SelectedBlockName;
+            
             if (data.IsSearchOnLayouts)
             {
                 blocks = _blockSearchService.SearchBlocksInSpace(Active.Database, blockName, "Layout", "");
             }
             if (data.IsSearchOnModel)
             {
+
                 blocks = _blockSearchService.SearchBlocksInSpace(Active.Database, blockName, "Model", "");
             }
+
             return blocks;
         }
 
@@ -116,7 +100,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                         var yDim = maxPoint.Y - minPoint.Y;
 
                         var format = FormatFinder.FindClosestFormat(xDim, yDim);
-                        Active.Editor.WriteMessage($"в полилинии xdim {xDim}, ydim {yDim}");
+                        
                         polylines.Add(
                             new PrintInfo(
                                 objId.Handle.Value,

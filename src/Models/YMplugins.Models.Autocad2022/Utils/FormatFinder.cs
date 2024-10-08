@@ -82,13 +82,13 @@ namespace YMplugins.Models.Autocad2022.Utils
                 if (differenceWidthHeight < minDifference)
                 {
                     minDifference = differenceWidthHeight;
-                    closestFormat = $"{format.Key} (Книжный)";
+                    closestFormat = $"{format.Key} (Vertical)";
                 }
 
                 if (differenceHeightWidth < minDifference)
                 {
                     minDifference = differenceHeightWidth;
-                    closestFormat = $"{format.Key} (Альбомный)";
+                    closestFormat = $"{format.Key} (Horizontal)";
                 }
             }
 

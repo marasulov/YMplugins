@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Icons\autoprint.png" />
     <None Remove="Icons\translation.png" />
   </ItemGroup>
 
@@ -36,6 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Icons\autoprint.png" />
     <Resource Include="Icons\translation.png" />
   </ItemGroup>
 

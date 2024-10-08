@@ -299,10 +299,10 @@ namespace YMplugins.Addin.Autocad2022
                 ribBtn.CommandHandler = commandHandler;
                 ribBtn.CommandParameter = "AutoPrint";
                 ribBtn.Size = RibbonItemSize.Large;
-                ribBtn.LargeImage = LoadImage("translation");
+                ribBtn.LargeImage = LoadImage("autoprint");
                 ribBtn.ShowImage = true;
                 ribBtn.ShowText = true;
-                tt.Content = "Translate";
+                tt.Content = "autoprint";
                 ribBtn.ToolTip = tt;
                 ribBtn.Orientation = Orientation.Vertical;
 
@@ -319,7 +319,7 @@ namespace YMplugins.Addin.Autocad2022
                 catch (Exception ex)
                 {
                     // Логирование ошибки или отладочная информация
-                    Console.WriteLine($"Error loading image: {ex.Message}");
+                    Active.Editor.WriteMessage($"Error loading image: {ex.Message}");
                     return null;
                 }
             }
