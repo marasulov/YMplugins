@@ -26,8 +26,8 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
             var pattern = new Regex(pat, RegexOptions.Compiled | RegexOptions.Singleline);
 
             // Получаем ближайший формат с использованием метода FindClosestFormat
-            var closestFormat = FormatFinder.FindClosestFormat(width, height);
-            if (string.IsNullOrEmpty(closestFormat))
+            var closestFormat = FormatFinder.FindFormatWithScale(width, height);
+            if (string.IsNullOrEmpty(closestFormat.Format))
             {
                 return "Не найден подходящий формат";
             }
@@ -54,7 +54,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
                 // Логика поиска по формату, если точное имя не найдено
                 foreach (var line in pConfig.CanonicalMediaNames)
                 {
-                    if (line.Contains(closestFormat)) // Если в строке присутствует найденный формат
+                    if (line.Contains(closestFormat.Format)) // Если в строке присутствует найденный формат
                     {
                         canonName = line;
                         break;

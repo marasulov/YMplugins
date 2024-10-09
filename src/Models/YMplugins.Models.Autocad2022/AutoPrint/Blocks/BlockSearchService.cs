@@ -74,12 +74,12 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                 var position = blockRef.Position;
                 var blockScale = blockRef.ScaleFactors.X;
                 var blockPointPosition = new PointDTO(position.X, position.Y, position.Z);
-                var format = FormatFinder.FindClosestFormat(xDim, yDim);
+                var format = FormatFinder.FindFormatWithScale(xDim, yDim);
                 Active.Editor.WriteMessage($"в полилинии xDim {xDim} по X, yDim {yDim}");
 #if DEBUG
                 Active.Editor.WriteMessage($"format {format}");
 #endif
-                PrintInfo blockData = new PrintInfo(blockRef.Id.Handle.Value, spaceName, format, blockScale, xDim, yDim, blockPointPosition, true);
+                PrintInfo blockData = new PrintInfo(blockRef.Id.Handle.Value, spaceName, format.Format, blockScale, xDim, yDim, blockPointPosition, true);
 
                 blockList.Add(blockData);
             }

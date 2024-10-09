@@ -51,14 +51,14 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                         var xDim = maxPoint.X - minPoint.X;
                         var yDim = maxPoint.Y - minPoint.Y;
 
-                        var format = FormatFinder.FindClosestFormat(xDim/scale, yDim/scale);
+                        var format = FormatFinder.FindFormatWithScale(xDim, yDim);
 
                         polylines.Add(
                             new PrintInfo(
                                 objId.Handle.Value,
                                 spaceName,
-                                format,
-                                scale,
+                                format.Format,
+                                format.Scale.Value,
                                 xDim,
                                 yDim,
                                 position,
