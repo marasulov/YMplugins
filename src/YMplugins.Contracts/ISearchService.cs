@@ -6,6 +6,6 @@ namespace YMplugins.Contracts
 {
     public interface ISearchService
     {
-        List<PrintInfo> FindObjects(SearchData searchData);
+        ObservableCollection<PrintInfo> FindObjects(SearchData searchData);
     }
 }

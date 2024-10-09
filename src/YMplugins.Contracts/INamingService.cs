@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using YMplugins.Contracts.Dto;
 
 namespace YMplugins.Contracts
 {
     public interface INamingService
     {
-        List<PrintInfo> GenerateFileName(IEnumerable<PrintInfo> printInfos, int numerationValue);
+        ObservableCollection<PrintInfo> GenerateFileName(IEnumerable<PrintInfo> printInfos, int numerationValue);
     }
 }

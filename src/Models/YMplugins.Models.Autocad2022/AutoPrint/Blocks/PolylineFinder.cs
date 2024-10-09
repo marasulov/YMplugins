@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.Geometry;
 using Gile.AutoCAD.Extension;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.Contracts;
 using YMplugins.Models.Autocad2022.Utils;
@@ -14,7 +15,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
     {
 
 
-      public List<PrintInfo> FindPolylines(SearchData data)
+      public ObservableCollection<PrintInfo> FindPolylines(SearchData data)
         {
             var polylines = new List<PrintInfo>();
             if (data.IsSearchOnLayouts)
@@ -25,12 +26,12 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             {
                 polylines.AddRange(SearchPolylinesInSpace(Active.Database, data.SelectedLayer, "Model", data.PlineScale));
             }
-            return polylines;
+            return new ObservableCollection<PrintInfo>(polylines);
         }
 
-        private List<PrintInfo> SearchPolylinesInSpace(Database db, string layerName, string spaceName, double scale)
+        private ObservableCollection<PrintInfo> SearchPolylinesInSpace(Database db, string layerName, string spaceName, double scale)
         {
-            var polylines = new List<PrintInfo>();
+            var polylines = new ObservableCollection<PrintInfo>();
 
             using (var tr = db.TransactionManager.StartTransaction())
             {

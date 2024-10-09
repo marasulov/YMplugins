@@ -17,7 +17,7 @@ namespace Mocks
         {
             _nameService = nameService;
         }
-        public List<PrintInfo> FindObjects(SearchData data)
+        public ObservableCollection<PrintInfo> FindObjects(SearchData data)
         {
             if (data.SelectedPrintByOption == PrintByOption.ByBlock)
             {
@@ -33,9 +33,9 @@ namespace Mocks
             return default;
         }
 
-        private List<PrintInfo> FindBlocks(SearchData data)
+        private ObservableCollection<PrintInfo> FindBlocks(SearchData data)
         {
-            var layers = new List<PrintInfo>();
+            var layers = new ObservableCollection<PrintInfo>();
             for (int i = 0; i < 50; i++)
             {
                 //var fileName = _nameService.GenerateFileName(default,0);
@@ -48,9 +48,9 @@ namespace Mocks
             
         }
 
-        private List<PrintInfo> FindPolylines(SearchData data)
+        private ObservableCollection<PrintInfo> FindPolylines(SearchData data)
         {
-            var layers = new List<PrintInfo>();
+            var layers = new ObservableCollection<PrintInfo>();
             for (int i = 0; i < 50; i++)
             {
                 //var fileName = _nameService.GenerateFileName(default,0);

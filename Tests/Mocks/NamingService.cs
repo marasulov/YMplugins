@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
@@ -35,14 +36,14 @@ namespace Mocks
         //    return filename;
 
         //}
-        public List<PrintInfo> GenerateFileName(IEnumerable<PrintInfo> printInfos, int numerationValue)
+        public ObservableCollection<PrintInfo> GenerateFileName(IEnumerable<PrintInfo> printInfos, int numerationValue)
         {
             foreach (var printInfo in printInfos)
             {
                 printInfo.FileName = printInfo.FileName + numerationValue;
             }
 
-            return printInfos.ToList();
+            return (ObservableCollection<PrintInfo>)printInfos;
         }
     }
 

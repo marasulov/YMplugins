@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using YMplugins.Contracts.Dto;
 
 namespace YMplugins.Models.Autocad2022.Contracts
 {
     public interface IBlockFinder
     {
-        List<PrintInfo> FindBlocks(SearchData data);
+        ObservableCollection<PrintInfo> FindBlocks(SearchData data);
     }
 }

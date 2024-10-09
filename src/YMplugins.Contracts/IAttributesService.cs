@@ -7,6 +7,6 @@ namespace YMplugins.Contracts
     public interface IAttributesService
     {
         List<BlockAttribute> GetAttributesForBlock(string selectedBlockName);
-        List<PrintInfo> GetPrintInfosForBlock(List<PrintInfo> printInfos, string selectedAttribute, int numerationStartValue, string prefix, string suffix, bool isCheckedNumbering);
+        ObservableCollection<PrintInfo> GetPrintInfosForBlock(ObservableCollection<PrintInfo> printInfos, string selectedAttribute, int numerationStartValue, string prefix, string suffix, bool isCheckedNumbering);
     }
 }

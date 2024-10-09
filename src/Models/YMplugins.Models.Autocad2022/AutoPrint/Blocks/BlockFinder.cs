@@ -1,5 +1,6 @@
 ﻿using Gile.AutoCAD.Extension;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.Contracts;
 
@@ -16,7 +17,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             _data = data;
         }
 
-        public List<PrintInfo> FindBlocks(SearchData data)
+        public ObservableCollection<PrintInfo> FindBlocks(SearchData data)
         {
             var blocks = new List<PrintInfo>();
             if (data.IsSearchOnLayouts)
@@ -27,7 +28,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             {
                 blocks.AddRange(_blockSearchService.SearchBlocksInSpace(Active.Database, data.SelectedBlockName, "Model", ""));
             }
-            return blocks;
+            return new ObservableCollection<PrintInfo>(blocks);
         }
 
         

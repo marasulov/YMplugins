@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
 using YMplugins.Contracts.Dto.Enums;
@@ -18,16 +19,16 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             _polylineFinder = polylineFinder;
         }
 
-        public List<PrintInfo> FindObjects(SearchData data)
+        public ObservableCollection<PrintInfo> FindObjects(SearchData data)
         {
             if (data.SelectedBlockName == null && data.SelectedLayer == null)
-                return new List<PrintInfo>();
+                return new ObservableCollection<PrintInfo>();
 
             return data.SelectedPrintByOption switch
             {
                 PrintByOption.ByBlock => _blockFinder.FindBlocks(data),
                 PrintByOption.ByPolyline => _polylineFinder.FindPolylines(data),
-                _ => new List<PrintInfo>()
+                _ => new ObservableCollection<PrintInfo>()
             };
         }
     }

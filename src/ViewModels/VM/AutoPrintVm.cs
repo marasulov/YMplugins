@@ -28,7 +28,7 @@ namespace YMplugins.ViewModels.VM
         private bool _isCheckedNumbering = true;
         private string _outputFileName;
         private bool _isAllPrintSelected = true;
-        private List<PrintInfo> _printDataCollection;
+        private ObservableCollection<PrintInfo> _printDataCollection;
         private int _selectedPrintCount;
         private string _error;
         private bool _isUpdatingBlockCollection;
@@ -84,7 +84,7 @@ namespace YMplugins.ViewModels.VM
             set => Set(ref _attributes, value);
         }
 
-        public List<PrintInfo> PrintDataCollection
+        public ObservableCollection<PrintInfo> PrintDataCollection
         {
             get => _printDataCollection;
             set => SetPrintDataCollection(value);
@@ -325,19 +325,19 @@ namespace YMplugins.ViewModels.VM
             {
                 if (SelectedPrintByOption == PrintByOption.ByPolyline)
                 {
-                    PrintDataCollection = new List<PrintInfo>(NamingPolylines(PrintDataCollection));
+                    PrintDataCollection = new ObservableCollection<PrintInfo>(NamingPolylines(PrintDataCollection));
                 }
                 if (SelectedPrintByOption == PrintByOption.ByBlock)
                 {
                     //if (SelectedAttr != null && PrintDataCollection != null)
                     //{
-                        PrintDataCollection = new List<PrintInfo>(
+                        PrintDataCollection = new ObservableCollection<PrintInfo>(
                             _attributesService.GetPrintInfosForBlock(PrintDataCollection, SelectedAttr?.AttributeName,
                                 NumerationStartValue, Prefix, Suffix, IsCheckedNumbering));
                     //}
                     //else
                     //{
-                    //    PrintDataCollection = new List<PrintInfo>(NamingPolylines(PrintDataCollection));
+                    //    PrintDataCollection = new ObservableCollection<PrintInfo>(NamingPolylines(PrintDataCollection));
                     //}
 
                 }
@@ -374,7 +374,7 @@ namespace YMplugins.ViewModels.VM
             };
         }
 
-        private void SetPrintDataCollection(List<PrintInfo> value)
+        private void SetPrintDataCollection(ObservableCollection<PrintInfo> value)
         {
             if (_printDataCollection == value) return;
 
@@ -444,10 +444,10 @@ namespace YMplugins.ViewModels.VM
             UpdateSelectedPrintCount();
         }
 
-        private List<PrintInfo> NamingPolylines(List<PrintInfo> dataCollection)
+        private ObservableCollection<PrintInfo> NamingPolylines(ObservableCollection<PrintInfo> dataCollection)
         {
             var i = NumerationStartValue;
-            var newdata = new List<PrintInfo>();
+            var newdata = new ObservableCollection<PrintInfo>();
             foreach (var printInfo in dataCollection)
             {
                 printInfo.FileName = Prefix + i + Suffix;

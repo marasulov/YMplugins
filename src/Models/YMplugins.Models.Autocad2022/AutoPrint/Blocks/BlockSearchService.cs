@@ -1,6 +1,7 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Gile.AutoCAD.Extension;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.Utils;
 
@@ -18,7 +19,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
         //}
 
         // Return found blocks with attributes and dynamic properties from the specified space
-        public List<PrintInfo> SearchBlocksInSpace(Database db, string blockName, string searchSpace, string attributeName)
+        public ObservableCollection<PrintInfo> SearchBlocksInSpace(Database db, string blockName, string searchSpace, string attributeName)
         {
             List<PrintInfo> foundBlocks = new List<PrintInfo>();
 
@@ -52,13 +53,13 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                 trans.Commit();
             }
 
-            return foundBlocks;
+            return new ObservableCollection<PrintInfo>(foundBlocks);
         }
 
         // Search blocks in specific space and return block data
-        private List<PrintInfo> SearchBlockInSpace(Transaction trans, BlockTableRecord space, string blockName, string spaceName)
+        private ObservableCollection<PrintInfo> SearchBlockInSpace(Transaction trans, BlockTableRecord space, string blockName, string spaceName)
         {
-            List<PrintInfo> blockList = new List<PrintInfo>();
+            ObservableCollection<PrintInfo> blockList = new ObservableCollection<PrintInfo>();
 
             foreach (ObjectId entId in space)
             {
