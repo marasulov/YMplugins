@@ -35,6 +35,7 @@ namespace YMplugins.ViewModels.VM
         private bool _isSearchOnLayout;
         private bool _isSearchOnModel = true;
         private string _fileName;
+        private int _plineScale = 1;
 
         public AutoPrintVm(
             GetBlocksNameCommand getBlocksNameCommand,
@@ -249,7 +250,16 @@ namespace YMplugins.ViewModels.VM
         public GetAttributesCommand GetAttributesCommand { get; private set; }
         public PrintCommand PrintCommand { get; private set; }
         public ZoomToPointCommand ZoomToPointCommand { get; private set; }
-        public int PlineScale { get; set; } = 1;
+
+        public int PlineScale
+        {
+            get => _plineScale;
+            set
+            {
+                Set(ref _plineScale, value);
+                SearchPolylinesInLayer();
+            }
+        } 
 
         private void InitializeCommands(
             GetBlocksNameCommand getBlocksNameCommand,
