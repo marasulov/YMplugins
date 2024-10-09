@@ -249,7 +249,7 @@ namespace YMplugins.ViewModels.VM
         public GetAttributesCommand GetAttributesCommand { get; private set; }
         public PrintCommand PrintCommand { get; private set; }
         public ZoomToPointCommand ZoomToPointCommand { get; private set; }
-        public int PlineScale { get; }
+        public int PlineScale { get; set; } = 1;
 
         private void InitializeCommands(
             GetBlocksNameCommand getBlocksNameCommand,

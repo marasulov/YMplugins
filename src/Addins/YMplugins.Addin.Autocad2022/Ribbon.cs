@@ -1,9 +1,9 @@
-﻿using System.IO;
-using YMplugins.Addin.Autocad2022.Commands.Translator;
+﻿using YMplugins.Addin.Autocad2022.Commands.Translator;
 using YMplugins.Services.Translator;
 
 namespace YMplugins.Addin.Autocad2022
 {
+    using System.IO;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.Runtime;
     using Autodesk.Windows;

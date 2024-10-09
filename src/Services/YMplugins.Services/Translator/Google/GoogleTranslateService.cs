@@ -1,5 +1,4 @@
-﻿using Google.Cloud.Translation.V2;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -8,7 +7,6 @@ namespace YMplugins.Services.Translator.Google
 {
     public class GoogleTranslateService : ITextTranslator
     {
-        private readonly TranslationClient _client;
         private string _fromLanguage;
         private string _targetLanguage;
 

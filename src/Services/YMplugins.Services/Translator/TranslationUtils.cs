@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Http;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using YMplugins.Settings.Translator;
+﻿using Newtonsoft.Json;
 
 
 namespace YMplugins.Services.Translator

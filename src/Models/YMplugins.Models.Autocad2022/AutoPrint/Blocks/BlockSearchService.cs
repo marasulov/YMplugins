@@ -74,8 +74,6 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                 var position = blockRef.Position;
                 var blockScale = blockRef.ScaleFactors.X;
                 var blockPointPosition = new PointDTO(position.X, position.Y, position.Z);
-                var blockDimension = new PointDTO(blockPointPosition.X + xDim,
-                    blockPointPosition.Y + yDim, blockPointPosition.Z);
                 var format = FormatFinder.FindClosestFormat(xDim, yDim);
                 Active.Editor.WriteMessage($"в полилинии xDim {xDim} по X, yDim {yDim}");
 #if DEBUG

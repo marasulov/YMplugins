@@ -1,13 +1,12 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.ApplicationServices.Core;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using SimpleInjector;
-using System.Collections.Generic;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
-using YMplugins.Contracts.Dto.Enums;
 using YMplugins.Models.Autocad2022.AutoPrint;
 using YMplugins.Models.Autocad2022.AutoPrint.Blocks;
 using YMplugins.Models.Autocad2022.AutoPrint.Layers;
@@ -18,6 +17,7 @@ using YMplugins.ViewModels.Commands;
 using YMplugins.ViewModels.VM;
 using YMplugins.Views.Services;
 using YMplugins.Views.Views;
+using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace YMplugins.Models.Autocad2022
 {
