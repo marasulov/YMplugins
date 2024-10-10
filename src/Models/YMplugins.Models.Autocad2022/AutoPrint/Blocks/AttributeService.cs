@@ -100,7 +100,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                 AttributeDefinition attDef = id.GetObject(OpenMode.ForRead) as AttributeDefinition;
                 if (attDef != null)
                 {
-                    ed.WriteMessage($"\nАтрибут: {attDef.Tag}, Значение по умолчанию: {attDef.TextString}");
+                    //ed.WriteMessage($"\nАтрибут: {attDef.Tag}, Значение по умолчанию: {attDef.TextString}");
 
                     blockAttributes.Add(new BlockAttribute(attDef.Tag, attDef.TextString));
                 }

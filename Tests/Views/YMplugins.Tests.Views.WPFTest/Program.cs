@@ -42,10 +42,11 @@ namespace YMplugins.Tests.Views.WPFTest
             container.Register<IAttributesService, AttributeService>();
             container.Register<ICombinePdfService, CombinePdfService>();
             container.Register<IAutoCadFileService, AutoCadFileService>();
+            //container.Register<IBlockFinder, BlockFinder>();
+            //container.Register<IPolylineFinder, PolylineFinder>();
+
             container.Register<INotifyService, NotifyService>();
-
             container.Register<IWindowService, WindowService>();
-
 
             var window = container.GetInstance<AutoPrintView>();
             var context = (AutoPrintVm)window.DataContext;

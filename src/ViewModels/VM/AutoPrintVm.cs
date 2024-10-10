@@ -329,16 +329,16 @@ namespace YMplugins.ViewModels.VM
                 }
                 if (SelectedPrintByOption == PrintByOption.ByBlock)
                 {
-                    //if (SelectedAttr != null && PrintDataCollection != null)
-                    //{
+                    if (SelectedAttr != null && PrintDataCollection != null)
+                    {
                         PrintDataCollection = new ObservableCollection<PrintInfo>(
                             _attributesService.GetPrintInfosForBlock(PrintDataCollection, SelectedAttr?.AttributeName,
                                 NumerationStartValue, Prefix, Suffix, IsCheckedNumbering));
-                    //}
-                    //else
-                    //{
-                    //    PrintDataCollection = new ObservableCollection<PrintInfo>(NamingPolylines(PrintDataCollection));
-                    //}
+                    }
+                    else
+                    {
+                        PrintDataCollection = new ObservableCollection<PrintInfo>(NamingPolylines(PrintDataCollection));
+                    }
 
                 }
 

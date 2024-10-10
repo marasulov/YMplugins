@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace YMplugins.Models.Autocad2022.Utils
 {
@@ -177,7 +178,7 @@ namespace YMplugins.Models.Autocad2022.Utils
             // Определяем меньшую и большую сторону
             double minDim = Math.Min(xDim, yDim);
             double maxDim = Math.Max(xDim, yDim);
-
+            double minDifference = double.MaxValue;
             // Определяем ориентацию
             bool isLandscape = xDim > yDim; // Альбомная, если xDim больше yDim
             string closestFormat = null;
@@ -218,9 +219,6 @@ namespace YMplugins.Models.Autocad2022.Utils
                 double formatX = format.Value.xFormatDim;
                 double formatY = format.Value.yFormatDim;
 
-                // Вычисляем масштаб
-                double scaleX = minDim / formatX;
-                double scaleY = maxDim / formatY;
 
                 if (userScale.HasValue)
                 {
@@ -249,14 +247,36 @@ namespace YMplugins.Models.Autocad2022.Utils
                         }
                     }
                 }
-                else if (IsCloseToWholeNumber(scaleX, tolerance) &&
-                         IsCloseToWholeNumber(scaleY, tolerance) &&
-                         Math.Abs(scaleX - scaleY) <= tolerance)
+                else
                 {
-                    // Ищем формат с минимальным отклонением от целого масштаба
-                    closestFormat = format.Key;
-                    closestScale = Math.Round(scaleX);
-                    break;
+                    double scaleX = minDim / formatX;
+                    double scaleY = maxDim / formatY;
+                    var mathx = Math.Abs(scaleX-scaleY);
+                    var mathY = Math.Abs(scaleY);
+                    var p = AreAlmostEqualPercentage(scaleX, scaleY, 10);
+                    var checkscale = mathx / mathY <= tolerance;
+                    var closeToWholeNumber = IsCloseToWholeNumber((scaleX + scaleY) / 2, tolerance);
+                    if (p)
+                    {
+                        scaleX = RoundToNearestAllowedScale(scaleX);
+                        scaleY = RoundToNearestAllowedScale(scaleY);
+                        if (IsAllowedScale(scaleX))
+                        {
+                            closestFormat = format.Key;
+                            
+                            //double averageScale = Math.Round((scaleX + scaleY) / 2);
+
+                            //double difference = Math.Abs(scaleX - averageScale) + Math.Abs(scaleY - averageScale);
+
+                            //if (difference < minDifference)
+                            //{
+                            //    minDifference = difference;
+                            //    closestFormat = format.Key;
+                            //    closestScale = averageScale;
+                            //}
+                        }
+                        
+                    }
                 }
             }
 
@@ -269,5 +289,48 @@ namespace YMplugins.Models.Autocad2022.Utils
             return Math.Abs(value - Math.Round(value)) <= tolerance;
         }
 
+        public static bool AreAlmostEqualPercentage(double value1, double value2, double percentageTolerance)
+        {
+            double maxValue = Math.Max(value1, value2);
+            double difference = Math.Abs(value1 - value2);
+
+            // Рассчитываем допустимую разницу в процентах
+            double tolerance = maxValue * (percentageTolerance / 100.0);
+            return difference <= tolerance;
+        }
+
+        public static bool IsAllowedScale(double scale, double tolerance = 0.05)
+        {
+            double[] allowedScales = new double[]
+            {
+                0.5, 0.4, 0.25, 0.2, 0.1, 0.0667, 0.05, 0.04, 0.025, 0.02, 0.0133, 0.01, 0.005, 0.0025, 0.002, 0.00125, 0.001, // Масштабы уменьшения
+                1,  // Натуральная величина
+                2, 2.5, 4, 5, 10, 20, 40, 50, 100,1000 // Масштабы увеличения
+            };
+
+            foreach (var allowedScale in allowedScales)
+            {
+                if (Math.Abs(scale - allowedScale) <= tolerance * allowedScale)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static double RoundToNearestAllowedScale(double scale)
+        {
+            double[] allowedScales = new double[]
+            {
+                0.5, 0.4, 0.25, 0.2, 0.1, 0.0667, 0.05, 0.04, 0.025, 0.02, 0.0133, 0.01, 0.005, 0.0025, 0.002, 0.00125, 0.001, // Масштабы уменьшения
+                1,  // Натуральная величина
+                2, 2.5, 4, 5, 10, 15, 20, 25, 40, 50, 75, 100, 200, 400, 500, 800, 1000 // Масштабы увеличения
+            };
+
+            // Ищем ближайшее допустимое значение
+            double closestScale = allowedScales.OrderBy(s => Math.Abs(s - scale)).First();
+            return closestScale;
+        }
     }
 }
