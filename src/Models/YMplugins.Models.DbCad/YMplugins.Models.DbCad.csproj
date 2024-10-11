@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release;Autocad;Test</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoCAD.NET" Version="24.3.0" ExcludeAssets="runtime"/>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Gile.AutoCAD.Extension">
+      <HintPath>D:\from comp\docs\repos\TransmittalCreator\TransmittalCreator\bin\Debug\Gile.AutoCAD.Extension.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

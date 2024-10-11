@@ -4,6 +4,12 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>9.0</LangVersion>
+    <Configurations>Debug;Release;Autocad;Test</Configurations>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\ViewModels\YMplugins.ViewModels.csproj" />
+    <ProjectReference Include="..\..\src\YMplugins.Contracts\YMplugins.Contracts.csproj" />
+  </ItemGroup>
 
 </Project>

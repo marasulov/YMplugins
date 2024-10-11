@@ -272,10 +272,10 @@ namespace YMplugins.Models.Acad2022.Services
             //}
         }
 
-        private bool ShouldTranslate(string text)
-        {
-            return !IsLatin(text);
-        }
+        //private bool ShouldTranslate(string text)
+        //{
+        //    return !IsLatin(text);
+        //}
 
         private string TranslateText(string text)
         {

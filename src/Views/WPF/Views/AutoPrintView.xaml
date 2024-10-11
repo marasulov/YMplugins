@@ -1,0 +1,312 @@
+﻿<Window x:Class="YMplugins.Views.Views.AutoPrintView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign ="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:vms="clr-namespace:YMplugins.ViewModels.VM;assembly=YMplugins.ViewModels"
+        xmlns:converters="clr-namespace:YMplugins.Views.Converters"
+        d:DataContext="{d:DesignInstance {x:Type  vms:AutoPrintVm}, IsDesignTimeCreatable=False}"
+        mc:Ignorable="d"
+        Name="AutoPrint"
+        Title="Print to Pdf" Height="700" Width="850" Style="{DynamicResource WindowElementStyle}">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Resources/WindowResourceDictionary.xaml" />
+                <ResourceDictionary Source="../Resources/TextBoxTemplates.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <!-- Header -->
+            <!-- Naming -->
+            <!-- Options -->
+            <RowDefinition Height="Auto" />
+
+            <RowDefinition Height="*"/>
+
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+
+
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="2*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Левая часть: Радиокнопки для выбора -->
+        <GroupBox Header="Print by" Grid.Row="0" Grid.Column="0" Margin="1">
+            <StackPanel>
+                <StackPanel>
+                    <RadioButton Content="By Block"
+                                 Name="ByBlockRadioButton"
+                                 IsChecked="{Binding SelectedPrintByOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=ByBlock}" />
+                    <RadioButton Content="By Polyline" 
+                                 Name="ByPolylineRadioButton"
+                                 IsChecked="{Binding SelectedPrintByOption, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=ByPolyline}" />
+                </StackPanel>
+                <StackPanel>
+                    <CheckBox IsChecked="{Binding IsSearchOnModel}">Search on model</CheckBox>
+                    <CheckBox IsChecked="{Binding IsSearchOnLayout}">Search on layouts</CheckBox>
+                </StackPanel>
+                <StackPanel>
+                    <CheckBox Name="combineCheckBox" IsChecked="{Binding IsCombinePdf, UpdateSourceTrigger=PropertyChanged}">Combine pdfs</CheckBox>
+                </StackPanel>
+                <StackPanel>
+                    <!--<TextBox Tag="Output file name:"
+                             ToolTip="Enter file name"
+                             Text="{Binding Path= OutputFileName}"
+                             Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                             Template="{StaticResource TextBoxWithHintTemplate}" />-->
+                    <TextBox  Name="outputFileTextbox"
+                              Text="{Binding Path=  OutputFileName ,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                              Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                              materialDesign:TextFieldAssist.HasClearButton="True"
+                              IsEnabled="{Binding IsChecked, ElementName=combineCheckBox}"
+                              Margin="8 0 8 0">
+                        <materialDesign:HintAssist.Hint>
+                            <StackPanel
+                                Orientation="Horizontal"
+                                Margin="-2 0 0 0">
+                                <TextBlock
+                                    Text="Enter output file name" Cursor="" />
+                            </StackPanel>
+                        </materialDesign:HintAssist.Hint>
+                    </TextBox>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+
+        <Grid Grid.Row="0" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!-- Средняя часть: Комбобоксы и кнопки -->
+            <GroupBox Margin="1">
+                <StackPanel>
+                    <!-- Комбобокс для Block -->
+                    <StackPanel Margin="0,0,0,10">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=ByBlockRadioButton, Path=IsChecked}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=ByBlockRadioButton, Path=IsChecked}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+
+                        <TextBlock Text="Select block name" />
+                        <ComboBox Width="200" Margin="0,0,0,10"
+                      ItemsSource="{Binding BlocksNames}"
+                      SelectedItem="{Binding SelectedBlockOnScreen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedIndex="0"/>
+                        <Button Content="Select on screen" Command="{Binding SelectBlockCommand }"  CommandParameter="{Binding }" />
+                    </StackPanel>
+
+                    <!-- Комбобокс для Polyline -->
+                    <StackPanel Margin="0,0,0,10">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=ByPolylineRadioButton, Path=IsChecked}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=ByPolylineRadioButton, Path=IsChecked}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+
+                        <TextBlock Text="Select layer" />
+                        <ComboBox Width="200" Margin="0,0,0,10" 
+                      ItemsSource="{Binding  Layers}"
+                      SelectedItem="{Binding SelectedLayerOnScreen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      SelectedIndex="0" />
+                        <Button Content="Select on layer screen" Command="{Binding SelectedLayerOnScreen}"  CommandParameter="{Binding }" />
+                        
+
+                        <StackPanel >
+                            <TextBlock Text="Enter polyline scale"></TextBlock>
+                            <TextBox Text="{Binding PlineScale}"></TextBox>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                </StackPanel>
+            </GroupBox>
+            <!-- Группа Printing order -->
+            <GroupBox Header="Printing order" Grid.Row="1" Grid.Column="1" Margin="1">
+                <StackPanel>
+                    <TextBlock Text="Printing numbering order" Margin="2 3 5 0" />
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <RadioButton Content="X" 
+                                     IsChecked="{Binding SelectedPrintingOrder, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=ByX}" />
+                        <RadioButton Content="Y" 
+                                     IsChecked="{Binding SelectedPrintingOrder, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=ByY}" />
+                        <!--<RadioButton Content="Select order" 
+                                     IsChecked="{Binding SelectedPrintingOrder, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Custom}" />-->
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+
+        <!-- Группа Naming справа -->
+        <GroupBox Header="Naming" Grid.Row="0" Grid.Column="2" Margin="1">
+            <StackPanel>
+                <StackPanel>
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=ByBlockRadioButton, Path=IsChecked}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=ByBlockRadioButton, Path=IsChecked}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Text="Attribute value:" />
+                    <ComboBox  Margin="0,0,0,10"
+                               VerticalAlignment="Center" Name="comboAttributes" Height="40"
+                               ItemsSource="{Binding Attributes}"
+                               SelectedItem="{Binding SelectedAttr, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                               IsEnabled="{Binding IsChecked, ElementName=attributeCheckBox}"
+                               FontSize="12"
+                               VerticalContentAlignment="Center">
+                        <materialDesign:HintAssist.Hint>
+                            <StackPanel
+                                Orientation="Horizontal"
+                                Margin="-2 0 0 0">
+                                <TextBlock
+                                    Text="Select attribute" />
+                            </StackPanel>
+                        </materialDesign:HintAssist.Hint>
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Vertical">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock FontWeight="Thin" xml:space="preserve"
+                                                   Text="Attribute Name: " />
+                                        <TextBlock FontWeight="Medium" Name="AttrNameTextBlock"
+                                                   Text="{Binding Path=AttributeName}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock FontWeight="Thin" xml:space="preserve" Text="Attribute Value: " />
+                                        <TextBlock FontWeight="DemiBold" Name="attrValueTextBox"
+                                                   Text="{Binding Path = AttributeValue}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <TextBlock Text="Numeration:" />
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox Name="numberingCheckbox"
+                              IsChecked="{Binding IsCheckedNumbering, UpdateSourceTrigger=PropertyChanged}"
+                              Margin="0,0,10,0" />
+                    <TextBox  Name="numberingTextbox"
+                          Text="{Binding Path= NumerationStartValue ,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                          Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                          materialDesign:TextFieldAssist.HasClearButton="True"
+                          IsEnabled="{Binding IsChecked, ElementName=numberingCheckbox}"
+                          Margin="8 0 8 0">
+                        <materialDesign:HintAssist.Hint>
+                            <StackPanel
+                            Orientation="Horizontal"
+                            Margin="-2 0 0 0">
+                                <TextBlock
+                                Text="Enter numbering start value" Cursor="" />
+                            </StackPanel>
+                        </materialDesign:HintAssist.Hint>
+                    </TextBox>
+                </StackPanel>
+                <TextBox Tag="Prefix:"
+                         ToolTip="Enter prefix"
+                         Text="{Binding Path=Prefix}"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Template="{StaticResource TextBoxWithHintTemplate}" />
+
+                <TextBox Tag="Suffix:"
+                         ToolTip="Enter suffix"
+                         Text="{Binding Path=Suffix}"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Template="{StaticResource TextBoxWithHintTemplate}" />
+            </StackPanel>
+        </GroupBox>
+
+        <!-- DataGrid для отображения данных блока -->
+        <GroupBox Grid.Row="1" Grid.ColumnSpan="3" Grid.Column="0">
+            <GroupBox.Header>
+                <!--<Label Content="{Binding ElementName=PrintCollection, Path=Items.Count}"
+                       ContentStringFormat="Blocks found {0}"/>-->
+                <Label Content="{Binding HeaderContent}" />
+            </GroupBox.Header >
+            <DataGrid ItemsSource="{Binding PrintDataCollection, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
+                      Name="PrintCollection"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserAddRows="False"
+                      Margin="5"
+                      MaxHeight="500"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <DataGrid.Columns>
+                    <!-- Пример колонок -->
+                    <DataGridTextColumn Header="Id" Binding="{Binding ObjectId}" Width="Auto" />
+                    <DataGridTextColumn Header="Layer" Binding="{Binding Space}" Width="Auto" />
+                    <DataGridTextColumn Header="Format" Binding="{Binding Format}" Width="*" />
+                    <DataGridTextColumn Header="FileName" Binding="{Binding FileName}" Width="*" />
+                    <DataGridTemplateColumn Header="Zoom">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding ElementName = AutoPrint,
+                                    Path= DataContext.ZoomToPointCommand}" 
+                                    CommandParameter="{Binding  ObjectId}" 
+                                    Content="Show"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.Header>
+                            <CheckBox Content="Printing" 
+                                      IsChecked="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.IsAllPrintSelected, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged }" />
+                        </DataGridTemplateColumn.Header>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsPrint, UpdateSourceTrigger=PropertyChanged}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+
+        <!-- Кнопки внизу -->
+        <StackPanel HorizontalAlignment="Center" Grid.Row="2" Grid.Column="1">
+            <Button Content="Cancel"  Margin="5" />
+            <Button Content="Print" Margin="5" Command="{Binding PrintCommand}" CommandParameter="{Binding }" />
+        </StackPanel>
+        <TextBlock Grid.Row="3" Grid.Column="0"
+                   Text="{Binding Error}" 
+                   Foreground="Red" 
+                   TextWrapping="Wrap" 
+                   Margin="5"/>
+    </Grid>
+</Window>

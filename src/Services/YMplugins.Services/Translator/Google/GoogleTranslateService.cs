@@ -1,15 +1,12 @@
-﻿using Google.Cloud.Translation.V2;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 
 namespace YMplugins.Services.Translator.Google
 {
     public class GoogleTranslateService : ITextTranslator
     {
-        private readonly TranslationClient _client;
         private string _fromLanguage;
         private string _targetLanguage;
 
@@ -30,10 +27,8 @@ namespace YMplugins.Services.Translator.Google
             }
             catch (Exception e)
             {
-
                 return $"{e.Message} - {e.StackTrace}";
             }
-
         }
 
         public static string TranslateText(string input, string sourceLanguage, string targetLanguage)
@@ -63,10 +58,8 @@ namespace YMplugins.Services.Translator.Google
             }
             catch (Exception e)
             {
-                
                 return $"{e.Message} - {e.StackTrace}";
             }
-           
         }
 
         //private static string LanguageEnumToIdentifier(string language)
@@ -76,7 +69,5 @@ namespace YMplugins.Services.Translator.Google
         //    LanguageModeMap.TryGetValue(language, out empty);
         //    return empty;
         //}
-
     }
-
 }

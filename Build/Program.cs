@@ -8,7 +8,7 @@ namespace Build
     internal class Program
     {
         private static string _projectName = "YMPlugins";
-        private static string _version = "1.0.2";
+        private static string _version = "2.0.3";
 
         static void Main(string[] args)
         {
@@ -20,7 +20,12 @@ namespace Build
                 UI = WUI.WixUI_ProgressOnly,
                 OutDir = "output",
                 GUID = new Guid("D56A3F69-DEB4-4332-B726-1DF06709DE7E"),
-                MajorUpgrade = MajorUpgrade.Default,
+                MajorUpgrade = new MajorUpgrade
+                {
+                    Schedule = UpgradeSchedule.afterInstallInitialize,
+                    AllowSameVersionUpgrades = true,
+                    DowngradeErrorMessage = "A newer release of plugin is already installed on this system. Please uninstall it first to continue."
+                },
                 ControlPanelInfo =
                 {
                     Manufacturer = Environment.UserName,
@@ -30,15 +35,18 @@ namespace Build
                     new InstallDir(pluginDir,
                         new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\PackageContents.xml"),
                         new Dir(@"Contents",
-                            new DirFiles(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Models\Acad2022\bin\Debug\*.dll"),
-                        new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Addins\Acad2022\bin\Debug\YMplugins.Addin.Acad2022.dll")))
+                            new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\conf.json"),
+                            new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\DWG_To_PDF_Uzle.pc3"),
+                            new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\Uzle.pmp"),
+                            new DirFiles(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\*.dll"),
+                            new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Addins\YMplugins.Addin.Autocad2022\bin\Debug\net48\YMplugins.Addin.Autocad2022.dll")))
                 },
 
             };
 
 
             project.Version = new Version(_version);
-            
+
             var managedAction = new ManagedAction(CustomActions.MyAction,
                 Return.ignore,
                 When.After,

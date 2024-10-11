@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Autocad": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Program Files\\Autodesk\\AutoCAD 2022\\acad.exe",
+      "commandLineArgs": "/product ACAD /language \"en-US\" /nologo /nohardware /b"
+    }
+  }
+}

@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>Latest</LangVersion>
+    <Configurations>Debug;Release;Autocad;Test</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

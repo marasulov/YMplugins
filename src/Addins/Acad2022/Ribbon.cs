@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.Runtime;
+using Autodesk.Windows;
+using System;
 using System.Collections.Generic;
-using System.Security.AccessControl;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.Windows;
 using YMplugins.Addin.Acad2022.Commands.Translator;
-using YMplugins.Models.Acad2022.Commands.Translator;
 using YMplugins.Services.Translator;
+using static Autodesk.AutoCAD.Internal.LayoutContextMenu;
 using acadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;
 
@@ -129,8 +128,8 @@ namespace YMplugins.Addin.Acad2022
                 ribTab.Id = "CADBoost_ID"; 
                 ribCntrl.Tabs.Add(ribTab); 
                 
-                TranlsateButtons(ribTab);
-                
+                TranslateButtons(ribTab);
+                AutoPrintButtons(ribTab);
                 //ribTab.IsActive = true;
                 
                 ribCntrl.UpdateLayout();
@@ -142,7 +141,7 @@ namespace YMplugins.Addin.Acad2022
             }
         }
 
-        void TranlsateButtons(RibbonTab ribTab)
+        private void TranslateButtons(RibbonTab ribTab)
         {
             try
             {
@@ -220,7 +219,6 @@ namespace YMplugins.Addin.Acad2022
                 //    commandHandler.SetNewObjectCheckBoxValue(newObjectCheckbox.IsChecked);
                 //};
 
-
                 tt = new RibbonToolTip();
                 tt.IsHelpEnabled = false;
                 
@@ -242,13 +240,44 @@ namespace YMplugins.Addin.Acad2022
                 ribSourcePanel.Items.Add(new RibbonSeparator());
                 ribSourcePanel.Items.Add(ribBtn);
 
-                RibbonPanelBreak panelBreak = new RibbonPanelBreak();
-                ribSourcePanel.Items.Add(panelBreak);
+                //RibbonPanelBreak panelBreak = new RibbonPanelBreak();
+                //ribSourcePanel.Items.Add(panelBreak);
+                
+
             }
             catch (System.Exception ex)
             {
                 Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(ex.Message);
             }
+        }
+
+        private void AutoPrintButtons(RibbonTab ribbonTab)
+        {
+            RibbonPanelSource ribSourcePanel = new RibbonPanelSource();
+            ribSourcePanel.Title = "AutoPrint";
+
+            RibbonPanel ribPanel = new RibbonPanel();
+            ribPanel.Source = ribSourcePanel;
+            ribbonTab.Panels.Add(ribPanel);
+
+            var commandHandler = new RibbonCommandHandler();
+
+            RibbonToolTip tt = new RibbonToolTip();
+            RibbonButton ribBtn = new RibbonButton();
+            ribBtn.Id = "translateBtn";
+            ribBtn.Name = "Translate";
+            ribBtn.Text = "Translate";
+            ribBtn.CommandHandler = commandHandler;
+            ribBtn.CommandParameter = "AutoPrint";
+            ribBtn.Size = RibbonItemSize.Large;
+            ribBtn.LargeImage = LoadImage("translation");
+            ribBtn.ShowImage = true;
+            ribBtn.ShowText = true;
+            tt.Content = "Translate";
+            ribBtn.ToolTip = tt;
+            ribBtn.Orientation = Orientation.Vertical;
+            
+            ribSourcePanel.Items.Add(ribBtn);
         }
 
         
@@ -298,27 +327,27 @@ namespace YMplugins.Addin.Acad2022
         /* Собственный обраотчик команд
         * Это один из вариантов вызова команды по нажатию кнопки
         */
-        //class RibbonCommandHandler : ICommand
-        //{
-        //    public bool CanExecute(object parameter)
-        //    {
-        //        return true;
-        //    }
+        class RibbonCommandHandler : ICommand
+        {
+            public bool CanExecute(object parameter)
+            {
+                return true;
+            }
 
-        //    public event EventHandler CanExecuteChanged;
+            public event EventHandler CanExecuteChanged;
 
-        //    public void Execute(object parameter)
-        //    {
-        //        if (parameter is RibbonButton)
-        //        {
-        //            // Просто берем команду, записанную в CommandParameter кнопки
-        //            // и выпоняем её используя функцию SendStringToExecute
-        //            RibbonButton button = parameter as RibbonButton;
-        //            acadApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
-        //                button.CommandParameter + " ", true, false, true);
-        //        }
-        //    }
-        //}
+            public void Execute(object parameter)
+            {
+                if (parameter is RibbonButton)
+                {
+                    // Просто берем команду, записанную в CommandParameter кнопки
+                    // и выпоняем её используя функцию SendStringToExecute
+                    RibbonButton button = parameter as RibbonButton;
+                    acadApp.DocumentManager.MdiActiveDocument.SendStringToExecute(
+                        button.CommandParameter + " ", true, false, true);
+                }
+            }
+        }
 
         //public class RelayCommandHandler : ICommand
         //{

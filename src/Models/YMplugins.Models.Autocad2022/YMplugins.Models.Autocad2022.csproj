@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release;Autocad;Test</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="conf.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="conf.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SimpleInjector" Version="5.5.0" />
+    <PackageReference Include="AutoCAD.NET" Version="24.3.0" ExcludeAssets="runtime"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Services\YMplugins.Services\YMplugins.Services.csproj" />
+    <ProjectReference Include="..\..\ViewModels\YMplugins.ViewModels.csproj" />
+    <ProjectReference Include="..\..\Views\WPF\YMplugins.Views.csproj" />
+    <ProjectReference Include="..\YMplugins.Models.DbCad\YMplugins.Models.DbCad.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Gile.AutoCAD.Extension">
+      <HintPath>D:\from comp\docs\repos\TransmittalCreator\TransmittalCreator\bin\Debug\Gile.AutoCAD.Extension.dll</HintPath>
+      <Private>True</Private>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+
+</Project>
