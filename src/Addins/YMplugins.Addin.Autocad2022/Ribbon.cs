@@ -1,10 +1,11 @@
-﻿using YMplugins.Addin.Autocad2022.Commands.Translator;
+﻿using System.IO;
+using System.Windows;
+using YMplugins.Addin.Autocad2022.Commands.Translator;
 using YMplugins.Models.Autocad2022.Utils.Print;
 using YMplugins.Services.Translator;
 
 namespace YMplugins.Addin.Autocad2022
 {
-    using System.IO;
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.Runtime;
     using Autodesk.Windows;
@@ -17,57 +18,12 @@ namespace YMplugins.Addin.Autocad2022
     using System.Windows.Media.Imaging;
     using acadApp = Autodesk.AutoCAD.ApplicationServices.Application;
     using Exception = Autodesk.AutoCAD.Runtime.Exception;
-    using AppCore = Autodesk.AutoCAD.ApplicationServices.Core.Application;
-    using AppSystemVariableChangedEventArgs
-        = Autodesk.AutoCAD.ApplicationServices.SystemVariableChangedEventArgs;
 
     namespace YMplugins.Addin.Acad2022
     {
-        internal static class ApplicationSettings
-        {
-            private static bool
-                _initialized,
-                _needUpdRibbonDetected;
 
-            /// <summary>
-            /// Инициализация
-            /// </summary>
-            public static void Initialize()
-            {
-                if (!_initialized)
-                {
-                    _initialized = true;
 
-                    AppCore.Idle += Application_Idle_RibbonUpdate;
-                    AppCore.SystemVariableChanged += App_SysVarChanged_RibbonUpdate;
-                }
-            }
 
-            private static void App_SysVarChanged_RibbonUpdate
-                (object sender, AppSystemVariableChangedEventArgs e)
-            {
-                if (!_needUpdRibbonDetected
-                    && e.Name.Equals("WSCURRENT",
-                        StringComparison.OrdinalIgnoreCase)
-                    || e.Name.Equals("CADBoost_ID",
-                        StringComparison.OrdinalIgnoreCase))
-                {
-                    _needUpdRibbonDetected = true;
-                    AppCore.Idle += Application_Idle_RibbonUpdate;
-                }
-            }
-
-            private static void Application_Idle_RibbonUpdate(object sender, EventArgs e)
-            {
-                RibbonControl ribbon = ComponentManager.Ribbon;
-                if (ribbon != null)
-                {
-                    AppCore.Idle -= Application_Idle_RibbonUpdate;
-                    _needUpdRibbonDetected = false;
-                    
-                }
-            }
-        }
 
         public class Ribbon : IExtensionApplication
         {
@@ -79,8 +35,12 @@ namespace YMplugins.Addin.Autocad2022
             public void Initialize()
             {
                 ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
-                BuildRibbonTab();
-                
+
+                if (ComponentManager.Ribbon != null)
+                {
+                    BuildRibbonTab();
+                }
+
                 var executablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 var pd = new ProxyDomain();
                 var assembly = pd.GetAssembly(Path.Combine(executablePath, "MaterialDesignThemes.Wpf.dll"));
@@ -88,7 +48,7 @@ namespace YMplugins.Addin.Autocad2022
                 var assembly1 = pd.GetAssembly(Path.Combine(executablePath, "MaterialDesignColors.dll"));
 
                 if ((assembly != null) | (assembly1 != null)) Active.Editor.WriteMessage("style dlls not load");
-                
+
                 var standartCopier = new StandartCopier();
                 var isConfFileCopied = standartCopier.CopyParamsFiles();
 
@@ -127,29 +87,18 @@ namespace YMplugins.Addin.Autocad2022
 
             private void BuildRibbonTab()
             {
-                Active.Editor.WriteMessage("гружу панель");
-                try
+                if (!IsLoaded())
                 {
-                    if (!IsLoaded())
-                    {
-                        CreateRibbonTab();
-                        acadApp.SystemVariableChanged += new SystemVariableChangedEventHandler(acadApp_SystemVariableChanged);
-                    }
-                    Active.Editor.WriteMessage("панель загружена");
+                    CreateRibbonTab();
+                    acadApp.SystemVariableChanged += new SystemVariableChangedEventHandler(acadApp_SystemVariableChanged);
                 }
-                catch (Exception e)
-                {
-                    Active.Editor.WriteMessage(e.Message);
-                    
-                }
-                
             }
 
             private bool IsLoaded()
             {
                 bool _loaded = false;
                 RibbonControl ribCntrl = ComponentManager.Ribbon;
-                
+
                 foreach (RibbonTab tab in ribCntrl.Tabs)
                 {
                     if (tab.Id.Equals("CADBoost_ID") & tab.Title.Equals("CADBoost"))
@@ -200,6 +149,7 @@ namespace YMplugins.Addin.Autocad2022
 
             private void acadApp_SystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
             {
+                Active.Editor.WriteMessage("acadApp_SystemVariableChanged");
                 if (e.Name.Equals("WSCURRENT")) BuildRibbonTab();
             }
 

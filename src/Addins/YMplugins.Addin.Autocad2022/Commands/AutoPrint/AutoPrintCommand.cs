@@ -17,7 +17,7 @@ namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
 {
     public class AutoPrintCommand
     {
-        [CommandMethod("Autoprint2121")]
+        [CommandMethod("Autoprint")]
         public static void Print()
         {
             var container = new Container();
