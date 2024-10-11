@@ -23,50 +23,50 @@ namespace YMplugins.Models.Autocad2022
 {
     public class TestCommands
     {
-        [CommandMethod("Autoprint2")]
-        public static void Print()
-        {
-            var container = new Container();
-            container.Options.EnableAutoVerification = false;
+        //[CommandMethod("Autoprint2")]
+        //public static void Print()
+        //{
+        //    var container = new Container();
+        //    container.Options.EnableAutoVerification = false;
 
-            container.Register<GetAttributesCommand>();
-            container.Register<GetBlocksNameCommand>();
-            container.Register<GetLayersCommand>();
-            container.Register<PrintCommand>();
-            container.Register<SelectBlockCommand>();
-            container.Register<ZoomToPointCommand>();
-            container.Register<AutoPrintVm>(Lifestyle.Transient);
-            container.Register<AutoPrintView>(Lifestyle.Transient);
+        //    container.Register<GetAttributesCommand>();
+        //    container.Register<GetBlocksNameCommand>();
+        //    container.Register<GetLayersCommand>();
+        //    container.Register<PrintCommand>();
+        //    container.Register<SelectBlockCommand>();
+        //    container.Register<ZoomToPointCommand>();
+        //    container.Register<AutoPrintVm>(Lifestyle.Transient);
+        //    container.Register<AutoPrintView>(Lifestyle.Transient);
 
-            container.Register<LoadingWindow>(Lifestyle.Transient);
+        //    container.Register<LoadingWindow>(Lifestyle.Transient);
 
-            container.Register<IGetBlocksNameService, GetBlocksNameService>();
-            container.Register<IPrintService, PrintService>();
-            container.Register<INamingService, NamingService>();
-            container.Register<BlockSearchService>();
-            container.Register<SearchData>();
+        //    container.Register<IGetBlocksNameService, GetBlocksNameService>();
+        //    container.Register<IPrintService, PrintService>();
+        //    container.Register<INamingService, NamingService>();
+        //    container.Register<BlockSearchService>();
+        //    container.Register<SearchData>();
 
-            container.Register<ISearchService, SearchService>();
-            container.Register<IZoomEntity, ZoomService>();
-            container.Register<IGetLayersService, GetLayersService>();
-            container.Register<ISelectBlockService, SelectBlockService>();
-            container.Register<IAttributesService, AttributeService>();
-            container.Register<ICombinePdfService, CombinePdfService>();
-            container.Register<IAutoCadFileService, AutoCadFileService>();
-            container.Register<IBlockFinder, BlockFinder>();
-            container.Register<IPolylineFinder, PolylineFinder>();
+        //    container.Register<ISearchService, SearchService>();
+        //    container.Register<IZoomEntity, ZoomService>();
+        //    container.Register<IGetLayersService, GetLayersService>();
+        //    container.Register<ISelectBlockService, SelectBlockService>();
+        //    container.Register<IAttributesService, AttributeService>();
+        //    container.Register<ICombinePdfService, CombinePdfService>();
+        //    container.Register<IAutoCadFileService, AutoCadFileService>();
+        //    container.Register<IBlockFinder, BlockFinder>();
+        //    container.Register<IPolylineFinder, PolylineFinder>();
 
-            container.Register<INotifyService, NotifyService>();
-            container.Register<IWindowService, WindowService>();
+        //    container.Register<INotifyService, NotifyService>();
+        //    container.Register<IWindowService, WindowService>();
 
-            var window = container.GetInstance<AutoPrintView>();
-            var context = (AutoPrintVm)window.DataContext;
+        //    var window = container.GetInstance<AutoPrintView>();
+        //    var context = (AutoPrintVm)window.DataContext;
 
-            context.GetBlocksNameCommand.Execute(null);
-            context.GetLayersCommand.Execute(null);
+        //    context.GetBlocksNameCommand.Execute(null);
+        //    context.GetLayersCommand.Execute(null);
 
-            window.ShowDialog();
-        }
+        //    window.ShowDialog();
+        //}
 
         //[CommandMethod("SearchBlocksByName")]
         //public void SearchBlocksByName()

@@ -7,15 +7,6 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
 {
     public class PrintService : IPrintService
     {
-        private readonly ICombinePdfService _fileCombineService;
-        private readonly INamingService _namingService;
-        private readonly IPrintEngine _printEngine;
-
-        public PrintService(ICombinePdfService fileCombineService)
-        {
-            _fileCombineService = fileCombineService;
-        }
-
         public string[] Print(PrintInfo[] data)
         {
             //var objectsToPrint = _searchService.FindObjects(data);

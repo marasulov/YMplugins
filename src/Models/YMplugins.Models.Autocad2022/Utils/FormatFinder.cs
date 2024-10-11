@@ -64,58 +64,58 @@ namespace YMplugins.Models.Autocad2022.Utils
 
         ////TODO finding scaling
 
-        //private const double Tolerance = 5.0;
+        private const double Tolerance = 5.0;
 
-        ///// <summary>
-        ///// Статический метод для поиска формата с учётом кратности
-        ///// </summary>
-        ///// <param name="width"></param>
-        ///// <param name="height"></param>
-        ///// <returns></returns>
-        //public static string FindClosestFormat(double width, double height)
-        //{
-        //    double normalizedWidth = Math.Min(width, height);
-        //    double normalizedHeight = Math.Max(width, height);
+        /// <summary>
+        /// Статический метод для поиска формата с учётом кратности
+        /// </summary>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
+        public static string FindFormatWithScale(double width, double height, double scale)
+        {
+            double normalizedWidth = Math.Min(width, height);
+            double normalizedHeight = Math.Max(width, height);
 
-        //    string closestFormat = null;
-        //    double minDifference = double.MaxValue;
+            string closestFormat = null;
+            double minDifference = double.MaxValue;
 
-        //    foreach (var format in GOSTFormats)
-        //    {
-        //        var (standardWidth, standardHeight) = format.Value;
+            foreach (var format in GOSTFormats)
+            {
+                var (standardWidth, standardHeight) = format.Value;
 
-        //        double differenceWidthHeight = GetDifference(normalizedWidth, normalizedHeight, standardWidth, standardHeight);
-        //        double differenceHeightWidth = GetDifference(normalizedWidth, normalizedHeight, standardHeight, standardWidth);
+                double differenceWidthHeight = GetDifference(normalizedWidth/scale, normalizedHeight/scale, standardWidth, standardHeight);
+                double differenceHeightWidth = GetDifference(normalizedWidth / scale, normalizedHeight / scale, standardHeight, standardWidth);
 
-        //        // Ищем формат с минимальным отклонением
-        //        if (differenceWidthHeight < minDifference)
-        //        {
-        //            minDifference = differenceWidthHeight;
-        //            closestFormat = $"{format.Key} (Vertical)";
-        //        }
+                // Ищем формат с минимальным отклонением
+                if (differenceWidthHeight < minDifference)
+                {
+                    minDifference = differenceWidthHeight;
+                    closestFormat = $"{format.Key} (Vertical)";
+                }
 
-        //        if (differenceHeightWidth < minDifference)
-        //        {
-        //            minDifference = differenceHeightWidth;
-        //            closestFormat = $"{format.Key} (Horizontal)";
-        //        }
-        //    }
+                if (differenceHeightWidth < minDifference)
+                {
+                    minDifference = differenceHeightWidth;
+                    closestFormat = $"{format.Key} (Horizontal)";
+                }
+            }
 
-        //    return closestFormat != null ? closestFormat : "Не найдено подходящего формата";
-        //}
+            return closestFormat != null ? closestFormat : "Не найдено подходящего формата";
+        }
 
-        ///// <summary>
-        ///// Метод для подсчета разницы между размерами
-        ///// </summary>
-        ///// <param name="width1"></param>
-        ///// <param name="height1"></param>
-        ///// <param name="width2"></param>
-        ///// <param name="height2"></param>
-        ///// <returns></returns>
-        //private static double GetDifference(double width1, double height1, double width2, double height2)
-        //{
-        //    return Math.Abs(width1 - width2) + Math.Abs(height1 - height2);
-        //}
+        /// <summary>
+        /// Метод для подсчета разницы между размерами
+        /// </summary>
+        /// <param name="width1"></param>
+        /// <param name="height1"></param>
+        /// <param name="width2"></param>
+        /// <param name="height2"></param>
+        /// <returns></returns>
+        private static double GetDifference(double width1, double height1, double width2, double height2)
+        {
+            return Math.Abs(width1 - width2) + Math.Abs(height1 - height2);
+        }
 
         /// <summary>
         /// Словарь, содержащий все форматы с указанием размеров для книжной и альбомной ориентации
@@ -173,164 +173,164 @@ namespace YMplugins.Models.Autocad2022.Utils
             { "A0x5 в", (1189, 841 * 5) }, { "A0x6 в", (1189, 841 * 6) },
         };
 
-        public static (string Format, double? Scale) FindFormatWithScale(double xDim, double yDim, double? userScale = null, double tolerance = 0.05)
-        {
-            // Определяем меньшую и большую сторону
-            double minDim = Math.Min(xDim, yDim);
-            double maxDim = Math.Max(xDim, yDim);
-            double minDifference = double.MaxValue;
-            // Определяем ориентацию
-            bool isLandscape = xDim > yDim; // Альбомная, если xDim больше yDim
-            string closestFormat = null;
-            double? closestScale = null;
+        //public static (string Format, double? Scale) FindFormatWithScale(double xDim, double yDim, double? userScale = null, double tolerance = 0.05)
+        //{
+        //    // Определяем меньшую и большую сторону
+        //    double minDim = Math.Min(xDim, yDim);
+        //    double maxDim = Math.Max(xDim, yDim);
+        //    double minDifference = double.MaxValue;
+        //    // Определяем ориентацию
+        //    bool isLandscape = xDim > yDim; // Альбомная, если xDim больше yDim
+        //    string closestFormat = null;
+        //    double? closestScale = null;
 
-            // Шаг 1: сначала ищем формат с масштабом 1
-            foreach (var format in GOSTFormats)
-            {
-                var formatX = format.Value.xFormatDim;
-                var formatY = format.Value.yFormatDim;
+        //    // Шаг 1: сначала ищем формат с масштабом 1
+        //    foreach (var format in GOSTFormats)
+        //    {
+        //        var formatX = format.Value.xFormatDim;
+        //        var formatY = format.Value.yFormatDim;
 
-                // Проверяем соответствие формату с масштабом 1 в зависимости от ориентации
-                if (isLandscape)
-                {
-                    // Если альбомная ориентация
-                    if (Math.Abs(xDim - formatX) <= tolerance && Math.Abs(yDim - formatY) <= tolerance)
-                    {
-                        closestFormat = format.Key;
-                        closestScale = 1;
-                        return (closestFormat, closestScale); // сразу возвращаем, если нашли подходящий формат
-                    }
-                }
-                else
-                {
-                    // Если книжная ориентация
-                    if (Math.Abs(yDim - formatY) <= tolerance && Math.Abs(xDim - formatX) <= tolerance)
-                    {
-                        closestFormat = format.Key;
-                        closestScale = 1;
-                        return (closestFormat, closestScale); // сразу возвращаем, если нашли подходящий формат
-                    }
-                }
-            }
+        //        // Проверяем соответствие формату с масштабом 1 в зависимости от ориентации
+        //        if (isLandscape)
+        //        {
+        //            // Если альбомная ориентация
+        //            if (Math.Abs(xDim - formatX) <= tolerance && Math.Abs(yDim - formatY) <= tolerance)
+        //            {
+        //                closestFormat = format.Key;
+        //                closestScale = 1;
+        //                return (closestFormat, closestScale); // сразу возвращаем, если нашли подходящий формат
+        //            }
+        //        }
+        //        else
+        //        {
+        //            // Если книжная ориентация
+        //            if (Math.Abs(yDim - formatY) <= tolerance && Math.Abs(xDim - formatX) <= tolerance)
+        //            {
+        //                closestFormat = format.Key;
+        //                closestScale = 1;
+        //                return (closestFormat, closestScale); // сразу возвращаем, если нашли подходящий формат
+        //            }
+        //        }
+        //    }
 
-            // Шаг 2: если формат не найден, ищем подходящий масштаб
-            foreach (var format in GOSTFormats)
-            {
-                double formatX = format.Value.xFormatDim;
-                double formatY = format.Value.yFormatDim;
+        //    // Шаг 2: если формат не найден, ищем подходящий масштаб
+        //    foreach (var format in GOSTFormats)
+        //    {
+        //        double formatX = format.Value.xFormatDim;
+        //        double formatY = format.Value.yFormatDim;
 
 
-                if (userScale.HasValue)
-                {
-                    // Если задан масштаб, проверяем его
-                    double scaledX = formatX * userScale.Value;
-                    double scaledY = formatY * userScale.Value;
+        //        if (userScale.HasValue)
+        //        {
+        //            // Если задан масштаб, проверяем его
+        //            double scaledX = formatX * userScale.Value;
+        //            double scaledY = formatY * userScale.Value;
 
-                    if (isLandscape)
-                    {
-                        // Если альбомная ориентация
-                        if (Math.Abs(minDim - scaledX) <= tolerance && Math.Abs(maxDim - scaledY) <= tolerance)
-                        {
-                            closestFormat = format.Key;
-                            closestScale = userScale;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        // Если книжная ориентация
-                        if (Math.Abs(minDim - scaledY) <= tolerance && Math.Abs(maxDim - scaledX) <= tolerance)
-                        {
-                            closestFormat = format.Key;
-                            closestScale = userScale;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    double scaleX = minDim / formatX;
-                    double scaleY = maxDim / formatY;
-                    var mathx = Math.Abs(scaleX-scaleY);
-                    var mathY = Math.Abs(scaleY);
-                    var p = AreAlmostEqualPercentage(scaleX, scaleY, 10);
-                    var checkscale = mathx / mathY <= tolerance;
-                    var closeToWholeNumber = IsCloseToWholeNumber((scaleX + scaleY) / 2, tolerance);
-                    if (p)
-                    {
-                        scaleX = RoundToNearestAllowedScale(scaleX);
-                        scaleY = RoundToNearestAllowedScale(scaleY);
-                        if (IsAllowedScale(scaleX))
-                        {
-                            closestFormat = format.Key;
+        //            if (isLandscape)
+        //            {
+        //                // Если альбомная ориентация
+        //                if (Math.Abs(minDim - scaledX) <= tolerance && Math.Abs(maxDim - scaledY) <= tolerance)
+        //                {
+        //                    closestFormat = format.Key;
+        //                    closestScale = userScale;
+        //                    break;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                // Если книжная ориентация
+        //                if (Math.Abs(minDim - scaledY) <= tolerance && Math.Abs(maxDim - scaledX) <= tolerance)
+        //                {
+        //                    closestFormat = format.Key;
+        //                    closestScale = userScale;
+        //                    break;
+        //                }
+        //            }
+        //        }
+        //        else
+        //        {
+        //            double scaleX = minDim / formatX;
+        //            double scaleY = maxDim / formatY;
+        //            var mathx = Math.Abs(scaleX-scaleY);
+        //            var mathY = Math.Abs(scaleY);
+        //            var p = AreAlmostEqualPercentage(scaleX, scaleY, 10);
+        //            var checkscale = mathx / mathY <= tolerance;
+        //            var closeToWholeNumber = IsCloseToWholeNumber((scaleX + scaleY) / 2, tolerance);
+        //            if (p)
+        //            {
+        //                scaleX = RoundToNearestAllowedScale(scaleX);
+        //                scaleY = RoundToNearestAllowedScale(scaleY);
+        //                if (IsAllowedScale(scaleX))
+        //                {
+        //                    closestFormat = format.Key;
                             
-                            //double averageScale = Math.Round((scaleX + scaleY) / 2);
+        //                    //double averageScale = Math.Round((scaleX + scaleY) / 2);
 
-                            //double difference = Math.Abs(scaleX - averageScale) + Math.Abs(scaleY - averageScale);
+        //                    //double difference = Math.Abs(scaleX - averageScale) + Math.Abs(scaleY - averageScale);
 
-                            //if (difference < minDifference)
-                            //{
-                            //    minDifference = difference;
-                            //    closestFormat = format.Key;
-                            //    closestScale = averageScale;
-                            //}
-                        }
+        //                    //if (difference < minDifference)
+        //                    //{
+        //                    //    minDifference = difference;
+        //                    //    closestFormat = format.Key;
+        //                    //    closestScale = averageScale;
+        //                    //}
+        //                }
                         
-                    }
-                }
-            }
+        //            }
+        //        }
+        //    }
 
-            return (closestFormat, closestScale);
-        }
+        //    return (closestFormat, closestScale);
+        //}
 
-        // Вспомогательная функция для проверки, является ли число близким к целому
-        private static bool IsCloseToWholeNumber(double value, double tolerance)
-        {
-            return Math.Abs(value - Math.Round(value)) <= tolerance;
-        }
+        //// Вспомогательная функция для проверки, является ли число близким к целому
+        //private static bool IsCloseToWholeNumber(double value, double tolerance)
+        //{
+        //    return Math.Abs(value - Math.Round(value)) <= tolerance;
+        //}
 
-        public static bool AreAlmostEqualPercentage(double value1, double value2, double percentageTolerance)
-        {
-            double maxValue = Math.Max(value1, value2);
-            double difference = Math.Abs(value1 - value2);
+        //public static bool AreAlmostEqualPercentage(double value1, double value2, double percentageTolerance)
+        //{
+        //    double maxValue = Math.Max(value1, value2);
+        //    double difference = Math.Abs(value1 - value2);
 
-            // Рассчитываем допустимую разницу в процентах
-            double tolerance = maxValue * (percentageTolerance / 100.0);
-            return difference <= tolerance;
-        }
+        //    // Рассчитываем допустимую разницу в процентах
+        //    double tolerance = maxValue * (percentageTolerance / 100.0);
+        //    return difference <= tolerance;
+        //}
 
-        public static bool IsAllowedScale(double scale, double tolerance = 0.05)
-        {
-            double[] allowedScales = new double[]
-            {
-                0.5, 0.4, 0.25, 0.2, 0.1, 0.0667, 0.05, 0.04, 0.025, 0.02, 0.0133, 0.01, 0.005, 0.0025, 0.002, 0.00125, 0.001, // Масштабы уменьшения
-                1,  // Натуральная величина
-                2, 2.5, 4, 5, 10, 20, 40, 50, 100,1000 // Масштабы увеличения
-            };
+        //public static bool IsAllowedScale(double scale, double tolerance = 0.05)
+        //{
+        //    double[] allowedScales = new double[]
+        //    {
+        //        0.5, 0.4, 0.25, 0.2, 0.1, 0.0667, 0.05, 0.04, 0.025, 0.02, 0.0133, 0.01, 0.005, 0.0025, 0.002, 0.00125, 0.001, // Масштабы уменьшения
+        //        1,  // Натуральная величина
+        //        2, 2.5, 4, 5, 10, 20, 40, 50, 100,1000 // Масштабы увеличения
+        //    };
 
-            foreach (var allowedScale in allowedScales)
-            {
-                if (Math.Abs(scale - allowedScale) <= tolerance * allowedScale)
-                {
-                    return true;
-                }
-            }
+        //    foreach (var allowedScale in allowedScales)
+        //    {
+        //        if (Math.Abs(scale - allowedScale) <= tolerance * allowedScale)
+        //        {
+        //            return true;
+        //        }
+        //    }
 
-            return false;
-        }
+        //    return false;
+        //}
 
-        public static double RoundToNearestAllowedScale(double scale)
-        {
-            double[] allowedScales = new double[]
-            {
-                0.5, 0.4, 0.25, 0.2, 0.1, 0.0667, 0.05, 0.04, 0.025, 0.02, 0.0133, 0.01, 0.005, 0.0025, 0.002, 0.00125, 0.001, // Масштабы уменьшения
-                1,  // Натуральная величина
-                2, 2.5, 4, 5, 10, 15, 20, 25, 40, 50, 75, 100, 200, 400, 500, 800, 1000 // Масштабы увеличения
-            };
+        //public static double RoundToNearestAllowedScale(double scale)
+        //{
+        //    double[] allowedScales = new double[]
+        //    {
+        //        0.5, 0.4, 0.25, 0.2, 0.1, 0.0667, 0.05, 0.04, 0.025, 0.02, 0.0133, 0.01, 0.005, 0.0025, 0.002, 0.00125, 0.001, // Масштабы уменьшения
+        //        1,  // Натуральная величина
+        //        2, 2.5, 4, 5, 10, 15, 20, 25, 40, 50, 75, 100, 200, 400, 500, 800, 1000 // Масштабы увеличения
+        //    };
 
-            // Ищем ближайшее допустимое значение
-            double closestScale = allowedScales.OrderBy(s => Math.Abs(s - scale)).First();
-            return closestScale;
-        }
+        //    // Ищем ближайшее допустимое значение
+        //    double closestScale = allowedScales.OrderBy(s => Math.Abs(s - scale)).First();
+        //    return closestScale;
+        //}
     }
 }

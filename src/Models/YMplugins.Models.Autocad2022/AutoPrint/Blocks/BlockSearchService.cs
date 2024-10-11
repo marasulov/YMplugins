@@ -19,7 +19,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
         //}
 
         // Return found blocks with attributes and dynamic properties from the specified space
-        public ObservableCollection<PrintInfo> SearchBlocksInSpace(Database db, string blockName, string searchSpace, string attributeName)
+        public ObservableCollection<PrintInfo> SearchAllBlocksInSpaceByName(Database db, string blockName, string searchSpace, int numerationStart = default)
         {
             List<PrintInfo> foundBlocks = new List<PrintInfo>();
 
@@ -31,7 +31,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                 {
                     // Search in Model Space
                     BlockTableRecord modelSpace = (BlockTableRecord)trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead);
-                    foundBlocks.AddRange(SearchBlockInSpace(trans, modelSpace, blockName, "Model Space"));
+                    foundBlocks.AddRange(SearchBlockInSpace(trans, modelSpace, blockName, "Model Space", numerationStart));
                 }
 
                 if (searchSpace == "Layout")
@@ -45,7 +45,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                         {
                             Layout layout = (Layout)trans.GetObject(btr.LayoutId, OpenMode.ForRead);
                             if (layout.LayoutName != "Model")
-                                foundBlocks.AddRange(SearchBlockInSpace(trans, btr, blockName, $"Layout: {layout.LayoutName}"));
+                                foundBlocks.AddRange(SearchBlockInSpace(trans, btr, blockName, $"Layout: {layout.LayoutName}", numerationStart));
                         }
                     }
                 }
@@ -57,7 +57,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
         }
 
         // Search blocks in specific space and return block data
-        private ObservableCollection<PrintInfo> SearchBlockInSpace(Transaction trans, BlockTableRecord space, string blockName, string spaceName)
+        private ObservableCollection<PrintInfo> SearchBlockInSpace(Transaction trans, BlockTableRecord space, string blockName, string spaceName, int numerationStartValue)
         {
             ObservableCollection<PrintInfo> blockList = new ObservableCollection<PrintInfo>();
 
@@ -75,14 +75,16 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                 var position = blockRef.Position;
                 var blockScale = blockRef.ScaleFactors.X;
                 var blockPointPosition = new PointDTO(position.X, position.Y, position.Z);
-                var format = FormatFinder.FindFormatWithScale(xDim, yDim);
-                Active.Editor.WriteMessage($"в полилинии xDim {xDim} по X, yDim {yDim}");
+                var format = FormatFinder.FindFormatWithScale(xDim, yDim, blockScale);
+                
 #if DEBUG
                 Active.Editor.WriteMessage($"format {format}");
+                Active.Editor.WriteMessage($"в полилинии xDim {xDim} по X, yDim {yDim}");
 #endif
-                PrintInfo blockData = new PrintInfo(blockRef.Id.Handle.Value, spaceName, format.Format, blockScale, xDim, yDim, blockPointPosition, true);
+                PrintInfo blockData = new PrintInfo(blockRef.Id.Handle.Value, spaceName, format, blockScale, xDim, yDim, blockPointPosition, true,numerationStartValue.ToString());
 
                 blockList.Add(blockData);
+                numerationStartValue++;
             }
 
             return blockList;

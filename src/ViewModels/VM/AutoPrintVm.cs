@@ -197,7 +197,15 @@ namespace YMplugins.ViewModels.VM
             {
                 if (Set(ref _isCheckedNumbering, value))
                 {
-                    UpdateBlockCollection();
+                    if (SelectedPrintByOption == PrintByOption.ByBlock)
+                    {
+                        UpdateBlockCollection();
+                    }
+                    else
+                    {
+                        PrintDataCollection = new ObservableCollection<PrintInfo>(NamingPolylines(PrintDataCollection));
+                    }
+
                 }
             }
         }
@@ -259,7 +267,7 @@ namespace YMplugins.ViewModels.VM
                 Set(ref _plineScale, value);
                 SearchPolylinesInLayer();
             }
-        } 
+        }
 
         private void InitializeCommands(
             GetBlocksNameCommand getBlocksNameCommand,
@@ -369,7 +377,7 @@ namespace YMplugins.ViewModels.VM
                 Prefix = Prefix,
                 Suffix = Suffix,
                 IsCheckedNumbering = IsCheckedNumbering,
-                SelectedLayer = SelectedLayerOnScreen, 
+                SelectedLayer = SelectedLayerOnScreen,
                 PlineScale = PlineScale
             };
         }
@@ -448,9 +456,16 @@ namespace YMplugins.ViewModels.VM
         {
             var i = NumerationStartValue;
             var newdata = new ObservableCollection<PrintInfo>();
+
+
             foreach (var printInfo in dataCollection)
             {
-                printInfo.FileName = Prefix + i + Suffix;
+                if (IsCheckedNumbering)
+                    printInfo.FileName = Prefix + i + Suffix;
+                else
+                {
+                    printInfo.FileName = Prefix + Suffix;
+                }
                 i++;
                 newdata.Add(printInfo);
             }

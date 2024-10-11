@@ -1,4 +1,5 @@
 ﻿using YMplugins.Addin.Autocad2022.Commands.Translator;
+using YMplugins.Models.Autocad2022.Utils.Print;
 using YMplugins.Services.Translator;
 
 namespace YMplugins.Addin.Autocad2022
@@ -16,9 +17,58 @@ namespace YMplugins.Addin.Autocad2022
     using System.Windows.Media.Imaging;
     using acadApp = Autodesk.AutoCAD.ApplicationServices.Application;
     using Exception = Autodesk.AutoCAD.Runtime.Exception;
+    using AppCore = Autodesk.AutoCAD.ApplicationServices.Core.Application;
+    using AppSystemVariableChangedEventArgs
+        = Autodesk.AutoCAD.ApplicationServices.SystemVariableChangedEventArgs;
 
     namespace YMplugins.Addin.Acad2022
     {
+        internal static class ApplicationSettings
+        {
+            private static bool
+                _initialized,
+                _needUpdRibbonDetected;
+
+            /// <summary>
+            /// Инициализация
+            /// </summary>
+            public static void Initialize()
+            {
+                if (!_initialized)
+                {
+                    _initialized = true;
+
+                    AppCore.Idle += Application_Idle_RibbonUpdate;
+                    AppCore.SystemVariableChanged += App_SysVarChanged_RibbonUpdate;
+                }
+            }
+
+            private static void App_SysVarChanged_RibbonUpdate
+                (object sender, AppSystemVariableChangedEventArgs e)
+            {
+                if (!_needUpdRibbonDetected
+                    && e.Name.Equals("WSCURRENT",
+                        StringComparison.OrdinalIgnoreCase)
+                    || e.Name.Equals("CADBoost_ID",
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    _needUpdRibbonDetected = true;
+                    AppCore.Idle += Application_Idle_RibbonUpdate;
+                }
+            }
+
+            private static void Application_Idle_RibbonUpdate(object sender, EventArgs e)
+            {
+                RibbonControl ribbon = ComponentManager.Ribbon;
+                if (ribbon != null)
+                {
+                    AppCore.Idle -= Application_Idle_RibbonUpdate;
+                    _needUpdRibbonDetected = false;
+                    
+                }
+            }
+        }
+
         public class Ribbon : IExtensionApplication
         {
             private static string _selsourceComboValue = "auto";
@@ -29,6 +79,8 @@ namespace YMplugins.Addin.Autocad2022
             public void Initialize()
             {
                 ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
+                BuildRibbonTab();
+                
                 var executablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 var pd = new ProxyDomain();
                 var assembly = pd.GetAssembly(Path.Combine(executablePath, "MaterialDesignThemes.Wpf.dll"));
@@ -36,11 +88,11 @@ namespace YMplugins.Addin.Autocad2022
                 var assembly1 = pd.GetAssembly(Path.Combine(executablePath, "MaterialDesignColors.dll"));
 
                 if ((assembly != null) | (assembly1 != null)) Active.Editor.WriteMessage("style dlls not load");
+                
+                var standartCopier = new StandartCopier();
+                var isConfFileCopied = standartCopier.CopyParamsFiles();
 
-                //var standartCopier = new StandartCopier();
-                //var isConfFileCopied = standartCopier.CopyParamsFiles();
-
-                //if (!isConfFileCopied) Active.Editor.WriteMessage("файлы не скопированы");
+                if (!isConfFileCopied) Active.Editor.WriteMessage("файлы не скопированы");
             }
 
             internal class ProxyDomain : MarshalByRefObject
@@ -64,13 +116,10 @@ namespace YMplugins.Addin.Autocad2022
 
             private void ComponentManager_ItemInitialized(object sender, RibbonItemEventArgs e)
             {
-                // Проверяем, что лента загружена
                 if (ComponentManager.Ribbon != null)
                 {
-                    // Строим нашу вкладку
                     BuildRibbonTab();
 
-                    //и раз уж лента запустилась, то отключаем обработчик событий
                     ComponentManager.ItemInitialized -=
                         ComponentManager_ItemInitialized;
                 }
@@ -78,24 +127,20 @@ namespace YMplugins.Addin.Autocad2022
 
             private void BuildRibbonTab()
             {
-                // Если лента еще не загружена
-                if (!isLoaded())
+                if (!IsLoaded())
                 {
-                    // Строим вкладку
                     CreateRibbonTab();
-                    // Подключаем обработчик событий изменения системных переменных
-                    acadApp.SystemVariableChanged += acadApp_SystemVariableChanged;
+                    acadApp.SystemVariableChanged += new SystemVariableChangedEventHandler(acadApp_SystemVariableChanged);
                 }
             }
 
-            private bool isLoaded()
+            private bool IsLoaded()
             {
                 bool _loaded = false;
                 RibbonControl ribCntrl = ComponentManager.Ribbon;
-                // Делаем итерацию по вкладкам ленты
+                
                 foreach (RibbonTab tab in ribCntrl.Tabs)
                 {
-                    // И если у вкладки совпадает идентификатор и заголовок, то значит вкладка загружена
                     if (tab.Id.Equals("CADBoost_ID") & tab.Title.Equals("CADBoost"))
                     {
                         _loaded = true;
@@ -147,7 +192,6 @@ namespace YMplugins.Addin.Autocad2022
                 if (e.Name.Equals("WSCURRENT")) BuildRibbonTab();
             }
 
-            // Создание нашей вкладки
             private void CreateRibbonTab()
             {
                 try

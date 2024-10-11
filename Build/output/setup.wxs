@@ -1,0 +1,240 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="d56a3f69-deb4-4332-b726-1df087090e7e" Name="YMPlugins" Language="1033" Codepage="Windows-1252" Version="2.0.2" UpgradeCode="d56a3f69-deb4-4332-b726-1df06709de7e" Manufacturer="yusufzhon.marasulov">
+    <Package InstallerVersion="200" Compressed="yes" SummaryCodepage="Windows-1252" InstallPrivileges="limited" Languages="1033" />
+    <Media Id="1" Cabinet="YMPlugins.cab" EmbedCab="yes" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="AppDataFolder" Name="AppDataFolder">
+        <Directory Id="Autodesk" Name="Autodesk">
+          <Directory Id="ApplicationPlugins" Name="ApplicationPlugins">
+            <Directory Id="INSTALLDIR" Name="YMplugins.bundle">
+
+              <Component Id="Component.PackageContents.xml_5366582" Guid="d56a3f69-deb4-4332-b726-1df0e6128f99">
+                <File Id="PackageContents.xml_5366582" Source="..\PackageContents.xml" />
+                <RemoveFolder Id="INSTALLDIR" On="uninstall" />
+
+                <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                  <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                </RegistryKey>
+              </Component>
+
+              <Directory Id="Contents" Name="Contents">
+
+                <Component Id="Component.conf.json_3366075777" Guid="d56a3f69-deb4-4332-b726-1df0e3b06712">
+                  <File Id="conf.json_3366075777" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\conf.json" />
+                  <RemoveFolder Id="Contents" On="uninstall" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.DWG_To_PDF_Uzle.pc3_2328880923" Guid="d56a3f69-deb4-4332-b726-1df026b6d111">
+                  <File Id="DWG_To_PDF_Uzle.pc3_2328880923" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\DWG_To_PDF_Uzle.pc3" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.Uzle.pmp_1186859551" Guid="d56a3f69-deb4-4332-b726-1df0fdda28c3">
+                  <File Id="Uzle.pmp_1186859551" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\Uzle.pmp" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.YMplugins.Addin.Autocad2022.dll_2172970347" Guid="d56a3f69-deb4-4332-b726-1df05b31c478">
+                  <File Id="YMplugins.Addin.Autocad2022.dll_2172970347" Source="..\src\Addins\YMplugins.Addin.Autocad2022\bin\Debug\net48\YMplugins.Addin.Autocad2022.dll" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.BouncyCastle.Cryptography.dll_473612763" Guid="d56a3f69-deb4-4332-b726-1df0971ec7b3">
+                  <File Id="BouncyCastle.Cryptography.dll_473612763" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\BouncyCastle.Cryptography.dll" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.Gile.AutoCAD.Extension.dll_3963062973" Guid="d56a3f69-deb4-4332-b726-1df050231a34">
+                  <File Id="Gile.AutoCAD.Extension.dll_3963062973" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\Gile.AutoCAD.Extension.dll" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.itextsharp.dll_3550906167" Guid="d56a3f69-deb4-4332-b726-1df0161d2e5a">
+                  <File Id="itextsharp.dll_3550906167" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\itextsharp.dll" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.MaterialDesignColors.dll_4264961847" Guid="d56a3f69-deb4-4332-b726-1df0de9398bf">
+                  <File Id="MaterialDesignColors.dll_4264961847" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\MaterialDesignColors.dll" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.MaterialDesignThemes.Wpf.dll_2722821079" Guid="d56a3f69-deb4-4332-b726-1df0eeea4cdb">
+                  <File Id="MaterialDesignThemes.Wpf.dll_2722821079" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\MaterialDesignThemes.Wpf.dll" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.Newtonsoft.Json.dll_4244729216" Guid="d56a3f69-deb4-4332-b726-1df0ba302ae1">
+                  <File Id="Newtonsoft.Json.dll_4244729216" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\Newtonsoft.Json.dll" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.SimpleInjector.dll_542998954" Guid="d56a3f69-deb4-4332-b726-1df0bc30a7b9">
+                  <File Id="SimpleInjector.dll_542998954" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\SimpleInjector.dll" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.YMplugins.Contracts.dll_3351877151" Guid="d56a3f69-deb4-4332-b726-1df0236fed16">
+                  <File Id="YMplugins.Contracts.dll_3351877151" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\YMplugins.Contracts.dll" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.YMplugins.Models.Autocad2022.dll_4116352346" Guid="d56a3f69-deb4-4332-b726-1df0d0f81349">
+                  <File Id="YMplugins.Models.Autocad2022.dll_4116352346" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\YMplugins.Models.Autocad2022.dll" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.YMplugins.Models.DbCad.dll_980752159" Guid="d56a3f69-deb4-4332-b726-1df0acba34d9">
+                  <File Id="YMplugins.Models.DbCad.dll_980752159" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\YMplugins.Models.DbCad.dll" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.YMplugins.Services.dll_3258379800" Guid="d56a3f69-deb4-4332-b726-1df08236d7e4">
+                  <File Id="YMplugins.Services.dll_3258379800" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\YMplugins.Services.dll" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.YMplugins.Settings.dll_511812056" Guid="d56a3f69-deb4-4332-b726-1df026c45f29">
+                  <File Id="YMplugins.Settings.dll_511812056" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\YMplugins.Settings.dll" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.YMplugins.ViewModels.dll_3225223743" Guid="d56a3f69-deb4-4332-b726-1df036cd54e3">
+                  <File Id="YMplugins.ViewModels.dll_3225223743" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\YMplugins.ViewModels.dll" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+                <Component Id="Component.YMplugins.Views.dll_626490813" Guid="d56a3f69-deb4-4332-b726-1df0559d0372">
+                  <File Id="YMplugins.Views.dll_626490813" Source="..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\YMplugins.Views.dll" />
+
+                  <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                    <RegistryValue Value="0" Type="string" KeyPath="yes" />
+                  </RegistryKey>
+                </Component>
+
+              </Directory>
+            </Directory>
+
+            <Component Id="ApplicationPlugins" Guid="d56a3f69-deb4-4332-b726-1df0f5d0cd4d">
+              <RemoveFolder Id="ApplicationPlugins" On="uninstall" />
+
+              <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+                <RegistryValue Value="0" Type="string" KeyPath="yes" />
+              </RegistryKey>
+            </Component>
+
+          </Directory>
+
+          <Component Id="Autodesk" Guid="d56a3f69-deb4-4332-b726-1df0ce7682f8">
+            <RemoveFolder Id="Autodesk" On="uninstall" />
+
+            <RegistryKey Root="HKCU" Key="Software\WixSharp\Used">
+              <RegistryValue Value="0" Type="string" KeyPath="yes" />
+            </RegistryKey>
+          </Component>
+
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <UI />
+
+    <WixVariable Id="WixUILicenseRtf" Value="C:\Users\yusufzhon.marasulov\Documents\Ym.rtf" />
+
+    <MajorUpgrade DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit." Schedule="afterInstallInitialize" />
+
+    <CustomAction Id="MyAction" BinaryKey="MyAction_File" DllEntry="MyAction" Return="ignore" Execute="immediate" />
+
+    <Binary Id="MyAction_File" SourceFile="output\%this%.CA.dll" />
+
+    <UIRef Id="WixUI_InstallDir" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <Property Id="REINSTALLMODE" Value="omus" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+
+    <Feature Id="Complete" Title="Complete" Absent="allow" Level="1">
+      <ComponentRef Id="Component.PackageContents.xml_5366582" />
+      <ComponentRef Id="Component.conf.json_3366075777" />
+      <ComponentRef Id="Component.DWG_To_PDF_Uzle.pc3_2328880923" />
+      <ComponentRef Id="Component.Uzle.pmp_1186859551" />
+      <ComponentRef Id="Component.YMplugins.Addin.Autocad2022.dll_2172970347" />
+      <ComponentRef Id="Component.BouncyCastle.Cryptography.dll_473612763" />
+      <ComponentRef Id="Component.Gile.AutoCAD.Extension.dll_3963062973" />
+      <ComponentRef Id="Component.itextsharp.dll_3550906167" />
+      <ComponentRef Id="Component.MaterialDesignColors.dll_4264961847" />
+      <ComponentRef Id="Component.MaterialDesignThemes.Wpf.dll_2722821079" />
+      <ComponentRef Id="Component.Newtonsoft.Json.dll_4244729216" />
+      <ComponentRef Id="Component.SimpleInjector.dll_542998954" />
+      <ComponentRef Id="Component.YMplugins.Contracts.dll_3351877151" />
+      <ComponentRef Id="Component.YMplugins.Models.Autocad2022.dll_4116352346" />
+      <ComponentRef Id="Component.YMplugins.Models.DbCad.dll_980752159" />
+      <ComponentRef Id="Component.YMplugins.Services.dll_3258379800" />
+      <ComponentRef Id="Component.YMplugins.Settings.dll_511812056" />
+      <ComponentRef Id="Component.YMplugins.ViewModels.dll_3225223743" />
+      <ComponentRef Id="Component.YMplugins.Views.dll_626490813" />
+      <ComponentRef Id="Autodesk" />
+      <ComponentRef Id="ApplicationPlugins" />
+    </Feature>
+
+    <InstallExecuteSequence>
+      <Custom Action="MyAction" After="InstallFinalize"> (1) </Custom>
+    </InstallExecuteSequence>
+
+  </Product>
+</Wix>
+

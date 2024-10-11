@@ -65,7 +65,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
                     Active.Editor.WriteMessage($"Файл {Pc3Source} скопирован в {Pc3Destination}");
                 Active.Editor.WriteMessage(IsFileCopied(PmpSource, PmpDestination)
                     ? $"Файл {PmpSource} скопирован в {PmpDestination}"
-                    : $"Не удалось скопировать файлы настройки, скопируйте с сервера \\\\uz-fs\\install\\CAD\\Blocks файлы {Pc3Source}  в {Pc3Destination} и {PmpDestination}");
+                    : $"Не удалось скопировать файлы настройки, скопируйте с папки программы файлы {Pc3Source}  в {Pc3Destination} и {PmpDestination}");
             }
             else
             {
@@ -89,7 +89,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
                 else
                 {
                     Active.Editor.WriteMessage(
-                        "Не удалось скопировать файлы настройки, скопируйте с сервера \\\\uz-fs\\install\\CAD\\Blocks файлы {0}  в {1} и {2} ",
+                        "Не удалось скопировать файлы настройки, скопируйте  с папки программы файлы {0}  в {1} и {2} ",
                         Pc3Destination, Pc3Source, PmpSource);
                 }
 

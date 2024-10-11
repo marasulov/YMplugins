@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "Профиль 1": {
+      "commandName": "Executable",
+      "executablePath": "C:\\Program Files\\Autodesk\\AutoCAD 2022\\acad.exe"
+    },
+    "Профиль 2": {
+      "commandName": "Project"
+    },
+    "Профиль 3": {
+      "commandName": "Project"
+    }
+  }
+}

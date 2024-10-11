@@ -18,7 +18,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
             _standartCopier = new StandartCopier();
         }
 
-        public string FindCanonName(double width, double height, double tolerance = 10.0)
+        public string FindCanonName(double width, double height, string format, double tolerance = 10.0)
         {
             var pConfig = PlotConfigManager.SetCurrentConfig(_standartCopier.Pc3Source);
             var pat = @"\d{1,}?\.\d{2}"; // Регулярное выражение для поиска размеров
@@ -26,8 +26,8 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
             var pattern = new Regex(pat, RegexOptions.Compiled | RegexOptions.Singleline);
 
             // Получаем ближайший формат с использованием метода FindClosestFormat
-            var closestFormat = FormatFinder.FindFormatWithScale(width, height);
-            if (string.IsNullOrEmpty(closestFormat.Format))
+            var closestFormat = format; //FormatFinder.FindFormatWithScale(width, height);
+            if (string.IsNullOrEmpty(closestFormat))
             {
                 return "Не найден подходящий формат";
             }
@@ -54,7 +54,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
                 // Логика поиска по формату, если точное имя не найдено
                 foreach (var line in pConfig.CanonicalMediaNames)
                 {
-                    if (line.Contains(closestFormat.Format)) // Если в строке присутствует найденный формат
+                    if (line.Contains(closestFormat)) // Если в строке присутствует найденный формат
                     {
                         canonName = line;
                         break;
@@ -82,14 +82,14 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
                 Active.Editor.WriteMessage($"printInfo.IsFormatHorizontal {isHor} {width} - {height}");
             }
 
-            return FindCanonName(width, height, tolerance);
+            return FindCanonName(width, height, printInfo.Format, tolerance);
         }
 
-        public string GetCanonNameForPolyline(Polyline polyline, double tolerance = 10.0)
-        {
-            var (length, width) = GetDimensions(polyline);
-            return FindCanonName(length, width, tolerance);
-        }
+        //public string GetCanonNameForPolyline(Polyline polyline, double tolerance = 10.0)
+        //{
+        //    var (length, width) = GetDimensions(polyline);
+        //    return FindCanonName(length, width, tolerance);
+        //}
 
         private static (double length, double width) GetDimensions(Polyline polyline)
         {
