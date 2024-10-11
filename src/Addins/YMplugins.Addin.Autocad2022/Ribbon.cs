@@ -127,11 +127,22 @@ namespace YMplugins.Addin.Autocad2022
 
             private void BuildRibbonTab()
             {
-                if (!IsLoaded())
+                Active.Editor.WriteMessage("гружу панель");
+                try
                 {
-                    CreateRibbonTab();
-                    acadApp.SystemVariableChanged += new SystemVariableChangedEventHandler(acadApp_SystemVariableChanged);
+                    if (!IsLoaded())
+                    {
+                        CreateRibbonTab();
+                        acadApp.SystemVariableChanged += new SystemVariableChangedEventHandler(acadApp_SystemVariableChanged);
+                    }
+                    Active.Editor.WriteMessage("панель загружена");
                 }
+                catch (Exception e)
+                {
+                    Active.Editor.WriteMessage(e.Message);
+                    
+                }
+                
             }
 
             private bool IsLoaded()
