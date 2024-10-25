@@ -27,14 +27,14 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             {
                 BlockTable bt = (BlockTable)trans.GetObject(db.BlockTableId, OpenMode.ForRead);
 
-                if (searchSpace == "Model")
+                if (searchSpace == "Model" || searchSpace == "Both")
                 {
                     // Search in Model Space
                     BlockTableRecord modelSpace = (BlockTableRecord)trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead);
-                    foundBlocks.AddRange(SearchBlockInSpace(trans, modelSpace, blockName, "Model Space", numerationStart));
+                    foundBlocks.AddRange(SearchBlockInSpace(trans, modelSpace, blockName, "Model", numerationStart));
                 }
 
-                if (searchSpace == "Layout")
+                if (searchSpace == "Layout" || searchSpace == "Both")
                 {
                     // Search in each Layout (Paper Space)
                     foreach (ObjectId btrId in bt)
@@ -45,7 +45,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                         {
                             Layout layout = (Layout)trans.GetObject(btr.LayoutId, OpenMode.ForRead);
                             if (layout.LayoutName != "Model")
-                                foundBlocks.AddRange(SearchBlockInSpace(trans, btr, blockName, $"Layout: {layout.LayoutName}", numerationStart));
+                                foundBlocks.AddRange(SearchBlockInSpace(trans, btr, blockName, layout.LayoutName, numerationStart));
                         }
                     }
                 }

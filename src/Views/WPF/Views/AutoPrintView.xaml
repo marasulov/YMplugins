@@ -20,6 +20,7 @@
 
             <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
         </ResourceDictionary>
+        
     </Window.Resources>
 
     <Grid Margin="10">
@@ -56,23 +57,44 @@
                 </StackPanel>
                 <StackPanel>
                     <CheckBox IsChecked="{Binding IsSearchOnModel}">Search on model</CheckBox>
-                    <CheckBox IsChecked="{Binding IsSearchOnLayout}">Search on layouts</CheckBox>
-                </StackPanel>
-                <StackPanel>
+                    <CheckBox x:Name="SearchOnLayoutsCheckBox" IsChecked="{Binding IsSearchOnLayout}">Search on layouts</CheckBox>
+                        <StackPanel Margin="20,0,0,0">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SearchOnLayoutsCheckBox, Path=IsChecked}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=SearchOnLayoutsCheckBox, Path=IsChecked}" Value="False">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+
+                        <CheckBox IsChecked="{Binding  IsDeleteEmptyLayouts, UpdateSourceTrigger=PropertyChanged}">
+                                Delete empty layouts
+                            </CheckBox>
+                            <CheckBox IsChecked="{Binding IsSetLayoutsToPlotSetting }">
+                                Set layouts to print borders
+                            </CheckBox>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel>
                     <CheckBox Name="combineCheckBox" IsChecked="{Binding IsCombinePdf, UpdateSourceTrigger=PropertyChanged}">Combine pdfs</CheckBox>
                 </StackPanel>
                 <StackPanel>
-                    <!--<TextBox Tag="Output file name:"
-                             ToolTip="Enter file name"
-                             Text="{Binding Path= OutputFileName}"
-                             Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                             Template="{StaticResource TextBoxWithHintTemplate}" />-->
                     <TextBox  Name="outputFileTextbox"
-                              Text="{Binding Path=  OutputFileName ,UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                              Text="{Binding Path=OutputFileName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, ValidatesOnDataErrors=True}"
                               Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                               materialDesign:TextFieldAssist.HasClearButton="True"
                               IsEnabled="{Binding IsChecked, ElementName=combineCheckBox}"
                               Margin="8 0 8 0">
+                        <TextBox.ToolTip>
+                            <ToolTip Visibility="{Binding (Validation.HasError), ElementName=outputFileTextbox, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=outputFileTextbox}" />
+                            </ToolTip>
+                        </TextBox.ToolTip>
                         <materialDesign:HintAssist.Hint>
                             <StackPanel
                                 Orientation="Horizontal"
@@ -299,11 +321,10 @@
         </GroupBox>
 
         <!-- Кнопки внизу -->
-        <StackPanel HorizontalAlignment="Center" Grid.Row="2" Grid.Column="1">
-            <Button Content="Cancel"  Margin="5" />
-            <Button Content="Print" Margin="5" Command="{Binding PrintCommand}" CommandParameter="{Binding }" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Grid.ColumnSpan="3">
+            <Button Content="Print" Width="100" Height="30" Margin="10" Command="{Binding PrintCommand}" CommandParameter="{Binding}" />
         </StackPanel>
-        <TextBlock Grid.Row="3" Grid.Column="0"
+        <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
                    Text="{Binding Error}" 
                    Foreground="Red" 
                    TextWrapping="Wrap" 

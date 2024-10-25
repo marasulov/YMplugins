@@ -1,4 +1,5 @@
 ﻿using Autodesk.AutoCAD.Runtime;
+using Gile.AutoCAD.Extension;
 using SimpleInjector;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
@@ -7,6 +8,7 @@ using YMplugins.Models.Autocad2022.AutoPrint.Blocks;
 using YMplugins.Models.Autocad2022.AutoPrint.Layers;
 using YMplugins.Models.Autocad2022.Contracts;
 using YMplugins.Models.Autocad2022.Utils;
+using YMplugins.Models.Autocad2022.Utils.LayoutsServices;
 using YMplugins.Services;
 using YMplugins.ViewModels.Commands;
 using YMplugins.ViewModels.VM;
@@ -20,6 +22,7 @@ namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
         [CommandMethod("Autoprint")]
         public static void Print()
         {
+            Active.Document.SendStringToExecute("_QSAVE ", true, false, false);
             var container = new Container();
             container.Options.EnableAutoVerification = false;
 
@@ -49,6 +52,9 @@ namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
             container.Register<IAutoCadFileService, AutoCadFileService>();
             container.Register<IBlockFinder, BlockFinder>();
             container.Register<IPolylineFinder, PolylineFinder>();
+            container.Register<IDeleteEmptyLayoutsService, DeleteEmptyLayoutsService>();
+            container.Register<ISetLayoutPlotSettingService, SetLayoutPlotSettingService>();
+
 
             container.Register<INotifyService, NotifyService>();
             container.Register<IWindowService, WindowService>();

@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <Configurations>Debug;Release;Autocad;Test</Configurations>
-
   </PropertyGroup>
 
   <ItemGroup>

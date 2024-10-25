@@ -146,24 +146,29 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
         //    return printStatus;
         //}
 
-        public string PlotCurrentLayout(PrintInfo printModel)
+        public string PlotCurrentLayout(PrintInfo printModel, StandartCopier standartCopier)
         {
             var acDoc = Active.Document;
             var acCurDb = acDoc.Database;
 
             Application.SetSystemVariable("BACKGROUNDPLOT", 0);
             string fileName = default;
-
+            
             try
             {
                 using var acTrans = acCurDb.TransactionManager.StartTransaction();
                 LayoutManager acLayoutMgr = LayoutManager.Current;
-                var acLayout = acTrans.GetObject(acLayoutMgr.GetLayoutId(acLayoutMgr.CurrentLayout), OpenMode.ForRead) as Layout;
+                
+                if (acLayoutMgr.CurrentLayout != printModel.Space)
+                {
+                    acLayoutMgr.CurrentLayout = printModel.Space;
+                }
+                var acLayout = acTrans.GetObject(acLayoutMgr.GetLayoutId(acLayoutMgr.CurrentLayout), OpenMode.ForRead) as Autodesk.AutoCAD.DatabaseServices.Layout;
 
                 // Create an instance of PlotHelper
                 PlotHelper plotHelper = new PlotHelper(acDoc, printModel);
 
-                PlotInfo acPlInfo = plotHelper.ConfigurePlotSettings(acLayout);
+                PlotInfo acPlInfo = plotHelper.ConfigurePlotSettings(acLayout, standartCopier);
                 var acPlInfoVdr = new PlotInfoValidator();
                 acPlInfoVdr.MediaMatchingPolicy = MatchingPolicy.MatchEnabled;
                 acPlInfoVdr.Validate(acPlInfo);

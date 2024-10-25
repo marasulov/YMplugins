@@ -10,15 +10,17 @@ namespace YMplugins.ViewModels.Commands
         private IPrintService _printService;
         private ICombinePdfService _combinePdfService;
         private INotifyService _notifyService;
-        private readonly IWindowService _windowService;
+        private readonly IDeleteEmptyLayoutsService _deleteEmptyLayouts;
+        private readonly ISetLayoutPlotSettingService _setLayoutPlot;
 
         public PrintCommand(IPrintService printService, ICombinePdfService combinePdfService,
-            INotifyService notifyService, IWindowService windowService)
+            INotifyService notifyService, IDeleteEmptyLayoutsService deleteEmptyLayouts, ISetLayoutPlotSettingService setLayoutPlot)
         {
             _printService = printService;
             _combinePdfService = combinePdfService;
             _notifyService = notifyService;
-            _windowService = windowService;
+            _deleteEmptyLayouts = deleteEmptyLayouts;
+            _setLayoutPlot = setLayoutPlot;
         }
 
         //public override async void Execute(object parameter)
@@ -68,15 +70,31 @@ namespace YMplugins.ViewModels.Commands
                 return;
             }
 
-            //if (vm.SelectedPrintByOption == PrintByOption.ByBlock)
-            //{
-            //}
-            //else
-            //{
-            //}
+            if (vm.IsCombinePdf && string.IsNullOrWhiteSpace(vm.OutputFileName))
+            {
+                vm.Error = "Output file name is required when combining PDFs.";
+                return;
 
+
+            }
+            
             vm.CloseAction?.Invoke();
+
+            
+
             var printData = vm.PrintDataCollection.Where(x => x.IsPrint).ToArray();
+
+            if (vm.IsSetLayoutsToPlotSetting)
+            {
+                _setLayoutPlot.Set(printData);
+            }
+
+            if (vm.IsDeleteEmptyLayouts)
+            {
+                _deleteEmptyLayouts.DeleteEmptyLayouts(printData);
+            }
+
+
             if (vm.SelectedPrintingOrder == PrintingOrder.ByX)
             {
                 printData = vm.PrintDataCollection.OrderBy(x => x.Position.X).ToArray();

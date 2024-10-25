@@ -13,9 +13,9 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
     {
         private readonly StandartCopier _standartCopier;
 
-        public CanonNameResolver()
+        public CanonNameResolver(StandartCopier standartCopier)
         {
-            _standartCopier = new StandartCopier();
+            _standartCopier = standartCopier;
         }
 
         public string FindCanonName(double width, double height, string format, double tolerance = 10.0)

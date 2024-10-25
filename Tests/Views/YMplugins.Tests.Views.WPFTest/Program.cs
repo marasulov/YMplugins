@@ -32,7 +32,7 @@ namespace YMplugins.Tests.Views.WPFTest
             container.Register<IGetBlocksNameService, GetBlocksNameService>();
             container.Register<IPrintService, PrintService>();
             container.Register<INamingService, NamingService>();
-            //container.Register<BlockSearchService>();
+            container.Register<BlockSearchService>();
             container.Register<SearchData>();
 
             container.Register<ISearchService, SearchService>();
@@ -44,6 +44,9 @@ namespace YMplugins.Tests.Views.WPFTest
             container.Register<IAutoCadFileService, AutoCadFileService>();
             //container.Register<IBlockFinder, BlockFinder>();
             //container.Register<IPolylineFinder, PolylineFinder>();
+            container.Register<IDeleteEmptyLayoutsService, DeleteEmptyLayoutsService>();
+            container.Register<ISetLayoutPlotSettingService, SetLayoutPlotSettingService>();
+
 
             container.Register<INotifyService, NotifyService>();
             container.Register<IWindowService, WindowService>();

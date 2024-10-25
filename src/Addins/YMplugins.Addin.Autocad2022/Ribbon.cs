@@ -149,7 +149,7 @@ namespace YMplugins.Addin.Autocad2022
 
             private void acadApp_SystemVariableChanged(object sender, SystemVariableChangedEventArgs e)
             {
-                Active.Editor.WriteMessage("acadApp_SystemVariableChanged");
+                
                 if (e.Name.Equals("WSCURRENT")) BuildRibbonTab();
             }
 

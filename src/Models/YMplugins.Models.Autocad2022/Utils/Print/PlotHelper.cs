@@ -12,17 +12,15 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
     public class PlotHelper
     {
         private Document _document;
-        private Database _database;
         private PrintInfo _printModel;
 
         public PlotHelper(Document document, PrintInfo printModel)
         {
             _document = document;
-            _database = document.Database;
             _printModel = printModel;
         }
 
-        public PlotInfo ConfigurePlotSettings(Layout acLayout)
+        public PlotInfo ConfigurePlotSettings(Layout acLayout, StandartCopier standartCopier)
         {
             var acPlInfo = new PlotInfo();
             acPlInfo.Layout = acLayout.ObjectId;
@@ -38,9 +36,8 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
             var points = new Extents2d(blockPosition, blockDimension);
 
             bool isHor = _printModel.IsFormatHorizontal();
-            CanonNameResolver resolver = new CanonNameResolver();
-
-            //TODO сделать поиск канонического имени
+            
+            CanonNameResolver resolver = new CanonNameResolver(standartCopier);
             string canonName = resolver.GetCanonNameByWidthAndHeight(_printModel);
 
             acPlSetVdr.SetPlotWindowArea(acPlSet, points);

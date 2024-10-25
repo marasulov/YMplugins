@@ -1,6 +1,7 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+using Gile.AutoCAD.Extension;
 using YMplugins.Contracts;
 
 namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
@@ -30,9 +31,10 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 
                     if (blockRef != null)
                     {
-                        doc.Editor.WriteMessage($"\nYou selected block: {blockRef.Name}");
+                        var effectiveName = blockRef.GetEffectiveName();
+                        doc.Editor.WriteMessage($"\nYou selected block: {effectiveName}");
 
-                        blockName = blockRef.Name;
+                        blockName = effectiveName;
                     }
                 }
                 else

@@ -30,19 +30,12 @@ namespace YMplugins.ViewModels.Commands
             if (parameter is not AutoPrintVm autoPrintVm) return;
             try
             {
-                Console.WriteLine("Закрываем текущее окно...");
                 autoPrintVm.CloseAction?.Invoke();
 
-                // Выполняем выбор блока синхронно (без Task.Run)
                 var selectedBlockId = _selectBlockService.SelectBlock();
-                Console.WriteLine($"Выбранный блок: {selectedBlockId}");
-
-                // Обновляем свойство в ViewModel
+                
                 autoPrintVm.SelectedBlockOnScreen = selectedBlockId;
-                Console.WriteLine("Свойство SelectedBlockOnScreen обновлено.");
-
-                // Открываем окно заново
-                Console.WriteLine("Открываем окно заново...");
+                
                 autoPrintVm.OpenAction?.Invoke();
             }
             catch (Exception ex)

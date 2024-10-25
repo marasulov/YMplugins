@@ -1,7 +1,9 @@
-﻿namespace YMplugins.Contracts
+﻿using System.Collections.Generic;
+using YMplugins.Contracts.Dto;
+
+namespace YMplugins.Contracts;
+
+public interface ISelectBlockService
 {
-    public interface ISelectBlockService
-    {
-        string SelectBlock();
-    }
+    string SelectBlock();
 }

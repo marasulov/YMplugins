@@ -4,6 +4,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
+using Gile.AutoCAD.Extension;
 using SimpleInjector;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
@@ -12,6 +13,7 @@ using YMplugins.Models.Autocad2022.AutoPrint.Blocks;
 using YMplugins.Models.Autocad2022.AutoPrint.Layers;
 using YMplugins.Models.Autocad2022.Contracts;
 using YMplugins.Models.Autocad2022.Utils;
+using YMplugins.Models.Autocad2022.Utils.LayoutsServices;
 using YMplugins.Services;
 using YMplugins.ViewModels.Commands;
 using YMplugins.ViewModels.VM;
@@ -23,50 +25,54 @@ namespace YMplugins.Models.Autocad2022
 {
     public class TestCommands
     {
-        //[CommandMethod("Autoprint2")]
-        //public static void Print()
-        //{
-        //    var container = new Container();
-        //    container.Options.EnableAutoVerification = false;
+        [CommandMethod("Autoprint2")]
+        public static void Print()
+        {
+            Active.Document.SendStringToExecute("_QSAVE ", true, false, false);
+            var container = new Container();
+            container.Options.EnableAutoVerification = false;
 
-        //    container.Register<GetAttributesCommand>();
-        //    container.Register<GetBlocksNameCommand>();
-        //    container.Register<GetLayersCommand>();
-        //    container.Register<PrintCommand>();
-        //    container.Register<SelectBlockCommand>();
-        //    container.Register<ZoomToPointCommand>();
-        //    container.Register<AutoPrintVm>(Lifestyle.Transient);
-        //    container.Register<AutoPrintView>(Lifestyle.Transient);
+            container.Register<GetAttributesCommand>();
+            container.Register<GetBlocksNameCommand>();
+            container.Register<GetLayersCommand>();
+            container.Register<PrintCommand>();
+            container.Register<SelectBlockCommand>();
+            container.Register<ZoomToPointCommand>();
+            container.Register<AutoPrintVm>(Lifestyle.Transient);
+            container.Register<AutoPrintView>(Lifestyle.Transient);
 
-        //    container.Register<LoadingWindow>(Lifestyle.Transient);
+            container.Register<LoadingWindow>(Lifestyle.Transient);
 
-        //    container.Register<IGetBlocksNameService, GetBlocksNameService>();
-        //    container.Register<IPrintService, PrintService>();
-        //    container.Register<INamingService, NamingService>();
-        //    container.Register<BlockSearchService>();
-        //    container.Register<SearchData>();
+            container.Register<IGetBlocksNameService, GetBlocksNameService>();
+            container.Register<IPrintService, PrintService>();
+            container.Register<INamingService, NamingService>();
+            container.Register<BlockSearchService>();
+            container.Register<SearchData>();
 
-        //    container.Register<ISearchService, SearchService>();
-        //    container.Register<IZoomEntity, ZoomService>();
-        //    container.Register<IGetLayersService, GetLayersService>();
-        //    container.Register<ISelectBlockService, SelectBlockService>();
-        //    container.Register<IAttributesService, AttributeService>();
-        //    container.Register<ICombinePdfService, CombinePdfService>();
-        //    container.Register<IAutoCadFileService, AutoCadFileService>();
-        //    container.Register<IBlockFinder, BlockFinder>();
-        //    container.Register<IPolylineFinder, PolylineFinder>();
+            container.Register<ISearchService, SearchService>();
+            container.Register<IZoomEntity, ZoomService>();
+            container.Register<IGetLayersService, GetLayersService>();
+            container.Register<ISelectBlockService, SelectBlockService>();
+            container.Register<IAttributesService, AttributeService>();
+            container.Register<ICombinePdfService, CombinePdfService>();
+            container.Register<IAutoCadFileService, AutoCadFileService>();
+            container.Register<IBlockFinder, BlockFinder>();
+            container.Register<IPolylineFinder, PolylineFinder>();
+            container.Register<IDeleteEmptyLayoutsService, DeleteEmptyLayoutsService>();
+            container.Register<ISetLayoutPlotSettingService, SetLayoutPlotSettingService>();
 
-        //    container.Register<INotifyService, NotifyService>();
-        //    container.Register<IWindowService, WindowService>();
 
-        //    var window = container.GetInstance<AutoPrintView>();
-        //    var context = (AutoPrintVm)window.DataContext;
+            container.Register<INotifyService, NotifyService>();
+            container.Register<IWindowService, WindowService>();
 
-        //    context.GetBlocksNameCommand.Execute(null);
-        //    context.GetLayersCommand.Execute(null);
+            var window = container.GetInstance<AutoPrintView>();
+            var context = (AutoPrintVm)window.DataContext;
 
-        //    window.ShowDialog();
-        //}
+            context.GetBlocksNameCommand.Execute(null);
+            context.GetLayersCommand.Execute(null);
+
+            window.ShowDialog();
+        }
 
         //[CommandMethod("SearchBlocksByName")]
         //public void SearchBlocksByName()

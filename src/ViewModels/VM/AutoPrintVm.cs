@@ -10,7 +10,7 @@ using YMplugins.ViewModels.Commands;
 
 namespace YMplugins.ViewModels.VM
 {
-    public class AutoPrintVm : BaseViewModel
+    public class AutoPrintVm : BaseViewModel, IDataErrorInfo
     {
         private readonly IAttributesService _attributesService;
         private readonly ISearchService _searchService;
@@ -36,6 +36,8 @@ namespace YMplugins.ViewModels.VM
         private bool _isSearchOnModel = true;
         private string _fileName;
         private int _plineScale = 1;
+        private bool _isDeleteEmptyLayouts;
+        private bool _isSetLayoutsToPlotSetting;
 
         public AutoPrintVm(
             GetBlocksNameCommand getBlocksNameCommand,
@@ -165,8 +167,15 @@ namespace YMplugins.ViewModels.VM
             set
             {
                 Set(ref _isSearchOnModel, value);
-                if (SelectedBlockOnScreen == null) return;
-                UpdateAttributes();
+                //if (SelectedBlockOnScreen == null) return;
+                if (SelectedPrintByOption == PrintByOption.ByBlock)
+                {
+                    UpdateAttributes();
+                }
+                else
+                {
+                    PrintDataCollection = _searchService.FindObjects(CreateSearchData());
+                }
                 UpdateBlockCollection();
             }
         }
@@ -177,8 +186,16 @@ namespace YMplugins.ViewModels.VM
             set
             {
                 Set(ref _isSearchOnLayout, value);
-                if (SelectedBlockOnScreen == null) return;
-                UpdateAttributes();
+                //if (SelectedBlockOnScreen == null) return;
+                if (SelectedPrintByOption == PrintByOption.ByBlock)
+                {
+                    UpdateAttributes();
+                }
+                else
+                {
+                    PrintDataCollection = _searchService.FindObjects(CreateSearchData());
+                }
+                
                 UpdateBlockCollection();
             }
 
@@ -208,6 +225,21 @@ namespace YMplugins.ViewModels.VM
 
                 }
             }
+        }
+
+        public bool IsSetLayoutsToPlotSetting
+        {
+            get => _isSetLayoutsToPlotSetting;
+            set => Set(ref _isSetLayoutsToPlotSetting, value);
+        }
+
+        /// <summary>
+        /// Удалить листы без блока штампа
+        /// </summary>
+        public bool IsDeleteEmptyLayouts
+        {
+            get => _isDeleteEmptyLayouts;
+            set => Set(ref _isDeleteEmptyLayouts, value);
         }
 
         public bool IsCombinePdf { get; set; }
@@ -244,6 +276,18 @@ namespace YMplugins.ViewModels.VM
             set => Set(ref _error, value);
         }
 
+        public string this[string columnName]
+        {
+            get
+            {
+                if (columnName == nameof(OutputFileName) && IsCombinePdf && string.IsNullOrWhiteSpace(OutputFileName))
+                {
+                    return "Output file name is required when combining PDFs.";
+                }
+                return null;
+            }
+        }
+
         public string FileName
         {
             get => _fileName;
@@ -268,6 +312,8 @@ namespace YMplugins.ViewModels.VM
                 SearchPolylinesInLayer();
             }
         }
+
+        
 
         private void InitializeCommands(
             GetBlocksNameCommand getBlocksNameCommand,

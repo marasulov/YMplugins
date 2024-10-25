@@ -8,7 +8,7 @@ namespace Build
     internal class Program
     {
         private static string _projectName = "YMPlugins";
-        private static string _version = "2.0.3";
+        private static string _version = "2.0.5";
 
         static void Main(string[] args)
         {
@@ -19,7 +19,7 @@ namespace Build
                 Name = _projectName,
                 UI = WUI.WixUI_ProgressOnly,
                 OutDir = "output",
-                GUID = new Guid("D56A3F69-DEB4-4332-B726-1DF06709DE7E"),
+                GUID = new Guid("3C9072CE-836B-4091-A545-7EF11EA63148"),
                 MajorUpgrade = new MajorUpgrade
                 {
                     Schedule = UpgradeSchedule.afterInstallInitialize,
@@ -33,13 +33,13 @@ namespace Build
                 Dirs = new Dir[]
                 {
                     new InstallDir(pluginDir,
-                        new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\PackageContents.xml"),
+                        new File(@".\..\PackageContents.xml"),
                         new Dir(@"Contents",
-                            new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\conf.json"),
-                            new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\DWG_To_PDF_Uzle.pc3"),
-                            new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\Uzle.pmp"),
-                            new DirFiles(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\*.dll"),
-                            new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Addins\YMplugins.Addin.Autocad2022\bin\Debug\net48\YMplugins.Addin.Autocad2022.dll")))
+                            new File(@".\..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\conf.json"),
+                            new File(@".\..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\DWG_To_PDF_Uzle.pc3"),
+                            new File(@".\..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\Uzle.pmp"),
+                            new DirFiles(@".\..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\*.dll"),
+                            new File(@".\..\src\Addins\YMplugins.Addin.Autocad2022\bin\Debug\net48\YMplugins.Addin.Autocad2022.dll")))
                 },
 
             };

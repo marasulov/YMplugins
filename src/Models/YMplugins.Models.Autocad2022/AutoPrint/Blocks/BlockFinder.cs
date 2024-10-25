@@ -20,23 +20,23 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
         public ObservableCollection<PrintInfo> FindBlocks(SearchData data)
         {
             var blocks = new List<PrintInfo>();
-            string searchSpace = data.IsSearchOnLayouts ? "Layout" : data.IsSearchOnModel ? "Model" : null;
-
-            if (searchSpace != null)
+            string searchSpace = default;
+            if (data.IsSearchOnLayouts & data.IsSearchOnModel) searchSpace = "Both";
+            else if (data.IsSearchOnModel) searchSpace = "Model";
+            else searchSpace = "Layout";
+            
+            if (data.IsCheckedNumbering)
             {
-                if (data.IsCheckedNumbering)
-                {
-                    blocks.AddRange(_blockSearchService.SearchAllBlocksInSpaceByName(Active.Database, data.SelectedBlockName, searchSpace, data.NumerationStartValue));
-                }
-                else
-                {
-                    blocks.AddRange(_blockSearchService.SearchAllBlocksInSpaceByName(Active.Database, data.SelectedBlockName, searchSpace));
-                }
+                blocks.AddRange(_blockSearchService.SearchAllBlocksInSpaceByName(Active.Database, data.SelectedBlockName, searchSpace, data.NumerationStartValue));
+            }
+            else
+            {
+                blocks.AddRange(_blockSearchService.SearchAllBlocksInSpaceByName(Active.Database, data.SelectedBlockName, searchSpace));
             }
 
             return new ObservableCollection<PrintInfo>(blocks);
         }
 
-        
+
     }
 }

@@ -12,7 +12,7 @@ namespace YMplugins.Views.Views
             InitializeComponent();
             DataContext = autoPrintVm;
 
-            autoPrintVm.CloseAction ??= Close;
+            autoPrintVm.CloseAction ??= Hide;
 
             autoPrintVm.OpenAction = new Action(() =>
             {
