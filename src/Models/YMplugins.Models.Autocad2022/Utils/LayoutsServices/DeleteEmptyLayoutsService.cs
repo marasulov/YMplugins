@@ -34,7 +34,7 @@ namespace YMplugins.Models.Autocad2022.Utils.LayoutsServices
                 var layoutDict = (DBDictionary)tr.GetObject(db.LayoutDictionaryId, OpenMode.ForRead);
                 foreach (var layoutEntry in layoutDict)
                 {
-                    var layout = (Autodesk.AutoCAD.DatabaseServices.Layout)tr.GetObject(layoutEntry.Value, OpenMode.ForRead);
+                    var layout = (Layout)tr.GetObject(layoutEntry.Value, OpenMode.ForRead);
                     if (!layout.ModelType)
                         tabOrderedLayouts[layout.TabOrder] = layout.LayoutName;
                 }

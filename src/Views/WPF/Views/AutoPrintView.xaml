@@ -19,6 +19,7 @@
             </ResourceDictionary.MergedDictionaries>
 
             <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
         </ResourceDictionary>
         
     </Window.Resources>
@@ -47,6 +48,15 @@
         <!-- Левая часть: Радиокнопки для выбора -->
         <GroupBox Header="Print by" Grid.Row="0" Grid.Column="0" Margin="1">
             <StackPanel>
+                <StackPanel>
+                    <RadioButton Content="Create pdf"
+                                 Name="ToPdfRadioButton"
+                                 IsChecked="{Binding IsCreatePdf}" />
+
+                    <RadioButton Content="Create dwg" 
+                                 Name="ToDwglineRadioButton"
+                                 IsChecked="{Binding IsCreatePdf, Converter={StaticResource InverseBoolConverter}}" />
+                </StackPanel>
                 <StackPanel>
                     <RadioButton Content="By Block"
                                  Name="ByBlockRadioButton"

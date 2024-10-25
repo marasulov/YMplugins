@@ -1,5 +1,7 @@
 ﻿using System.Linq;
+using System.Net.Http.Headers;
 using YMplugins.Contracts;
+using YMplugins.Contracts.Dto;
 using YMplugins.Contracts.Dto.Enums;
 using YMplugins.ViewModels.VM;
 
@@ -12,6 +14,7 @@ namespace YMplugins.ViewModels.Commands
         private INotifyService _notifyService;
         private readonly IDeleteEmptyLayoutsService _deleteEmptyLayouts;
         private readonly ISetLayoutPlotSettingService _setLayoutPlot;
+        private ICreateDwgService _createDwgService;
 
         public PrintCommand(IPrintService printService, ICombinePdfService combinePdfService,
             INotifyService notifyService, IDeleteEmptyLayoutsService deleteEmptyLayouts, ISetLayoutPlotSettingService setLayoutPlot)
@@ -103,12 +106,30 @@ namespace YMplugins.ViewModels.Commands
             {
                 printData = vm.PrintDataCollection.OrderByDescending(x => x.Position.Y).ToArray();
             }
-            var fileNames = _printService.Print(printData);
+
+            string[] fileNames = new string[printData.Length];
+
+            if (vm.IsCreatePdf)
+            {
+                fileNames = _printService.Print(printData);
+            }
+            else
+            {
+                fileNames = _createDwgService.Create(printData);
+            }
+
+
+
             var joinedBubbleTexts = string.Join("\n", fileNames);
             if (vm.IsCombinePdf)
                 joinedBubbleTexts = _combinePdfService.Combine(fileNames, string.Join("", vm.OutputFileName, ".pdf"));
 
             _notifyService.Notify(joinedBubbleTexts);
         }
+    }
+
+    internal interface ICreateDwgService
+    {
+        string[] Create(PrintInfo[] printData);
     }
 }

@@ -38,6 +38,7 @@ namespace YMplugins.ViewModels.VM
         private int _plineScale = 1;
         private bool _isDeleteEmptyLayouts;
         private bool _isSetLayoutsToPlotSetting;
+        private bool _isCreatePdf;
 
         public AutoPrintVm(
             GetBlocksNameCommand getBlocksNameCommand,
@@ -127,6 +128,12 @@ namespace YMplugins.ViewModels.VM
                     UpdateBlockCollection();
                 }
             }
+        }
+
+        public bool IsCreatePdf
+        {
+            get => _isCreatePdf;
+            set => Set(ref _isCreatePdf, value);
         }
 
         public PrintByOption SelectedPrintByOption
