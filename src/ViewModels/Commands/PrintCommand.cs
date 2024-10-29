@@ -17,13 +17,14 @@ namespace YMplugins.ViewModels.Commands
         private ICreateDwgService _createDwgService;
 
         public PrintCommand(IPrintService printService, ICombinePdfService combinePdfService,
-            INotifyService notifyService, IDeleteEmptyLayoutsService deleteEmptyLayouts, ISetLayoutPlotSettingService setLayoutPlot)
+            INotifyService notifyService, IDeleteEmptyLayoutsService deleteEmptyLayouts, ISetLayoutPlotSettingService setLayoutPlot, ICreateDwgService createDwgService)
         {
             _printService = printService;
             _combinePdfService = combinePdfService;
             _notifyService = notifyService;
             _deleteEmptyLayouts = deleteEmptyLayouts;
             _setLayoutPlot = setLayoutPlot;
+            _createDwgService = createDwgService;
         }
 
         //public override async void Execute(object parameter)
@@ -83,8 +84,6 @@ namespace YMplugins.ViewModels.Commands
             
             vm.CloseAction?.Invoke();
 
-            
-
             var printData = vm.PrintDataCollection.Where(x => x.IsPrint).ToArray();
 
             if (vm.IsSetLayoutsToPlotSetting)
@@ -118,18 +117,11 @@ namespace YMplugins.ViewModels.Commands
                 fileNames = _createDwgService.Create(printData);
             }
 
-
-
             var joinedBubbleTexts = string.Join("\n", fileNames);
             if (vm.IsCombinePdf)
                 joinedBubbleTexts = _combinePdfService.Combine(fileNames, string.Join("", vm.OutputFileName, ".pdf"));
 
             _notifyService.Notify(joinedBubbleTexts);
         }
-    }
-
-    internal interface ICreateDwgService
-    {
-        string[] Create(PrintInfo[] printData);
     }
 }

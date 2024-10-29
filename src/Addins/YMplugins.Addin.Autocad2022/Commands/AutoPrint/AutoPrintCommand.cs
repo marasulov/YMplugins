@@ -54,6 +54,7 @@ namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
             container.Register<IPolylineFinder, PolylineFinder>();
             container.Register<IDeleteEmptyLayoutsService, DeleteEmptyLayoutsService>();
             container.Register<ISetLayoutPlotSettingService, SetLayoutPlotSettingService>();
+            container.Register<ICreateDwgService, CreateDwgService>();
 
 
             container.Register<INotifyService, NotifyService>();
