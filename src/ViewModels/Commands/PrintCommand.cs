@@ -1,7 +1,5 @@
 ﻿using System.Linq;
-using System.Net.Http.Headers;
 using YMplugins.Contracts;
-using YMplugins.Contracts.Dto;
 using YMplugins.Contracts.Dto.Enums;
 using YMplugins.ViewModels.VM;
 
@@ -26,36 +24,6 @@ namespace YMplugins.ViewModels.Commands
             _setLayoutPlot = setLayoutPlot;
             _createDwgService = createDwgService;
         }
-
-        //public override async void Execute(object parameter)
-        //{
-        //    _windowService.ShowLoadingWindow();
-
-        //    try
-        //    {
-        //        var vm = (AutoPrintVm)parameter;
-        //        var printData = vm.PrintDataCollection.ToArray();
-
-        //        var fileNames = await Task.Run(() => _printService.Print(printData));
-        //        var joinedBubbleTexts = string.Join("\n", fileNames);
-
-        //        if (vm.IsCombinePdf)
-        //        {
-        //            joinedBubbleTexts = Path.Combine(_combinePdfService.Combine(fileNames, vm.OutputFileName), ".pdf");
-        //        }
-
-        //        _notifyService.Notify("Работа завершена!");
-        //        _notifyService.Notify(joinedBubbleTexts);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _notifyService.Notify($"Произошла ошибка: {ex.Message}");
-        //    }
-        //    finally
-        //    {
-        //        _windowService.CloseLoadingWindow();
-        //    }
-        //}
 
         public override void Execute(object parameter)
         {

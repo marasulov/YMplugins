@@ -14,6 +14,8 @@ namespace YMplugins.ViewModels.VM
     {
         private readonly IAttributesService _attributesService;
         private readonly ISearchService _searchService;
+        private readonly IGetLayersFromOpenedDocsService _getLayersFromOpenedDocsService;
+        private IGetBlocksFromOpenedDocsService _getblocksFromOpenedDocsService;
         private List<string> _blocksNames;
         private List<string> _layers;
         private List<BlockAttribute> _attributes;
@@ -39,22 +41,33 @@ namespace YMplugins.ViewModels.VM
         private bool _isDeleteEmptyLayouts;
         private bool _isSetLayoutsToPlotSetting;
         private bool _isCreatePdf;
+        private bool _isAllOpenedDocuments;
+        private bool _isActiveDocument = true;
+        private bool _isPrintByBlock = true;
+        private List<string> _layersFromService;
 
         public AutoPrintVm(
             GetBlocksNameCommand getBlocksNameCommand,
             GetLayersCommand getLayersCommand,
+            /*GetAllDocsLayersCommand getAllDocsLayersCommand,*/
             GetAttributesCommand getAttributesCommand,
             PrintCommand printCommand,
             SelectBlockCommand selectBlockCommand,
             ZoomToPointCommand zoomToPointCommand,
             IAttributesService attributesService,
-            ISearchService searchService)
+            ISearchService searchService, 
+            IGetLayersFromOpenedDocsService getLayersFromOpenedDocsService,
+            IGetBlocksFromOpenedDocsService getBlocksFromOpenedDocsService)
         {
             _attributesService = attributesService ?? throw new ArgumentNullException(nameof(attributesService));
             _searchService = searchService ?? throw new ArgumentNullException(nameof(searchService));
+            _getLayersFromOpenedDocsService = getLayersFromOpenedDocsService;
+            _getblocksFromOpenedDocsService = getBlocksFromOpenedDocsService;
 
-            InitializeCommands(getBlocksNameCommand, getLayersCommand, getAttributesCommand,
+            InitializeCommands(getBlocksNameCommand, getLayersCommand, /*getAllDocsLayersCommand,*/ getAttributesCommand,
                                printCommand, selectBlockCommand, zoomToPointCommand);
+            
+
         }
 
         public List<string> BlocksNames
@@ -81,6 +94,15 @@ namespace YMplugins.ViewModels.VM
             }
         }
 
+        
+
+        public List<string> LayersFromService
+        {
+            get => _layersFromService;
+            set => Set(ref _layersFromService, value);
+        }
+        
+        
         public List<BlockAttribute> Attributes
         {
             get => _attributes;
@@ -139,8 +161,29 @@ namespace YMplugins.ViewModels.VM
         public PrintByOption SelectedPrintByOption
         {
             get => _selectedPrintByOption;
-            set => SetSelectedPrintByOption(value);
+            set
+            {
+                SetSelectedPrintByOption(value);
+                UpdateLayers();
+            }
         }
+        
+        
+        // public bool IsPrintByBlock
+        // {
+        //     get => _isPrintByBlock;
+        //     set
+        //     {
+        //         if (Set(ref _isPrintByBlock, value)) // Автоматически вызывает OnPropertyChanged для IsPrintByBlock
+        //         {
+        //             OnPropertyChanged(nameof(IsPrintByPolyline)); // Уведомляем, что IsPrintByPolyline тоже изменился
+        //         }
+        //         UpdateLayers();
+        //     }
+        // }
+
+        //public bool IsPrintByPolyline => !_isPrintByBlock;
+        
 
         public PrintingOrder SelectedPrintingOrder { get; set; }
 
@@ -274,6 +317,71 @@ namespace YMplugins.ViewModels.VM
                 OnPropertyChanged(nameof(HeaderContent));
             }
         }
+        
+        public bool IsAllOpenedDocuments
+        {
+            get => _isAllOpenedDocuments;
+            set
+            {
+                Set(ref _isAllOpenedDocuments, value); 
+                if (SelectedPrintByOption == PrintByOption.ByBlock)
+                {
+                    UpdateBlocks();
+                }
+                else
+                {
+                    UpdateLayers();
+                }
+            }
+        }
+
+        private void UpdateLayers()
+        {
+            if (IsAllOpenedDocuments)
+            {
+                var layersFromAllOpenDocuments  = _getLayersFromOpenedDocsService.GetLayersFromAllOpenDocuments();
+                Layers = layersFromAllOpenDocuments
+                    .SelectMany(kvp => kvp.Value)  
+                    .Distinct()                   
+                    .ToList();    
+            }
+            else
+            {
+                Layers = LayersFromService;
+            }
+            
+        }
+        
+        private void UpdateBlocks()
+        {
+            if (IsAllOpenedDocuments)
+            {
+                var allBlocks  = _getblocksFromOpenedDocsService.GetBlocksFromAllOpenDocuments();
+                BlocksNames = allBlocks
+                    .SelectMany(kvp => kvp.Value)  
+                    .Distinct()                   
+                    .ToList();
+            }
+            else
+            {
+                BlocksNames = LayersFromService;
+            }
+            
+        }
+        
+        
+        
+
+        public bool IsActiveDocument
+        {
+            get => _isActiveDocument;
+            set
+            {
+                Set(ref _isActiveDocument, value);
+                UpdateBlockCollection();
+            }
+        }
+
 
         public string HeaderContent => $"Blocks found {PrintDataCollection?.Count ?? 0} | Selected for Printing: {SelectedPrintCount}";
 
@@ -306,6 +414,7 @@ namespace YMplugins.ViewModels.VM
         public GetBlocksNameCommand GetBlocksNameCommand { get; private set; }
         public SelectBlockCommand SelectBlockCommand { get; private set; }
         public GetLayersCommand GetLayersCommand { get; private set; }
+        public GetAllDocsLayersCommand GetAllDocsLayersCommand { get; private set; }
         public GetAttributesCommand GetAttributesCommand { get; private set; }
         public PrintCommand PrintCommand { get; private set; }
         public ZoomToPointCommand ZoomToPointCommand { get; private set; }
@@ -320,8 +429,6 @@ namespace YMplugins.ViewModels.VM
             }
         }
 
-        
-
         private void InitializeCommands(
             GetBlocksNameCommand getBlocksNameCommand,
             GetLayersCommand getLayersCommand,
@@ -335,6 +442,9 @@ namespace YMplugins.ViewModels.VM
 
             GetLayersCommand = getLayersCommand ?? throw new ArgumentNullException(nameof(getLayersCommand));
             GetLayersCommand.ResultObtained += GetLayersCommandOnResultObtained;
+            
+            // GetAllDocsLayersCommand = getAllDocsLayersCommand ?? throw new ArgumentNullException(nameof(getAllDocsLayersCommand));
+            // GetAllDocsLayersCommand.ResultObtained += GetLayersCommandOnResultObtained;
 
             GetAttributesCommand = getAttributesCommand ?? throw new ArgumentNullException(nameof(getAttributesCommand));
             PrintCommand = printCommand ?? throw new ArgumentNullException(nameof(printCommand));
@@ -350,6 +460,7 @@ namespace YMplugins.ViewModels.VM
         private void GetLayersCommandOnResultObtained(List<string> obj)
         {
             Layers = obj;
+            LayersFromService = Layers;
         }
 
         private void OnBlockDataPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -384,7 +495,7 @@ namespace YMplugins.ViewModels.VM
 
             try
             {
-                if (SelectedPrintByOption == PrintByOption.ByPolyline)
+                if (SelectedPrintByOption == PrintByOption.ByPolyline )
                 {
                     PrintDataCollection = new ObservableCollection<PrintInfo>(NamingPolylines(PrintDataCollection));
                 }
@@ -434,7 +545,7 @@ namespace YMplugins.ViewModels.VM
                 PlineScale = PlineScale
             };
         }
-
+        
         private void SetPrintDataCollection(ObservableCollection<PrintInfo> value)
         {
             if (_printDataCollection == value) return;
@@ -479,7 +590,7 @@ namespace YMplugins.ViewModels.VM
                 UpdateSelectedPrintCount();
             }
         }
-
+        
         private void SetNumerationStartValue(int value)
         {
             if (_numerationStartValue == value) return;

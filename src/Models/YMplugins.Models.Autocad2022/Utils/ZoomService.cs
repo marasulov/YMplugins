@@ -1,8 +1,6 @@
-﻿using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.DatabaseServices;
 using Gile.AutoCAD.Extension;
-using System.Threading;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.Internal;
 using YMplugins.Contracts;
 
 namespace YMplugins.Models.Autocad2022.Utils;
@@ -14,8 +12,6 @@ public class ZoomService : IZoomEntity
         Handle handle = new Handle(id);
         ObjectId objId = Active.Database.GetObjectId(false, handle, 0);
 
-        //using (DocumentLock docLock = Active.Document.LockDocument())
-        //{
         using (Transaction trans = Active.Database.TransactionManager.StartTransaction())
         {
             // Open the object
@@ -24,14 +20,10 @@ public class ZoomService : IZoomEntity
             BlockTableRecord btr = trans.GetObject(dbObj.OwnerId, OpenMode.ForRead) as BlockTableRecord;
             if (btr == null) return;
 
-            // Проверить, это Model Space или Layout
-
             if (!btr.IsLayout) return;
 
-            Autodesk.AutoCAD.DatabaseServices.Layout layout = trans.GetObject(btr.LayoutId, OpenMode.ForRead) as Autodesk.AutoCAD.DatabaseServices.Layout;
+            Layout layout = trans.GetObject(btr.LayoutId, OpenMode.ForRead) as Layout;
             string layoutName = layout.LayoutName;
-            //if (layoutName != "Model")
-            //{
 
             LayoutManager layoutMgr = LayoutManager.Current;
             using (DocumentLock docLock = Active.Document.LockDocument())
@@ -42,27 +34,18 @@ public class ZoomService : IZoomEntity
                 }
             }
 
-
-            //layoutMgr.SetCurrentLayoutId(layoutId);
-
             ZoomToEntity(entity);
 
-            //}
-
-            //else
-            //{
-            //    ZoomToEntity(entity);
-            //}
+           
             trans.Commit();
         }
-        //}
+     
     }
 
     private void ZoomToEntity(Entity entity)
     {
         if (entity is BlockReference || entity is Polyline)
         {
-            // Get the extents (bounding box) of the entity
             Extents3d extents = entity.GeometricExtents;
 
             extents.TransformBy(
@@ -71,8 +54,6 @@ public class ZoomService : IZoomEntity
             );
 
             Active.Editor.ZoomWindow(extents.MinPoint, extents.MaxPoint);
-
-
         }
         else
         {
@@ -80,25 +61,4 @@ public class ZoomService : IZoomEntity
             Active.Editor.WriteMessage("The entity is neither a BlockReference nor a Polyline.");
         }
     }
-
-    //private static void ZoomWin(Editor ed, Point3d min, Point3d max)
-    //{
-    //    Point2d min2d = new Point2d(min.X, min.Y);
-
-    //    Point2d max2d = new Point2d(max.X, max.Y);
-
-    //    ViewTableRecord view =
-
-    //        new ViewTableRecord();
-
-    //    view.CenterPoint =
-
-    //        min2d + ((max2d - min2d) / 2.0);
-
-    //    view.YDim = max2d.Y - min2d.Y;
-
-    //    view.XDim = max2d.X - min2d.X;
-
-    //    ed.SetCurrentView(view);
-    //}
 }

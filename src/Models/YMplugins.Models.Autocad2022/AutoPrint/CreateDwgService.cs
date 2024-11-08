@@ -71,7 +71,12 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
                 using (var acTrans = Active.Document.TransactionManager.StartTransaction())
                 {
                     var psr = Active.Editor.SelectCrossingWindow(minPoint3d, maxPoint3d);
-                    Active.Editor.WriteMessage($"selected {psr.Value.Count.ToString()}");
+                    if (psr.Value != null)
+                    {
+                        Active.Editor.WriteMessage($"selected {psr.Value.Count.ToString()}");
+                    }
+
+                    
                     if (psr.Status == PromptStatus.OK)
                     {
                         var cnt = 0;

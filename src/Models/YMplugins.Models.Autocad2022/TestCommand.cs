@@ -1,13 +1,13 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.ApplicationServices.Core;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.PlottingServices;
 using Autodesk.AutoCAD.Runtime;
 using Gile.AutoCAD.Extension;
 using SimpleInjector;
-using System.IO;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using Autodesk.AutoCAD.ApplicationServices;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.AutoPrint;
@@ -21,7 +21,6 @@ using YMplugins.ViewModels.Commands;
 using YMplugins.ViewModels.VM;
 using YMplugins.Views.Services;
 using YMplugins.Views.Views;
-using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace YMplugins.Models.Autocad2022
 {
@@ -37,9 +36,11 @@ namespace YMplugins.Models.Autocad2022
             container.Register<GetAttributesCommand>();
             container.Register<GetBlocksNameCommand>();
             container.Register<GetLayersCommand>();
+            container.Register<GetAllDocsLayersCommand>();
             container.Register<PrintCommand>();
             container.Register<SelectBlockCommand>();
             container.Register<ZoomToPointCommand>();
+            // container.Register<GetLayersCommand>();
             container.Register<AutoPrintVm>(Lifestyle.Transient);
             container.Register<AutoPrintView>(Lifestyle.Transient);
 
@@ -58,13 +59,16 @@ namespace YMplugins.Models.Autocad2022
             container.Register<IAttributesService, AttributeService>();
             container.Register<ICombinePdfService, CombinePdfService>();
             container.Register<IAutoCadFileService, AutoCadFileService>();
+
+            container.Register<IGetLayersFromOpenedDocsService, GetLayerFromOpenedDocsService>();
+            container.Register<IGetBlocksFromOpenedDocsService, GetBlocksFromOpenedDocsService>();
+            
             container.Register<IBlockFinder, BlockFinder>();
             container.Register<IPolylineFinder, PolylineFinder>();
             container.Register<IDeleteEmptyLayoutsService, DeleteEmptyLayoutsService>();
             container.Register<ISetLayoutPlotSettingService, SetLayoutPlotSettingService>();
             container.Register<ICreateDwgService, CreateDwgService>();
-
-
+            
             container.Register<INotifyService, NotifyService>();
             container.Register<IWindowService, WindowService>();
 
@@ -73,23 +77,34 @@ namespace YMplugins.Models.Autocad2022
 
             context.GetBlocksNameCommand.Execute(null);
             context.GetLayersCommand.Execute(null);
+            //context.GetAllDocsLayersCommand.Execute(null);
 
             window.ShowDialog();
         }
+
         [CommandMethod("ReadDrawingDataFromFolder")]
         public void ReadDrawingDataFromFolder()
         {
-            // Задайте путь к папке с чертежами
-            string folderPath = @"C:\Users\yusufzhon.marasulov\Documents\11";
+            // string folderPath = @"C:\Users\yusufzhon.marasulov\Documents\11";
+            //
+            // ReadDataFromFolder(folderPath);
+            //
+            // ReadStampRectangularPolylinesFromFolder(folderPath);
+            var blocksFromAllDocuments = BlockUtils.GetBlocksFromAllOpenDocuments();
 
+            foreach (var entry in blocksFromAllDocuments)
+            {
+                Active.Editor.WriteMessage("Документ: " + entry.Key);
+                foreach (var blockName in entry.Value)
+                {
+                    Active.Editor.WriteMessage(" - Блок: " + blockName);
+                }
+            }
             
-            // Читаем данные из всех чертежей в указанной папке
-            ReadDataFromFolder(folderPath);
         }
 
 
-        
-        public static void ReadDataFromFolder(string folderPath)
+        public void ReadStampRectangularPolylinesFromFolder(string folderPath)
         {
             // Проверяем, существует ли папка
             if (!Directory.Exists(folderPath))
@@ -103,7 +118,7 @@ namespace YMplugins.Models.Autocad2022
 
             foreach (string dwgFilePath in dwgFiles)
             {
-                Active.Editor.WriteMessage($"Чтение файла:  {dwgFilePath}\n");
+                Active.Editor.WriteMessage("Чтение файла: " + dwgFilePath);
 
                 // Создаем объект Database для работы с чертежом на диске
                 using (Database db = new Database(false, true))
@@ -114,12 +129,28 @@ namespace YMplugins.Models.Autocad2022
                     // Запускаем транзакцию для доступа к данным чертежа
                     using (Transaction tr = db.TransactionManager.StartTransaction())
                     {
-                        // Пример: получение списка блоков в чертеже
+                        // Получаем BlockTableRecord для ModelSpace
                         BlockTable bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
-                        foreach (ObjectId btrId in bt)
+                        BlockTableRecord btr =
+                            (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead);
+
+                        Active.Editor.WriteMessage("Прямоугольные закрытые полилинии на слое 'Штамп':");
+
+                        // Проходим по каждому объекту в ModelSpace
+                        foreach (ObjectId objId in btr)
                         {
-                            BlockTableRecord btr = (BlockTableRecord)tr.GetObject(btrId, OpenMode.ForRead);
-                            Active.Editor.WriteMessage($"Имя блока: {btr.Name} \n");
+                            Entity entity = (Entity)tr.GetObject(objId, OpenMode.ForRead);
+                            if (entity is Polyline polyline &&
+                                polyline.Closed &&
+                                polyline.NumberOfVertices == 4 &&
+                                polyline.Layer == "штамп")
+                            {
+                                Active.Editor.WriteMessage("- Полилиния является закрытым прямоугольником.");
+                                for (int i = 0; i < polyline.NumberOfVertices; i++)
+                                {
+                                    Active.Editor.WriteMessage("  Вершина " + i + ": " + polyline.GetPoint2dAt(i));
+                                }
+                            }
                         }
 
                         // Завершаем транзакцию
@@ -129,304 +160,282 @@ namespace YMplugins.Models.Autocad2022
             }
         }
 
-        //[CommandMethod("FindBlockByNameInSpace")]
-        //public void FindBlockByNameInSpace()
-        //{
-        //    Document doc = Application.DocumentManager.MdiActiveDocument;
-        //    Database db = doc.Database;
-        //    Editor ed = doc.Editor;
+        [CommandMethod("ConvertDWGToPDF")]
+        public void ConvertDWGToPDF()
+        {
+            // Укажите папку с исходными DWG файлами и папку для сохранения PDF
+            string sourceFolder = @"C:\Users\yusufzhon.marasulov\Documents\11";
+            string outputFolder = @"C:\Users\yusufzhon.marasulov\Documents\11\OutputPDFs";
 
-        //    // Get block name from user
-        //    PromptStringOptions promptOptions = new PromptStringOptions("\nEnter block name to search: ");
-        //    PromptResult result = ed.GetString(promptOptions);
+            // Создаем экземпляр класса для конвертации чертежей
 
-        //    if (result.Status != PromptStatus.OK)
-        //    {
-        //        return;
-        //    }
+            ConvertFolderToPDF(sourceFolder, outputFolder);
+        }
 
-        //    string blockName = result.StringResult;
+        public void ConvertFolderToPDF(string sourceFolder, string outputFolder)
+        {
+            // Проверяем, существует ли папка
+            if (!Directory.Exists(sourceFolder))
+            {
+                Active.Editor.WriteMessage("Папка не найдена: " + sourceFolder);
+                return;
+            }
 
-        //    // Ask where to search: Model, Layouts, or both
-        //    PromptKeywordOptions spaceOptions = new PromptKeywordOptions("\nSearch in [Model/Layout/Both]: ");
-        //    spaceOptions.Keywords.Add("Model");
-        //    spaceOptions.Keywords.Add("Layout");
-        //    spaceOptions.Keywords.Add("Both");
-        //    spaceOptions.AllowNone = false;
+            // Убедитесь, что папка для вывода существует
+            if (!Directory.Exists(outputFolder))
+            {
+                Directory.CreateDirectory(outputFolder);
+            }
 
-        //    PromptResult spaceResult = ed.GetKeywords(spaceOptions);
+            // Получаем список всех DWG-файлов в папке
+            string[] dwgFiles = Directory.GetFiles(sourceFolder, "*.dwg");
 
-        //    if (spaceResult.Status != PromptStatus.OK)
-        //    {
-        //        return;
-        //    }
+            foreach (string dwgFilePath in dwgFiles)
+            {
+                string fileName = Path.GetFileNameWithoutExtension(dwgFilePath);
+                string pdfFilePath = Path.Combine(outputFolder, fileName + ".pdf");
+                Active.Editor.WriteMessage("Конвертация " + dwgFilePath + " в " + pdfFilePath);
 
-        //    using (Transaction trans = db.TransactionManager.StartTransaction())
-        //    {
-        //        BlockTable bt = (BlockTable)trans.GetObject(db.BlockTableId, OpenMode.ForRead);
+                // Создаем объект Database для работы с чертежом на диске
+                using (Database db = new Database(false, true))
+                {
+                    db.ReadDwgFile(dwgFilePath, FileShare.Read, true, "");
 
-        //        bool found = false;
+                    // Печать в PDF
+                    PlotToPDF(db, pdfFilePath);
+                }
+            }
+        }
 
-        //        if (spaceResult.StringResult == "Model")
-        //        {
-        //            // Search in Model Space
-        //            BlockTableRecord modelSpace = (BlockTableRecord)trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead);
-        //            found |= SearchBlockInSpace(trans, modelSpace, blockName, "Model Space");
-        //        }
+        private void PlotToPDF(Database db, string pdfFilePath)
+        {
+            using (PlotEngine plotEngine = PlotFactory.CreatePublishEngine())
+            {
+                using (PlotProgressDialog progressDialog = new PlotProgressDialog(false, 1, true))
+                {
+                    // Настройки печати
+                    using (Transaction tr = db.TransactionManager.StartTransaction())
+                    {
+                        PlotSettings plotSettings = new PlotSettings(true);
+                        PlotSettingsValidator psv = PlotSettingsValidator.Current;
 
-        //        if (spaceResult.StringResult == "Layout")
-        //        {
-        //            // Search in each Layout (Paper Space)
-        //            foreach (ObjectId btrId in bt)
-        //            {
-        //                BlockTableRecord btr = (BlockTableRecord)trans.GetObject(btrId, OpenMode.ForRead);
+                        // Указываем параметры PDF устройства
+                        psv.SetPlotType(plotSettings, Autodesk.AutoCAD.DatabaseServices.PlotType.Extents);
+                        psv.SetUseStandardScale(plotSettings, true);
+                        psv.SetPlotConfigurationName(plotSettings, "DWG To PDF.pc3", "ANSI_A_(8.50_x_11.00_Inches)");
+                        psv.SetPlotPaperUnits(plotSettings, PlotPaperUnit.Inches);
+                        psv.SetPlotOrigin(plotSettings, new Point2d(0, 0));
+                        psv.SetPlotCentered(plotSettings, true);
 
-        //                if (btr.IsLayout)
-        //                {
-        //                    Layout layout = (Layout)trans.GetObject(btr.LayoutId, OpenMode.ForRead);
-        //                    if (layout.LayoutName != "Model")
-        //                    {
-        //                        found |= SearchBlockInSpace(trans, btr, blockName, $"Layout: {layout.LayoutName}");
-        //                    }
-        //                }
-        //            }
-        //        }
+                        // Параметры вывода
+                        PlotInfo plotInfo = new PlotInfo
+                            { Layout = db.CurrentSpaceId, OverrideSettings = plotSettings };
 
-        //        if (!found)
-        //        {
-        //            ed.WriteMessage($"\nBlock {blockName} not found.");
-        //        }
+                        // Начинаем процесс печати
+                        plotEngine.BeginPlot(progressDialog, null);
+                        plotEngine.BeginDocument(plotInfo, db.Filename, null, 1, true, pdfFilePath);
 
-        //        trans.Commit();
-        //    }
-        //}
+                        // Создаем область печати
+                        PlotPageInfo pageInfo = new PlotPageInfo();
+                        plotEngine.BeginPage(pageInfo, plotInfo, true, null);
+                        plotEngine.BeginGenerateGraphics(null);
+                        plotEngine.EndGenerateGraphics(null);
+                        plotEngine.EndPage(null);
+                        plotEngine.EndDocument(null);
+                        plotEngine.EndPlot(null);
 
-        // Function to search for the block in a given space (Model Space or Layout)
-        //private bool SearchBlockInSpace(Transaction trans, BlockTableRecord space, string blockName, string spaceName)
-        //{
-        //    Editor ed = Application.DocumentManager.MdiActiveDocument.Editor;
+                        tr.Commit();
+                    }
+                }
+            }
+        }
 
-        //    foreach (ObjectId entId in space)
-        //    {
-        //        Entity ent = (Entity)trans.GetObject(entId, OpenMode.ForRead);
+        public static void ReadDataFromFolder(string folderPath)
+        {
+            if (!Directory.Exists(folderPath))
+            {
+                Active.Editor.WriteMessage("Указанная папка не найдена: " + folderPath);
+                return;
+            }
 
-        //        if (ent is BlockReference blockRef && blockRef.Name == blockName)
-        //        {
-        //            ed.WriteMessage($"\nBlock {blockName} found in {spaceName}.");
-        //            return true;
-        //        }
-        //    }
-        //    return false;
-        //}
+            string[] dwgFiles = Directory.GetFiles(folderPath, "*.dwg");
 
-    //    [CommandMethod("GetPolylinePosition")]
-    //    public static void GetPolylinePosition()
-    //    {
-    //        Document acDoc = Application.DocumentManager.MdiActiveDocument;
-    //        Editor acEd = acDoc.Editor;
-    //        Database acCurDb = acDoc.Database;
+            foreach (string dwgFilePath in dwgFiles)
+            {
+                Active.Editor.WriteMessage($"Чтение файла:  {dwgFilePath}\n");
 
-    //        // Запрашиваем пользователя выбрать объект
-    //        PromptEntityOptions peo = new PromptEntityOptions("\nВыберите полилинию: ");
-    //        peo.SetRejectMessage("\nЭто не полилиния. Попробуйте снова.");
-    //        peo.AddAllowedClass(typeof(Polyline), true);
+                using (Database db = new Database(false, true))
+                {
+                    db.ReadDwgFile(dwgFilePath, FileShare.Read, true, "");
 
-    //        PromptEntityResult per = acEd.GetEntity(peo);
-    //        if (per.Status != PromptStatus.OK)
-    //        {
-    //            acEd.WriteMessage("\nВыбор отменен.");
-    //            return;
-    //        }
+                    using (Transaction tr = db.TransactionManager.StartTransaction())
+                    {
+                        BlockTable bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
+                        foreach (ObjectId btrId in bt)
+                        {
+                            BlockTableRecord btr = (BlockTableRecord)tr.GetObject(btrId, OpenMode.ForRead);
+                            Active.Editor.WriteMessage($"Имя блока: {btr.Name} \n");
+                        }
 
-    //        using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
-    //        {
-    //            // Получаем выбранный объект
-    //            Entity ent = acTrans.GetObject(per.ObjectId, OpenMode.ForRead) as Entity;
+                        tr.Commit();
+                    }
+                }
+            }
+        }
 
-    //            if (ent is Polyline)
-    //            {
-    //                Polyline polyline = ent as Polyline;
+        [CommandMethod("ReadStampRectangularPolylinesFromFolder")]
+        public void ReadStampRectangularPolylinesFromFolder()
+        {
+            // Задайте путь к папке с чертежами
+            string folderPath = @"C:\Users\yusufzhon.marasulov\Documents\11";
 
-    //                // Получение первой точки полилинии
-    //                Point2d firstPoint = GetFirstPoint(polyline);
-    //                acEd.WriteMessage($"\nПервая точка полилинии: X = {firstPoint.X}, Y = {firstPoint.Y}");
+            // Создаем экземпляр класса для чтения данных чертежей
+            DrawingDataReader dataReader = new DrawingDataReader();
 
-    //                // Или получение центроида полилинии
-    //                Point2d centroid = GetCentroid(polyline);
-    //                acEd.WriteMessage($"\nЦентроид полилинии: X = {centroid.X}, Y = {centroid.Y}");
-    //            }
+            // Читаем данные из всех чертежей в указанной папке
+            dataReader.ReadStampRectangularPolylinesFromFolder(folderPath);
+        }
+    }
 
-    //            acTrans.Commit();
-    //        }
-    //    }
+    public class DrawingDataReader
+    {
+        public void ReadStampRectangularPolylinesFromFolder(string folderPath)
+        {
+            // Проверяем, существует ли папка
+            if (!Directory.Exists(folderPath))
+            {
+                Active.Editor.WriteMessage("Указанная папка не найдена: " + folderPath);
+                return;
+            }
 
-    //    public static Point2d GetCentroid(Polyline polyline)
-    //    {
-    //        double sumX = 0, sumY = 0;
-    //        int vertexCount = polyline.NumberOfVertices;
+            // Получаем список всех DWG-файлов в папке
+            string[] dwgFiles = Directory.GetFiles(folderPath, "*.dwg");
 
-    //        // Проходим по всем вершинам полилинии
-    //        for (int i = 0; i < vertexCount; i++)
-    //        {
-    //            Point2d vertex = polyline.GetPoint2dAt(i);
-    //            sumX += vertex.X;
-    //            sumY += vertex.Y;
-    //        }
+            foreach (string dwgFilePath in dwgFiles)
+            {
+                Active.Editor.WriteMessage("Чтение файла: " + dwgFilePath);
 
-    //        // Возвращаем среднюю точку по X и Y
-    //        return new Point2d(sumX / vertexCount, sumY / vertexCount);
-    //    }
+                // Создаем объект Database для работы с чертежом на диске
+                using (Database db = new Database(false, true))
+                {
+                    // Читаем чертеж из файла
+                    db.ReadDwgFile(dwgFilePath, FileShare.Read, true, "");
 
-    //    public static Point2d GetFirstPoint(Polyline polyline)
-    //    {
-    //        return polyline.GetPoint2dAt(0); // Получение первой точки
-    //    }
+                    // Запускаем транзакцию для доступа к данным чертежа
+                    using (Transaction tr = db.TransactionManager.StartTransaction())
+                    {
+                        // Получаем BlockTableRecord для ModelSpace
+                        BlockTable bt = (BlockTable)tr.GetObject(db.BlockTableId, OpenMode.ForRead);
+                        BlockTableRecord btr =
+                            (BlockTableRecord)tr.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForRead);
 
-    //    [CommandMethod("SelectAndGetDimensions")]
-    //    public static void SelectAndGetDimensions()
-    //    {
-    //        Document acDoc = Application.DocumentManager.MdiActiveDocument;
-    //        Editor acEd = acDoc.Editor;
-    //        Database acCurDb = acDoc.Database;
+                        Active.Editor.WriteMessage("Прямоугольные закрытые полилинии на слое 'Штамп':");
 
-    //        // Запрашиваем пользователя выбрать объект
-    //        PromptEntityOptions peo = new PromptEntityOptions("\nВыберите полилинию: ");
-    //        peo.SetRejectMessage("\nЭто не полилиния. Попробуйте снова.");
-    //        peo.AddAllowedClass(typeof(Polyline), true);
+                        // Проходим по каждому объекту в ModelSpace
+                        foreach (ObjectId objId in btr)
+                        {
+                            Entity entity = (Entity)tr.GetObject(objId, OpenMode.ForRead);
+                            if (entity is Polyline polyline &&
+                                polyline.Closed &&
+                                polyline.NumberOfVertices == 4 &&
+                                polyline.Layer.ToLower() == "штамп")
+                            {
+                                // Проверка на прямоугольность: углы должны быть прямыми
+                                bool isRectangle = IsRectangle(polyline);
 
-    //        // Получаем результат выбора
-    //        PromptEntityResult per = acEd.GetEntity(peo);
-    //        if (per.Status != PromptStatus.OK)
-    //        {
-    //            acEd.WriteMessage("\nВыбор отменен.");
-    //            return;
-    //        }
+                                if (isRectangle)
+                                {
+                                    Active.Editor.WriteMessage("- Полилиния является закрытым прямоугольником.");
+                                    for (int i = 0; i < polyline.NumberOfVertices; i++)
+                                    {
+                                        Active.Editor.WriteMessage("  Вершина " + i + ": " + polyline.GetPoint2dAt(i));
+                                    }
+                                }
+                            }
+                        }
 
-    //        // Открываем транзакцию и обрабатываем выбранную полилинию
-    //        using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
-    //        {
-    //            // Получаем выбранный объект
-    //            Entity ent = acTrans.GetObject(per.ObjectId, OpenMode.ForRead) as Entity;
+                        // Завершаем транзакцию
+                        tr.Commit();
+                    }
+                }
+            }
+        }
 
-    //            // Передаем объект полилинии в метод для расчета длины и ширины
-    //            if (ent is Polyline)
-    //            {
-    //                Polyline polyline = ent as Polyline;
-    //                (double length, double width) = GetDimensions(polyline);
+        // Метод для проверки, является ли полилиния прямоугольной
+        private bool IsRectangle(Polyline polyline)
+        {
+            if (polyline.NumberOfVertices != 4) return false;
 
-    //                // Выводим результаты
-    //                acEd.WriteMessage($"\nДлина: {length}, Ширина: {width}");
-    //            }
+            // Проверяем, образуют ли стороны прямые углы
+            for (int i = 0; i < 4; i++)
+            {
+                // Получаем три последовательные точки
+                var p1 = polyline.GetPoint2dAt(i);
+                var p2 = polyline.GetPoint2dAt((i + 1) % 4);
+                var p3 = polyline.GetPoint2dAt((i + 2) % 4);
 
-    //            acTrans.Commit();
-    //        }
-    //    }
+                // Вычисляем векторы между точками
+                var v1 = p2 - p1;
+                var v2 = p3 - p2;
 
-    //    public static (double length, double width) GetDimensions(Polyline polyline)
-    //    {
-    //        double minX = double.MaxValue, minY = double.MaxValue;
-    //        double maxX = double.MinValue, maxY = double.MinValue;
+                // Проверяем, что скалярное произведение равно нулю (угол 90 градусов)
+                if (Math.Abs(v1.X * v2.X + v1.Y * v2.Y) > 1e-6)
+                    return false;
+            }
 
-    //        for (int i = 0; i < polyline.NumberOfVertices; i++)
-    //        {
-    //            Point2d vertex = polyline.GetPoint2dAt(i);
+            return true;
+        }
+        
+    }
+    public static class BlockUtils
+    {
+        // Метод для получения блоков из всех открытых документов
+        public static Dictionary<string, List<string>> GetBlocksFromAllOpenDocuments()
+        {
+            var documentBlocks = new Dictionary<string, List<string>>();
 
-    //            if (vertex.X < minX) minX = vertex.X;
-    //            if (vertex.X > maxX) maxX = vertex.X;
-    //            if (vertex.Y < minY) minY = vertex.Y;
-    //            if (vertex.Y > maxY) maxY = vertex.Y;
-    //        }
+            // Проходим по всем открытым документам
+            foreach (Document doc in Application.DocumentManager)
+            {
+                List<string> blocks = GetBlocksFromDocument(doc.Database);
+                documentBlocks.Add(doc.Name, blocks);
+            }
 
-    //        double length = maxX - minX;
-    //        double width = maxY - minY;
+            return documentBlocks;
+        }
 
-    //        return (length, width);
-    //    }
+        // Вспомогательный метод для получения блоков из базы данных документа
+        private static List<string> GetBlocksFromDocument(Database db)
+        {
+            var blockNames = new List<string>();
 
-    //    // Function to search for the block in a given space (Model Space or Layout)
-    //    private bool SearchBlockInSpace(Transaction trans, BlockTableRecord space, string blockName, string spaceName)
-    //    {
-    //        Editor ed = Application.DocumentManager.MdiActiveDocument.Editor;
-    //        bool found = false;
+            using (Transaction tr = db.TransactionManager.StartTransaction())
+            {
+                if (db.BlockTableId.IsValid && tr.GetObject(db.BlockTableId, OpenMode.ForRead) is BlockTable bt)
+                {
+                    foreach (ObjectId btrId in bt)
+                    {
+                        try
+                        {
+                            if (tr.GetObject(btrId, OpenMode.ForRead) is BlockTableRecord btr)
+                            {
+                                // Проверяем, что блок не является анонимным и не пустой
+                                if (!btr.IsAnonymous && !btr.IsLayout)
+                                {
+                                    blockNames.Add(btr.Name);
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            // Игнорируем ошибки при доступе к блоку
+                        }
+                    }
+                }
+                tr.Commit();
+            }
 
-    //        foreach (ObjectId entId in space)
-    //        {
-    //            Entity ent = (Entity)trans.GetObject(entId, OpenMode.ForRead);
-
-    //            if (ent is BlockReference blockRef)
-    //            {
-    //                string blockRefName = GetEffectiveBlockName(blockRef, trans);
-
-    //                if (blockRefName == blockName)
-    //                {
-    //                    ed.WriteMessage($"\nBlock {blockName} found in {spaceName}.");
-
-    //                    // Get Attributes (name and value) from the block
-    //                    //if (blockRef.AttributeCollection.Count > 0)
-    //                    //{
-    //                    //    GetAttributesFromBlock(blockRef);
-    //                    //}
-
-    //                    //// If it's a dynamic block, list the dynamic properties
-    //                    //if (blockRef.IsDynamicBlock)
-    //                    //{
-    //                    //    ListDynamicBlockProperties(blockRef);
-    //                    //}
-
-    //                    found = true;
-    //                }
-    //            }
-    //        }
-    //        return found;
-    //    }
-
-    //    // Function to get the effective name of the block (handles dynamic blocks)
-    //    private string GetEffectiveBlockName(BlockReference blockRef, Transaction trans)
-    //    {
-    //        // If the block is dynamic, get its effective name
-    //        if (blockRef.IsDynamicBlock)
-    //        {
-    //            BlockTableRecord dynamicBTR = (BlockTableRecord)trans.GetObject(blockRef.DynamicBlockTableRecord, OpenMode.ForRead);
-    //            return dynamicBTR.Name; // Get the effective dynamic block name
-    //        }
-    //        else
-    //        {
-    //            return blockRef.Name; // Regular block name
-    //        }
-    //    }
-
-    //    // Function to list dynamic properties of the block
-    //    private void ListDynamicBlockProperties(BlockReference blockRef)
-    //    {
-    //        Editor ed = Application.DocumentManager.MdiActiveDocument.Editor;
-
-    //        // Get the dynamic properties of the block reference
-    //        DynamicBlockReferencePropertyCollection dynamicProps = blockRef.DynamicBlockReferencePropertyCollection;
-
-    //        if (dynamicProps != null && dynamicProps.Count > 0)
-    //        {
-    //            ed.WriteMessage($"\nDynamic Block Properties for {blockRef.Name}:");
-
-    //            foreach (DynamicBlockReferenceProperty prop in dynamicProps)
-    //            {
-    //                ed.WriteMessage($"\n  - {prop.PropertyName}: {prop.Value}");
-    //            }
-    //        }
-    //    }
-
-    //    // Function to retrieve attributes from a block reference
-    //    private void GetAttributesFromBlock(BlockReference blockRef)
-    //    {
-    //        Editor ed = Application.DocumentManager.MdiActiveDocument.Editor;
-
-    //        // Iterate over the block's attributes
-    //        foreach (ObjectId attId in blockRef.AttributeCollection)
-    //        {
-    //            AttributeReference attRef = (AttributeReference)blockRef.Database.TransactionManager.GetObject(attId, OpenMode.ForRead);
-
-    //            // Print attribute name and value
-    //            ed.WriteMessage($"\n  - Attribute: {attRef.Tag}, Value: {attRef.TextString}");
-    //        }
-    //    }
+            return blockNames;
+        }
     }
 }

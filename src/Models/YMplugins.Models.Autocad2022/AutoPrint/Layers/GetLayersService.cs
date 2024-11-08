@@ -7,7 +7,9 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Layers
     {
         public List<string> GetLayers()
         {
-            return DbCad.LayersExtension.Layers;
+            return DbCad.LayersExtension.GetLayers();
         }
+
+        
     }
 }

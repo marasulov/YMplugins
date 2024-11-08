@@ -12,7 +12,6 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             List<string> blockNames = new List<string>();
             using (Transaction trans = Active.Database.TransactionManager.StartTransaction())
             {
-                //get the blockTable and iterate through all blockDef
 
                 BlockTable bt = (BlockTable)trans.GetObject(Active.Database.BlockTableId, OpenMode.ForRead);
 
@@ -26,10 +25,10 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                     blockNames.Add(btr.Name);
                 }
 
-                foreach (var blockName in blockNames)
-                {
-                    Active.Editor.WriteMessage($"{blockName} \n");
-                }
+                //foreach (var blockName in blockNames)
+                //{
+                //    Active.Editor.WriteMessage($"{blockName} \n");
+                //}
             }
 
             return blockNames;

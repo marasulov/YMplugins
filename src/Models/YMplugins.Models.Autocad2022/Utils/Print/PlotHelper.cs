@@ -11,12 +11,12 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
 {
     public class PlotHelper
     {
-        private Document _document;
+        private Database _db;
         private PrintInfo _printModel;
 
-        public PlotHelper(Document document, PrintInfo printModel)
+        public PlotHelper(Database db, PrintInfo printModel)
         {
-            _document = document;
+            _db = db;
             _printModel = printModel;
         }
 
@@ -80,10 +80,11 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
                     {
                         acPlProgDlg.OnBeginPlot();
                         acPlProgDlg.IsVisible = true;
-                        //TODO имя надо сделать
-                        filename = Path.Combine(Path.GetDirectoryName(_document.Name), filename) + ".pdf";
+
+                       
+                        filename = Path.Combine(Path.GetDirectoryName(_db.Filename), filename) + ".pdf";
                         acPlEng.BeginPlot(acPlProgDlg, null);
-                        acPlEng.BeginDocument(acPlInfo, _document.Name, null, 1, true, filename);
+                        acPlEng.BeginDocument(acPlInfo, _db.Filename, null, 1, true, filename);
 
                         PlotPageInfo acPlPageInfo = new PlotPageInfo();
                         acPlEng.BeginPage(acPlPageInfo, acPlInfo, true, null);

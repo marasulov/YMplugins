@@ -49,14 +49,15 @@
         <GroupBox Header="Print by" Grid.Row="0" Grid.Column="0" Margin="1">
             <StackPanel>
                 <StackPanel>
-                    <RadioButton Content="Create pdf"
-                                 Name="ToPdfRadioButton"
-                                 IsChecked="{Binding IsCreatePdf}" />
+                    <RadioButton Content="Current active document"
+                                 Name="IsActiveDocRadioButton"
+                                 IsChecked="{Binding IsActiveDocument}" />
 
-                    <RadioButton Content="Create dwg" 
-                                 Name="ToDwglineRadioButton"
-                                 IsChecked="{Binding IsCreatePdf, Converter={StaticResource InverseBoolConverter}}" />
+                    <RadioButton Content="All opened documents" 
+                                 Name="IsOpenedDocumentsRadioButton"
+                                 IsChecked="{Binding IsAllOpenedDocuments}" />
                 </StackPanel>
+                <StackPanel/>
                 <StackPanel>
                     <RadioButton Content="By Block"
                                  Name="ByBlockRadioButton"
@@ -331,8 +332,14 @@
         </GroupBox>
 
         <!-- Кнопки внизу -->
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Grid.ColumnSpan="3">
-            <Button Content="Print" Width="100" Height="30" Margin="10" Command="{Binding PrintCommand}" CommandParameter="{Binding}" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" >
+            <Button Content="Create pdf" Width="120" Height="30" Margin="10" Command="{Binding PrintCommand}" CommandParameter="{Binding}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" >
+            <Button Content="Create dwg" Width="120" Height="30" Margin="10" Command="{Binding PrintCommand}" CommandParameter="{Binding}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" >
+            <Button Content="Close" Width="120" Height="30" Margin="10" Command="{Binding PrintCommand}" CommandParameter="{Binding}" />
         </StackPanel>
         <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"
                    Text="{Binding Error}" 

@@ -10,7 +10,7 @@ namespace Mocks
         public List<string> GetLayers()
         {
             var layers = new List<string>();
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 8; i++)
             {
                 var newHoleDto = "layer" + i;
                 layers.Add(newHoleDto);
@@ -18,5 +18,7 @@ namespace Mocks
 
             return layers;
         }
+
+      
     }
 }
