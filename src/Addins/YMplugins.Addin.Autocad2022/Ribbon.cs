@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Drawing.Imaging;
+using System.IO;
 using System.Windows;
 using YMplugins.Addin.Autocad2022.Commands.Translator;
 using YMplugins.Models.Autocad2022.Utils.Print;
@@ -255,23 +256,23 @@ namespace YMplugins.Addin.Autocad2022
                     //    commandHandler.SetNewObjectCheckBoxValue(newObjectCheckbox.IsChecked);
                     //};
 
-                    tt = new RibbonToolTip();
-                    tt.IsHelpEnabled = false;
+                    //tt = new RibbonToolTip();
+                    //tt.IsHelpEnabled = false;
 
-                    RibbonButton ribBtn = new RibbonButton();
-                    ribBtn.Id = "translateBtn";
-                    ribBtn.Name = "Translate";
-                    ribBtn.Text = "Translate";
-                    ribBtn.CommandHandler = commandHandler;
-                    ribBtn.CommandParameter = "YmTranslate";
-                    ribBtn.Size = RibbonItemSize.Large;
-                    ribBtn.LargeImage = LoadImage("translation");
-                    ribBtn.ShowImage = true;
-                    ribBtn.ShowText = true;
-                    tt.Content = "Translate";
-                    ribBtn.ToolTip = tt;
-                    ribBtn.Orientation = Orientation.Vertical;
-
+                    //RibbonButton ribBtn = new RibbonButton();
+                    //ribBtn.Id = "translateBtn";
+                    //ribBtn.Name = "Translate";
+                    //ribBtn.Text = "Translate";
+                    //ribBtn.CommandHandler = commandHandler;
+                    //ribBtn.CommandParameter = "YmTranslate";
+                    //ribBtn.Size = RibbonItemSize.Large;
+                    //ribBtn.LargeImage = LoadImage("translation");
+                    //ribBtn.ShowImage = true;
+                    //ribBtn.ShowText = true;
+                    //tt.Content = "Translate";
+                    //ribBtn.ToolTip = tt;
+                    //ribBtn.Orientation = Orientation.Vertical;
+                    var ribBtn = CreateButton("Translate", commandHandler);
                     ribSourcePanel.Items.Add(rowPanel);
                     ribSourcePanel.Items.Add(new RibbonSeparator());
                     ribSourcePanel.Items.Add(ribBtn);
@@ -296,29 +297,52 @@ namespace YMplugins.Addin.Autocad2022
 
                 var commandHandler = new RibbonCommandHandler();
 
+                //RibbonToolTip tt = new RibbonToolTip();
+                //RibbonButton ribBtn = new RibbonButton();
+                //ribBtn.Id = "autoprintBtn";
+                //ribBtn.Name = "AutoPrint";
+                //ribBtn.Text = "AutoPrint";
+                //ribBtn.CommandHandler = commandHandler;
+                //ribBtn.CommandParameter = "AutoPrint";
+                //ribBtn.Size = RibbonItemSize.Large;
+                //ribBtn.LargeImage = LoadImage("autoprint");
+                //ribBtn.ShowImage = true;
+                //ribBtn.ShowText = true;
+                //tt.Content = "autoprint";
+                //ribBtn.ToolTip = tt;
+                //ribBtn.Orientation = Orientation.Vertical;
+
+                var autoPrintBtn = CreateButton("Autoprint", commandHandler);
+
+                ribSourcePanel.Items.Add(autoPrintBtn);
+            }
+
+            private RibbonButton CreateButton(string buttonText, ICommand commandHandler)
+            {
                 RibbonToolTip tt = new RibbonToolTip();
                 RibbonButton ribBtn = new RibbonButton();
-                ribBtn.Id = "translateBtn";
-                ribBtn.Name = "AutoPrint";
-                ribBtn.Text = "AutoPrint";
+                ribBtn.Id = $"{buttonText}Btn";
+                ribBtn.Name = buttonText;
+                ribBtn.Text = buttonText;
                 ribBtn.CommandHandler = commandHandler;
-                ribBtn.CommandParameter = "AutoPrint";
+                ribBtn.CommandParameter = buttonText;
                 ribBtn.Size = RibbonItemSize.Large;
-                ribBtn.LargeImage = LoadImage("autoprint");
+                ribBtn.LargeImage = LoadImage(buttonText.ToLower());
                 ribBtn.ShowImage = true;
                 ribBtn.ShowText = true;
-                tt.Content = "autoprint";
+                tt.Content = buttonText;
                 ribBtn.ToolTip = tt;
                 ribBtn.Orientation = Orientation.Vertical;
 
-                ribSourcePanel.Items.Add(ribBtn);
+                return ribBtn;
             }
 
-            private BitmapImage LoadImage(string ImageName)
+
+            private BitmapImage LoadImage(string imageName)
             {
                 try
                 {
-                    var image = "pack://application:,,,/YMplugins.Addin.Autocad2022;component/" + "Icons/" + ImageName + ".png";
+                    var image = "pack://application:,,,/YMplugins.Addin.Autocad2022;component/" + "Icons/" + imageName + ".png";
                     return new BitmapImage(new Uri(image));
                 }
                 catch (Exception ex)
@@ -402,7 +426,7 @@ namespace YMplugins.Addin.Autocad2022
             //    public event EventHandler CanExecuteChanged;
             //}
 
-            public class ButtonCommandHandler : ICommand
+            private class ButtonCommandHandler : ICommand
             {
                 public event EventHandler CanExecuteChanged;
 

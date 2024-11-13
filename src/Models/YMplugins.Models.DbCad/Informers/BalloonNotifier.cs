@@ -1,6 +1,7 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Windows;
 using System;
+using System.Diagnostics;
 using System.Text;
 using Gile.AutoCAD.Extension;
 
@@ -51,37 +52,47 @@ namespace YMplugins.Models.DbCad.Informers
 
         void Application_Idle(object sender, EventArgs e)
         {
-            if (sb.Length != 0)
+            try
             {
-                TrayItem ti = new TrayItem();
-                ti.ToolTipText = _toolTipText;
-                ti.Icon = Active.Document.GetStatusBar().TrayItems[0].Icon;
-                Application.StatusBar.TrayItems.Add(ti);
-                Application.StatusBar.Update();
-                ti.CloseBubbleWindows();
-                TrayItemBubbleWindow bw = new TrayItemBubbleWindow();
-                bw.Title = _bwTitile;
-                bw.Text = sb.ToString();
-
-
-                bw.IconType = bw.IconType != null ? _icon : IconType.Information;
-
-                if (_drawingPath != null)
+                if (sb.Length != 0)
                 {
-                    bw.HyperText = _drawingPath;
-                    bw.HyperLink = _drawingPath;
+                    TrayItem ti = new TrayItem();
+                    ti.ToolTipText = _toolTipText;
+                    ti.Icon = Active.Document.GetStatusBar().TrayItems[0].Icon;
+                    Application.StatusBar.TrayItems.Add(ti);
+                    Application.StatusBar.Update();
+                    ti.CloseBubbleWindows();
+                    TrayItemBubbleWindow bw = new TrayItemBubbleWindow();
+                    bw.Title = _bwTitile;
+                    bw.Text = sb.ToString();
+
+
+                    bw.IconType = bw.IconType != null ? _icon : IconType.Information;
+
+                    if (_drawingPath != null)
+                    {
+                        bw.HyperText = _drawingPath;
+                        bw.HyperLink = _drawingPath;
+                    }
+
+                    ti.ShowBubbleWindow(bw);
+
+
+                    bw.Closed += delegate { CloseBw(ti); };
                 }
 
-                ti.ShowBubbleWindow(bw);
 
-
-                bw.Closed += delegate { CloseBw(ti); };
+                Application.Idle -= notifyHandler;
+                sb.Clear();
+                notifyHandler = null;
+            }
+            catch (Exception exception)
+            {
+                Debug.Print($"Error when trying to attempt to create tray item: {exception.Message}");
+                throw;
             }
 
-
-            Application.Idle -= notifyHandler;
-            sb.Clear();
-            notifyHandler = null;
+            
         }
 
         void CloseBw(TrayItem ti)
@@ -91,8 +102,10 @@ namespace YMplugins.Models.DbCad.Informers
                 Application.StatusBar.TrayItems.Remove(ti);
                 Application.StatusBar.Update();
             }
-            catch
-            { }
+            catch (Exception exception)
+            {
+                Active.Editor.WriteMessage($"Error when trying to close tray item: {exception.Message}");
+            }
         }
 
         public void Alert(string message)

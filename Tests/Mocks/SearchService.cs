@@ -39,7 +39,7 @@ namespace Mocks
             for (int i = 0; i < 50; i++)
             {
                 //var fileName = _nameService.GenerateFileName(default,0);
-                var newHoleDto = new PrintInfo(i, $"space for {i}", $"format for {i}", 1, 1, 1, new PointDTO(2, 3, 4), true);
+                var newHoleDto = new PrintInfo(i, $"space for {i}", $"format for {i}", 1, 1, 1, new PointDTO(2, 3, 4), true, "", $"source file {i}");
 
                 layers.Add(newHoleDto);
             }

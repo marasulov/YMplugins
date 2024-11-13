@@ -19,7 +19,7 @@
             </ResourceDictionary.MergedDictionaries>
 
             <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
-            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
+            <converters:MultiParameterConverter x:Key="MultiParameterConverter" />
         </ResourceDictionary>
         
     </Window.Resources>
@@ -300,19 +300,26 @@
                       Margin="5"
                       MaxHeight="500"
                       ScrollViewer.VerticalScrollBarVisibility="Auto">
+                
                 <DataGrid.Columns>
                     <!-- Пример колонок -->
-                    <DataGridTextColumn Header="Id" Binding="{Binding ObjectId}" Width="Auto" />
+                    <!-- <DataGridTextColumn Header="Id" Binding="{Binding ObjectId}" Width="Auto" /> -->
+                    <DataGridTextColumn Header="File" Binding="{Binding SourceFileName}" Width="Auto"/>
                     <DataGridTextColumn Header="Layer" Binding="{Binding Space}" Width="Auto" />
                     <DataGridTextColumn Header="Format" Binding="{Binding Format}" Width="*" />
-                    <DataGridTextColumn Header="FileName" Binding="{Binding FileName}" Width="*" />
+                    <DataGridTextColumn Header="FileName" Binding="{Binding TargetFileName}" Width="*" />
                     <DataGridTemplateColumn Header="Zoom">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Command="{Binding ElementName = AutoPrint,
-                                    Path= DataContext.ZoomToPointCommand}" 
-                                    CommandParameter="{Binding  ObjectId}" 
-                                    Content="Show"/>
+                                <Button Command="{Binding ElementName=AutoPrint, Path=DataContext.ZoomToPointCommand}"
+                                        Content="Show">
+                                    <Button.CommandParameter>
+                                        <MultiBinding Converter="{StaticResource MultiParameterConverter}">
+                                            <Binding Path="ObjectId" />
+                                            <Binding Path="SourceFileName" />
+                                        </MultiBinding>
+                                    </Button.CommandParameter>
+                                </Button>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

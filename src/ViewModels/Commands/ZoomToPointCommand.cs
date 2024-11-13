@@ -23,9 +23,14 @@ namespace YMplugins.ViewModels.Commands
 
         public override void Execute(object parameter)
         {
-            var id = Convert.ToInt32(parameter);
+            if (parameter is object[] parameters && parameters.Length == 2)
+            {
+                var id = Convert.ToInt32(parameters[0]);
+                var fileName = Convert.ToString(parameters[1]);
 
-            _intersectionPointZoom.Zoom(id);
+                _intersectionPointZoom.Zoom(id, fileName);
+            }
+
         }
     }
 }

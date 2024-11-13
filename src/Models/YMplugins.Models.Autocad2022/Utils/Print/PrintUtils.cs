@@ -174,7 +174,7 @@ namespace YMplugins.Models.Autocad2022.Utils.Print
                 acPlInfoVdr.Validate(acPlInfo);
 
                 // Execute the plot
-                fileName = plotHelper.ExecutePlot(acPlInfo, printModel.FileName);
+                fileName = plotHelper.ExecutePlot(acPlInfo, printModel.TargetFileName);
 
                 acTrans.Commit();
             }

@@ -8,9 +8,9 @@ namespace Mocks
 {
     public class ZoomService : IZoomEntity
     {
-        public void Zoom(int id)
+        public void Zoom(int id, string fileName)
         {
-            Debug.Print($"zoom to {id}");
+            Debug.Print($"zoom to {id} - {fileName}");
         }
     }
 }

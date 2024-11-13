@@ -1,4 +1,5 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
+﻿using System;
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Gile.AutoCAD.Extension;
 using YMplugins.Contracts;
@@ -7,11 +8,21 @@ namespace YMplugins.Models.Autocad2022.Utils;
 
 public class ZoomService : IZoomEntity
 {
-    public void Zoom(int id)
+    public void Zoom(int id, string fileName)
     {
-        Handle handle = new Handle(id);
-        ObjectId objId = Active.Database.GetObjectId(false, handle, 0);
 
+        
+        var docManager = Application.DocumentManager;
+        foreach (Document doc in docManager) 
+        {
+            if (doc.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase))
+            {
+                docManager.MdiActiveDocument = doc;
+                
+            }
+        }
+        
+        var objId = Convertors.IntToObjectId(id);
         using (Transaction trans = Active.Database.TransactionManager.StartTransaction())
         {
             // Open the object

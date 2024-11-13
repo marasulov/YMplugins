@@ -15,6 +15,7 @@ using YMplugins.ViewModels.VM;
 using YMplugins.Views.Services;
 using YMplugins.Views.Views;
 
+
 namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
 {
     public class AutoPrintCommand
@@ -22,7 +23,6 @@ namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
         [CommandMethod("Autoprint")]
         public static void Print()
         {
-            Active.Document.SendStringToExecute("_QSAVE ", true, false, false);
             var container = new Container();
             container.Options.EnableAutoVerification = false;
 
@@ -48,6 +48,10 @@ namespace YMplugins.Addin.Autocad2022.Commands.AutoPrint
             container.Register<IGetLayersService, GetLayersService>();
             container.Register<ISelectBlockService, SelectBlockService>();
             container.Register<IAttributesService, AttributeService>();
+
+            container.Register<IGetLayersFromOpenedDocsService, GetLayerFromOpenedDocsService>();
+            container.Register<IGetBlocksFromOpenedDocsService, GetBlocksFromOpenedDocsService>();
+
             container.Register<ICombinePdfService, CombinePdfService>();
             container.Register<IAutoCadFileService, AutoCadFileService>();
             container.Register<IBlockFinder, BlockFinder>();

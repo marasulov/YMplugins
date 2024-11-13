@@ -357,6 +357,9 @@ namespace YMplugins.ViewModels.VM
             if (IsAllOpenedDocuments)
             {
                 var allBlocks  = _getblocksFromOpenedDocsService.GetBlocksFromAllOpenDocuments();
+
+                DocumentsWithBlocks = allBlocks;
+                
                 BlocksNames = allBlocks
                     .SelectMany(kvp => kvp.Value)  
                     .Distinct()                   
@@ -368,9 +371,9 @@ namespace YMplugins.ViewModels.VM
             }
             
         }
-        
-        
-        
+
+        public Dictionary<string, List<string>> DocumentsWithBlocks { get; set; }
+
 
         public bool IsActiveDocument
         {
@@ -481,8 +484,19 @@ namespace YMplugins.ViewModels.VM
             if (_isUpdatingAttributes || string.IsNullOrEmpty(_selectedBlockOnScreen))
                 return;
 
+            // if (_isUpdatingAttributes)
+            //     return;
             _isUpdatingAttributes = true;
-            Attributes = _attributesService.GetAttributesForBlock(_selectedBlockOnScreen);
+            if (!IsAllOpenedDocuments)
+            {
+                Attributes = _attributesService.GetAttributesForBlock(SelectedBlockOnScreen);    
+            }
+            else
+            {
+                var docName =  DocumentsWithBlocks.FirstOrDefault(kvp => kvp.Value.Contains(SelectedBlockOnScreen)).Key;
+                Attributes = _attributesService.GetAttributesForBlock(SelectedBlockOnScreen,docName);
+            }
+            
             PrintDataCollection = _searchService.FindObjects(CreateSearchData());
             _isUpdatingAttributes = false;
         }
@@ -542,7 +556,8 @@ namespace YMplugins.ViewModels.VM
                 Suffix = Suffix,
                 IsCheckedNumbering = IsCheckedNumbering,
                 SelectedLayer = SelectedLayerOnScreen,
-                PlineScale = PlineScale
+                PlineScale = PlineScale,
+                IsSearchFromAllDocuments = IsAllOpenedDocuments
             };
         }
         
@@ -625,10 +640,10 @@ namespace YMplugins.ViewModels.VM
             foreach (var printInfo in dataCollection)
             {
                 if (IsCheckedNumbering)
-                    printInfo.FileName = Prefix + i + Suffix;
+                    printInfo.TargetFileName = Prefix + i + Suffix;
                 else
                 {
-                    printInfo.FileName = Prefix + Suffix;
+                    printInfo.TargetFileName = Prefix + Suffix;
                 }
                 i++;
                 newdata.Add(printInfo);

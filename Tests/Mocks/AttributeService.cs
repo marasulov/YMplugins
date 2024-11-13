@@ -7,7 +7,7 @@ namespace Mocks
 {
     public class AttributeService : IAttributesService
     {
-        public List<BlockAttribute>? GetAttributesForBlock(string selectedBlockName)
+        public List<BlockAttribute>? GetAttributesForBlock(string selectedBlockName, string docName = null)
         {
             var blocks = new List<BlockAttribute>();
             for (int i = 0; i < 50; i++)
@@ -19,21 +19,23 @@ namespace Mocks
             return blocks;
         }
 
+        
+
         public ObservableCollection<PrintInfo> GetPrintInfosForBlock(ObservableCollection<PrintInfo> printInfos, string selectedAttribute, int numerationStartValue, string prefix, string suffix, bool isCheckedNumbering)
         {
 
             foreach (var printInfo in printInfos)
             {
-                printInfo.FileName = $"{prefix}{printInfo.ObjectId}{selectedAttribute}{suffix}";
+                printInfo.TargetFileName = $"{prefix}{printInfo.ObjectId}{selectedAttribute}{suffix}";
                 if (numerationStartValue == null) continue;
                 if (isCheckedNumbering)
                 {
-                    printInfo.FileName = $"{prefix}{printInfo.ObjectId}{selectedAttribute}{numerationStartValue}{suffix}";
+                    printInfo.TargetFileName = $"{prefix}{printInfo.ObjectId}{selectedAttribute}{numerationStartValue}{suffix}";
                     numerationStartValue++;
                 }
                 else
                 {
-                    printInfo.FileName = $"{prefix}{printInfo.ObjectId}{selectedAttribute}{suffix}";
+                    printInfo.TargetFileName = $"{prefix}{printInfo.ObjectId}{selectedAttribute}{suffix}";
                 }
 
             }

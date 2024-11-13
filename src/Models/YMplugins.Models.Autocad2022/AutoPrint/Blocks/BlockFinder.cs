@@ -1,6 +1,8 @@
 ﻿using Gile.AutoCAD.Extension;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using Autodesk.AutoCAD.ApplicationServices;
 using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.Contracts;
 
@@ -25,14 +27,50 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             else if (data.IsSearchOnModel) searchSpace = "Model";
             else searchSpace = "Layout";
             
-            if (data.IsCheckedNumbering)
+            // if (!data.IsSearchFromAllDocuments)
+            // {
+            //     if (data.IsCheckedNumbering)
+            //     {
+            //         blocks.AddRange(_blockSearchService.SearchAllBlocksInSpaceByName(Active.Database, data.SelectedBlockName, searchSpace, data.NumerationStartValue));
+            //     }
+            //     else
+            //     {
+            //         blocks.AddRange(_blockSearchService.SearchAllBlocksInSpaceByName(Active.Database, data.SelectedBlockName, searchSpace));
+            //     }
+            //         
+            // }
+            // else
+            // {
+            //     foreach (Document doc in Application.DocumentManager)
+            //     {
+            //         if (data.IsCheckedNumbering)
+            //         {
+            //             blocks.AddRange(_blockSearchService.SearchAllBlocksInSpaceByName(doc.Database, data.SelectedBlockName, searchSpace, data.NumerationStartValue));
+            //         }
+            //         else
+            //         {
+            //             blocks.AddRange(_blockSearchService.SearchAllBlocksInSpaceByName(doc.Database, data.SelectedBlockName, searchSpace));
+            //         }    
+            //     }
+            // }
+
+            var databases =
+                Application.DocumentManager.Cast<Document>();
+                
+
+            foreach (var db in databases)
             {
-                blocks.AddRange(_blockSearchService.SearchAllBlocksInSpaceByName(Active.Database, data.SelectedBlockName, searchSpace, data.NumerationStartValue));
+                if (data.IsCheckedNumbering)
+                {
+                    blocks.AddRange(_blockSearchService.SearchAllBlocksInSpaceByName(db, data.SelectedBlockName, searchSpace, data.NumerationStartValue));
+                }
+                else
+                {
+                    blocks.AddRange(_blockSearchService.SearchAllBlocksInSpaceByName(db, data.SelectedBlockName, searchSpace));
+                }
             }
-            else
-            {
-                blocks.AddRange(_blockSearchService.SearchAllBlocksInSpaceByName(Active.Database, data.SelectedBlockName, searchSpace));
-            }
+            
+            
 
             return new ObservableCollection<PrintInfo>(blocks);
         }

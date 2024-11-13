@@ -15,8 +15,8 @@ namespace Mocks
             var filenames = new List<string>();
             foreach (var printInfo in data)
             {
-                Console.WriteLine(printInfo.FileName);
-                filenames.Add(printInfo.FileName);
+                Console.WriteLine(printInfo.TargetFileName);
+                filenames.Add(printInfo.TargetFileName);
             }
 
             return filenames.ToArray();

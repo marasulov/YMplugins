@@ -3,19 +3,32 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using Gile.AutoCAD.Extension;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
+using YMplugins.Models.Autocad2022.Utils;
 using YMplugins.Models.DbCad;
+using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 
 namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 {
     public class AttributeService : IAttributesService
     {
-        public List<BlockAttribute>? GetAttributesForBlock(string selectedBlockName)
+        public List<BlockAttribute>? GetAttributesForBlock(string selectedBlockName, string docName = null)
         {
-            Document doc = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument;
-            Database db = doc.Database;
-            var ed = doc.Editor;
+            
+            var db = Application.DocumentManager.MdiActiveDocument.Database;
+            
+            if(!string.IsNullOrEmpty(docName))
+            {
+                Document doc = Application.DocumentManager.Cast<Document>()
+                    .FirstOrDefault(d => d.Name.Equals(docName));
+
+                db = doc.Database;
+            }
+
+
             List<BlockAttribute> blockAttributes = new List<BlockAttribute>();
 
             using (Transaction tr = db.TransactionManager.StartTransaction())
@@ -24,22 +37,24 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                 BlockTable bt = tr.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
                 if (bt.Has(selectedBlockName))
                 {
-                    ed.WriteMessage("\nНайдено определение блока.");
+                    Active.Editor.WriteMessage("\nНайдено определение блока.");
                     BlockTableRecord btr = tr.GetObject(bt[selectedBlockName], OpenMode.ForRead) as BlockTableRecord;
-                    blockAttributes = PrintBlockAttributes(btr, ed);
+                    blockAttributes = PrintBlockAttributes(btr, Active.Editor);
                 }
                 else
                 {
-                    ed.WriteMessage("\nОпределение блока не найдено. Поиск вхождений блока...");
-                    blockAttributes = FindBlockReference(selectedBlockName, db, ed, tr);
+                    Active.Editor.WriteMessage("\nОпределение блока не найдено. Поиск вхождений блока...");
+                    blockAttributes = FindBlockReference(selectedBlockName, db, Active.Editor, tr);
                 }
 
                 tr.Commit();
             }
+
             return blockAttributes;
         }
 
-        public ObservableCollection<PrintInfo> GetPrintInfosForBlock(ObservableCollection<PrintInfo> printInfos, string selectedAttribute, int numerationStartValue, string prefix, string suffix, bool isCheckedNumbering)
+        public ObservableCollection<PrintInfo> GetPrintInfosForBlock(ObservableCollection<PrintInfo> printInfos,
+            string selectedAttribute, int numerationStartValue, string prefix, string suffix, bool isCheckedNumbering)
         {
             Document doc = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument;
             Database db = doc.Database;
@@ -56,12 +71,12 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                     var attrValue = blref.GetBlockAttribute(selectedAttribute);
                     if (isCheckedNumbering)
                     {
-                        printInfo.FileName = prefix + attrValue + suffix + numerationStartValue;
+                        printInfo.TargetFileName = prefix + attrValue + suffix + numerationStartValue;
                         numerationStartValue++;
                     }
                     else
                     {
-                        printInfo.FileName = prefix + attrValue + suffix;
+                        printInfo.TargetFileName = prefix + attrValue + suffix;
                     }
                 }
 
@@ -113,7 +128,8 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
         {
             List<BlockAttribute> blockAttributes = new List<BlockAttribute>();
             // Перебираем все элементы в пространстве модели и пространствах листов
-            BlockTableRecord modelSpace = tr.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
+            BlockTableRecord modelSpace =
+                tr.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), OpenMode.ForRead) as BlockTableRecord;
 
             foreach (ObjectId id in modelSpace)
             {
@@ -190,7 +206,8 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             // Iterate over the block's attributes
             foreach (ObjectId attId in blockRef.AttributeCollection)
             {
-                AttributeReference attRef = (AttributeReference)blockRef.Database.TransactionManager.GetObject(attId, OpenMode.ForRead);
+                AttributeReference attRef =
+                    (AttributeReference)blockRef.Database.TransactionManager.GetObject(attId, OpenMode.ForRead);
 
                 // If attribute name matches, return the attribute's value
                 if (attRef.Tag == attributeName || string.IsNullOrEmpty(attributeName))
@@ -209,7 +226,8 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
             foreach (ObjectId attId in blockRef.AttributeCollection)
             {
                 // Open the attribute in read mode
-                AttributeReference attRef = (AttributeReference)blockRef.Database.TransactionManager.GetObject(attId, OpenMode.ForRead);
+                AttributeReference attRef =
+                    (AttributeReference)blockRef.Database.TransactionManager.GetObject(attId, OpenMode.ForRead);
 
                 // Check if the attribute's tag matches the provided attribute name
                 if (attRef.Tag == attributeName)

@@ -40,7 +40,7 @@ namespace Mocks
         {
             foreach (var printInfo in printInfos)
             {
-                printInfo.FileName = printInfo.FileName + numerationValue;
+                printInfo.TargetFileName = printInfo.TargetFileName + numerationValue;
             }
 
             return (ObservableCollection<PrintInfo>)printInfos;

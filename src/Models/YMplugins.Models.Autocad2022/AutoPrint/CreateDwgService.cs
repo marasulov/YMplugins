@@ -30,7 +30,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
                 foreach (var printInfo in printData)
                 {
 
-                    // Начинаем транзакцию для открытия объекта
+                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     using Transaction acTrans = Active.Database.TransactionManager.StartTransaction();
                     try
                     {
@@ -39,7 +39,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
                             minPoint.Y + printInfo.YDim, 0);
                         Active.Editor.WriteMessage($"minpoint {minPoint} maxpoint {maxPoint}");
                         var selectedIds = SelectCrossingWindow(minPoint, maxPoint);
-                        var dwgFileName = printInfo.FileName + ".dwg";
+                        var dwgFileName = printInfo.TargetFileName + ".dwg";
                         var fileName = Path.Combine(drawingPath, dwgFileName);
                         CopyObjectsNewDatabases(selectedIds, fileName);
                         //CreateNewFileFromSelection(selectedIds, fiePath);
@@ -50,7 +50,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
                     }
                     catch (Autodesk.AutoCAD.Runtime.Exception ex)
                     {
-                        Active.Editor.WriteMessage($"\nОшибка: {ex.Message}");
+                        Active.Editor.WriteMessage($"\nпїЅпїЅпїЅпїЅпїЅпїЅ: {ex.Message}");
                     }
 
                     acTrans.Commit();

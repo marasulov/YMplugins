@@ -15,7 +15,7 @@ namespace YMplugins.Tests.Views.WPFTest
         [STAThread()]
         private static void Main(string[] args)
         {
-             var container = new Container();
+            var container = new Container();
             container.Options.EnableAutoVerification = false;
 
             container.Register<GetAttributesCommand>();

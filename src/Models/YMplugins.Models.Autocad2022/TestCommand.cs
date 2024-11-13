@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.EditorInput;
 using YMplugins.Contracts;
 using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.AutoPrint;
@@ -29,7 +30,6 @@ namespace YMplugins.Models.Autocad2022
         [CommandMethod("Autoprint2")]
         public static void Print()
         {
-            Active.Document.SendStringToExecute("_QSAVE ", true, false, false);
             var container = new Container();
             container.Options.EnableAutoVerification = false;
 
@@ -82,6 +82,33 @@ namespace YMplugins.Models.Autocad2022
             window.ShowDialog();
         }
 
+        private static Dictionary<int, Document> documentIdMap = new Dictionary<int, Document>();
+        private static int nextDocumentId = 1;
+
+        [CommandMethod("AssignDocumentIds")]
+        public void AssignUniqueIdsToDocuments()
+        {
+            DocumentCollection docManager = Application.DocumentManager;
+            Editor ed = docManager.MdiActiveDocument.Editor;
+
+            // Обновление словаря для всех открытых документов
+            foreach (Document doc in docManager)
+            {
+                Database db = doc.Database;
+                ed.WriteMessage($"\nДокумент '{doc.Name}' db {db.Filename}");
+                
+                // if (!documentIdMap.ContainsValue(doc))
+                // {
+                //     documentIdMap[nextDocumentId] = doc;
+                //     ed.WriteMessage($"\nДокумент '{doc.Name}' получил ID: {nextDocumentId}");
+                //     nextDocumentId++;
+                // }
+            }
+        }
+
+    
+        
+      
         [CommandMethod("ReadDrawingDataFromFolder")]
         public void ReadDrawingDataFromFolder()
         {

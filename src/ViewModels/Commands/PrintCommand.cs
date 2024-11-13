@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using YMplugins.Contracts;
+using YMplugins.Contracts.Dto;
 using YMplugins.Contracts.Dto.Enums;
 using YMplugins.ViewModels.VM;
 
@@ -35,7 +36,7 @@ namespace YMplugins.ViewModels.Commands
                 return;
             }
 
-            var emptyFileNameBlocks = vm.PrintDataCollection.Where(b => string.IsNullOrWhiteSpace(b.FileName)).ToList();
+            var emptyFileNameBlocks = vm.PrintDataCollection.Where(b => string.IsNullOrWhiteSpace(b.TargetFileName)).ToList();
             if (emptyFileNameBlocks.Any())
             {
                 vm.Error = "File name is absent.";
@@ -49,7 +50,7 @@ namespace YMplugins.ViewModels.Commands
 
 
             }
-            
+
             vm.CloseAction?.Invoke();
 
             var printData = vm.PrintDataCollection.Where(x => x.IsPrint).ToArray();
@@ -64,32 +65,31 @@ namespace YMplugins.ViewModels.Commands
                 _deleteEmptyLayouts.DeleteEmptyLayouts(printData);
             }
 
-
+            
             if (vm.SelectedPrintingOrder == PrintingOrder.ByX)
             {
-                printData = vm.PrintDataCollection.OrderBy(x => x.Position.X).ToArray();
+                printData = printData.OrderBy(x => x.Position.X).ToArray();
             }
             else if (vm.SelectedPrintingOrder == PrintingOrder.ByY)
             {
-                printData = vm.PrintDataCollection.OrderByDescending(x => x.Position.Y).ToArray();
+                printData = printData.OrderByDescending(x => x.Position.Y).ToArray();
             }
 
             string[] fileNames = new string[printData.Length];
 
-            if (vm.IsCreatePdf)
-            {
-                fileNames = _printService.Print(printData);
-            }
-            else
-            {
-                fileNames = _createDwgService.Create(printData);
-            }
 
-            var joinedBubbleTexts = string.Join("\n", fileNames);
-            if (vm.IsCombinePdf)
-                joinedBubbleTexts = _combinePdfService.Combine(fileNames, string.Join("", vm.OutputFileName, ".pdf"));
+            fileNames = _printService.Print(printData);
 
-            _notifyService.Notify(joinedBubbleTexts);
+            //else
+            //{
+            //    fileNames = _createDwgService.Create(printData);
+            //}
+
+            // var joinedBubbleTexts = string.Join("\n", fileNames);
+            // if (vm.IsCombinePdf)
+            //     joinedBubbleTexts = _combinePdfService.Combine(fileNames, string.Join("", vm.OutputFileName, ".pdf"));
+            //
+            // _notifyService.Notify(joinedBubbleTexts);
         }
     }
 }

@@ -2,6 +2,6 @@
 {
     public interface IZoomEntity
     {
-        void Zoom(int id);
+        void Zoom(int id, string fileName);
     }
 }

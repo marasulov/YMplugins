@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <None Remove="Icons\autoprint.png" />
-    <None Remove="Icons\translation.png" />
+    <None Remove="Icons\translate.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,7 +41,13 @@
 
   <ItemGroup>
     <Resource Include="Icons\autoprint.png" />
-    <Resource Include="Icons\translation.png" />
+    <Resource Include="Icons\translate.png" />
+    <None Remove="Icons\autoprint2.png" />
+    <Resource Include="Icons\autoprint2.png" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /y /r &quot;$(TargetDir)*.dll&quot; &quot;%appdata%\Autodesk\ApplicationPlugins\YMplugins.bundle\Contents\&quot;" />
+  </Target>
 
 </Project>

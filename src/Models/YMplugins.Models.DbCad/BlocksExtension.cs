@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Runtime;
+using Gile.AutoCAD.Extension;
 
 namespace YMplugins.Models.DbCad;
 
@@ -45,9 +47,9 @@ public static class BlocksExtension
                             }
                         }
                     }
-                    catch
+                    catch (Exception exception)
                     {
-                        // Игнорируем ошибки при доступе к блоку
+                        Active.Editor.WriteMessage($"Block {btrId} error {exception.Message} ");
                     }
                 }
             }
