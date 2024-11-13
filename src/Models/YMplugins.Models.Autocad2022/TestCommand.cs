@@ -40,7 +40,6 @@ namespace YMplugins.Models.Autocad2022
             container.Register<PrintCommand>();
             container.Register<SelectBlockCommand>();
             container.Register<ZoomToPointCommand>();
-            // container.Register<GetLayersCommand>();
             container.Register<AutoPrintVm>(Lifestyle.Transient);
             container.Register<AutoPrintView>(Lifestyle.Transient);
 

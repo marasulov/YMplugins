@@ -16,9 +16,8 @@ namespace YMplugins.Models.Autocad2022.AutoPrint
     {
         public string[] Print(PrintInfo[] data)
         {
-            //Active.Document.SendStringToExecute("_QSAVE ", true, false, false);
             var fileNames = new List<string>();
-            var standartCopier = new StandartCopier()
+            var standartCopier = new StandartCopier();
             
             // var acDoc = Active.Document;
             // var acCurDb = acDoc.Database;
