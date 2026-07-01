@@ -2,7 +2,14 @@
 using Autodesk.AutoCAD.Windows;
 using System;
 using System.Text;
-using Gile.AutoCAD.Extension;
+
+#if NET8_0_OR_GREATER
+// Этот using подставится при сборке для AutoCAD 2025+ (.NET 8)
+using Gile.AutoCAD.R25.Extension;
+#else
+// Этот using подставится при сборке для AutoCAD <= 2024 (.NET 4.8)
+using Gile.AutoCAD.R20.Extension;
+#endif
 
 namespace YMplugins.Models.DbCad.Informers
 {

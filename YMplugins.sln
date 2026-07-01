@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.10.35004.147
+# Visual Studio Version 18
+VisualStudioVersion = 18.7.11919.86 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{8E073BBF-FF94-470E-85A3-BA5CD8083921}"
 EndProject
@@ -48,9 +48,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YMplugins.TestConsole", "Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Build", "Build\Build.csproj", "{9A7CEFA1-8DED-4B15-A202-563CD40395A3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YMplugins.Addin.Autocad2022", "src\Addins\YMplugins.Addin.Autocad2022\YMplugins.Addin.Autocad2022.csproj", "{46E5FAD7-7ECE-44FA-A28C-FBC7428957D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YMplugins.Addin", "src\Addins\YMplugins.Addin.Autocad2022\YMplugins.Addin.csproj", "{46E5FAD7-7ECE-44FA-A28C-FBC7428957D3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YMplugins.Models.Autocad2022", "src\Models\YMplugins.Models.Autocad2022\YMplugins.Models.Autocad2022.csproj", "{5875C3A6-DB26-4152-A77D-F2CD1B94BD97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YMplugins.Models", "src\Models\YMplugins.Models.Autocad2022\YMplugins.Models.csproj", "{5875C3A6-DB26-4152-A77D-F2CD1B94BD97}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YMplugins.Tests.Views.WPFTest", "Tests\Views\YMplugins.Tests.Views.WPFTest\YMplugins.Tests.Views.WPFTest.csproj", "{37DDFB86-81CD-4894-BE1A-D064214BD8EE}"
 EndProject

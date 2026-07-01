@@ -1,8 +1,13 @@
-﻿using Gile.AutoCAD.Extension;
+﻿
 using System.Collections.Generic;
 using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.Contracts;
 
+#if NET8_0_OR_GREATER
+    using Gile.AutoCAD.R25.Extension;
+#else
+using Gile.AutoCAD.R20.Extension;
+#endif
 namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
 {
     public class BlockFinder : IBlockFinder

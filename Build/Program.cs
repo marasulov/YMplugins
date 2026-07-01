@@ -1,8 +1,9 @@
 ﻿using Microsoft.Deployment.WindowsInstaller;
 using System;
+using System.IO;
 using WixSharp;
 using Action = WixSharp.Action;
-
+using File = WixSharp.File;
 namespace Build
 {
     internal class Program
@@ -12,8 +13,16 @@ namespace Build
 
         static void Main(string[] args)
         {
-
             var pluginDir = @"[AppDataFolder]\Autodesk\ApplicationPlugins\YMplugins.bundle\";
+
+            // Задаем базовый путь один раз. 
+            // Вы можете указать ваш новый локальный путь:
+            string rootDir = @"C:\Users\y.marasulov\source\repos\YMplugins\";
+
+            // АЛЬТЕРНАТИВА: Если хотите вообще избавиться от абсолютных путей,
+            // раскомментируйте строчку ниже. Она сама найдет папку YMplugins относительно запущенного файла:
+            // string rootDir = Path.GetFullPath(@"..\..\..\..\");
+
             var project = new Project()
             {
                 Name = _projectName,
@@ -28,18 +37,32 @@ namespace Build
                 Dirs = new Dir[]
                 {
                     new InstallDir(pluginDir,
-                        new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\PackageContents.xml"),
-                        new Dir(@"Contents",
-                            new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\conf.json"),
-                            new DirFiles(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\*.dll"),
-                            new File(@"C:\Users\yusufzhon.marasulov\source\repos\YMplugins\src\Addins\YMplugins.Addin.Autocad2022\bin\Debug\net48\YMplugins.Addin.Autocad2022.dll")))
-                },
+                        
+                        // Файл манифеста
+                        new File($@"{rootDir}PackageContents.xml"),
 
+                        new Dir(@"Contents",
+                            
+                            // Папка для AutoCAD 2021-2024 (.NET 4.8)
+                            new Dir(@"net48",
+                                new File($@"{rootDir}src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\conf.json"),
+                                new DirFiles($@"{rootDir}src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\*.dll"),
+                                new File($@"{rootDir}src\Addins\YMplugins.Addin.Autocad2022\bin\Debug\net48\YMplugins.Addin.dll")
+                            ),
+
+                            // Папка для AutoCAD 2025+ (.NET 8.0)
+                            new Dir(@"net8.0-windows",
+                                new File($@"{rootDir}src\Models\YMplugins.Models.Autocad2022\bin\Debug\net8.0-windows\conf.json"),
+                                new DirFiles($@"{rootDir}src\Models\YMplugins.Models.Autocad2022\bin\Debug\net8.0-windows\*.dll"),
+                                new File($@"{rootDir}src\Addins\YMplugins.Addin.Autocad2022\bin\Debug\net8.0-windows\YMplugins.Addin.dll")
+                            )
+                        )
+                    )
+                },
             };
 
-
             project.Version = new Version(_version);
-            
+
             var managedAction = new ManagedAction(CustomActions.MyAction,
                 Return.ignore,
                 When.After,
@@ -52,7 +75,8 @@ namespace Build
             project.Actions = new Action[] { managedAction };
 
             project.UI = WUI.WixUI_InstallDir;
-            project.LicenceFile = @"C:\Users\yusufzhon.marasulov\Documents\Ym.rtf";
+            // Здесь тоже используем rootDir для лицензии
+            project.LicenceFile = $@"{rootDir}\License.rtf";
             project.InstallPrivileges = InstallPrivileges.limited;
             project.BuildMsi();
         }

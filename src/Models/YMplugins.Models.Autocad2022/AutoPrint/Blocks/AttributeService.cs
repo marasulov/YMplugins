@@ -52,7 +52,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                     ObjectId objId = db.GetObjectId(false, handle, 0);
                     var blref = GetBlockById(objId, tr);
 
-                    var attrValue = blref.GetBlockAttribute(selectedAttribute);
+                    var attrValue = blref.GetBlockAttribute(tr, selectedAttribute);
                     if (isCheckedNumbering)
                     {
                         printInfo.FileName = prefix + attrValue + suffix + numerationStartValue;

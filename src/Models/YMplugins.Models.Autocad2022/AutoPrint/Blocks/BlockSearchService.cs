@@ -1,5 +1,10 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
-using Gile.AutoCAD.Extension;
+
+#if NET8_0_OR_GREATER
+    using Gile.AutoCAD.R25.Extension;
+#else
+using Gile.AutoCAD.R20.Extension;
+#endif
 using System.Collections.Generic;
 using YMplugins.Contracts.Dto;
 using YMplugins.Models.Autocad2022.Utils;
@@ -65,7 +70,7 @@ namespace YMplugins.Models.Autocad2022.AutoPrint.Blocks
                 Entity ent = (Entity)trans.GetObject(entId, OpenMode.ForRead);
 
                 if (ent is not BlockReference blockRef) continue;
-                var blockRefName = blockRef.GetEffectiveName();
+                var blockRefName = blockRef.GetEffectiveName(trans);
 
                 if (blockRefName != blockName) continue;
                 var blockExtents = blockRef.GeometricExtents;
