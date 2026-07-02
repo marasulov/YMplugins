@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release;Autocad;Test</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Icons\autoprint.png" />
+    <None Remove="Icons\translation.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SimpleInjector" Version="5.5.0" />
+    <PackageReference Include="AutoCAD.NET" Version="24.3.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Models\YMplugins.Models.Autocad2024\YMplugins.Models.Autocad2024.csproj" />
+    <ProjectReference Include="..\..\ViewModels\YMplugins.ViewModels.csproj" />
+    <ProjectReference Include="..\..\Views\WPF\YMplugins.Views.csproj" />
+    <ProjectReference Include="..\..\..\external\Gile.AutoCAD.Extension\Gile.AutoCAD.R20.Extension\Gile.AutoCAD.R20.Extension.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PresentationCore">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PresentationFramework">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="WindowsBase">
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Icons\autoprint.png" />
+    <Resource Include="Icons\translation.png" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /y /r &quot;$(TargetDir)*.dll&quot; &quot;%25appdata%25\Autodesk\ApplicationPlugins\YMplugins.bundle\Contents\&quot;" />
+  </Target>
+
+</Project>

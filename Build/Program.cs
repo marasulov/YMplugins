@@ -35,11 +35,11 @@ namespace Build
                     new InstallDir(pluginDir,
                         new File(@".\..\PackageContents.xml"),
                         new Dir(@"Contents",
-                            new File(@".\..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\conf.json"),
-                            new File(@".\..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\DWG_To_PDF_Uzle.pc3"),
-                            new File(@".\..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\Uzle.pmp"),
-                            new DirFiles(@".\..\src\Models\YMplugins.Models.Autocad2022\bin\Debug\net48\*.dll"),
-                            new File(@".\..\src\Addins\YMplugins.Addin.Autocad2022\bin\Debug\net48\YMplugins.Addin.Autocad2022.dll")))
+                            new File(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Debug\net48\conf.json"),
+                            new File(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Debug\net48\DWG_To_PDF_Uzle.pc3"),
+                            new File(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Debug\net48\Uzle.pmp"),
+                            new DirFiles(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Debug\net48\*.dll"),
+                            new File(@".\..\src\Addins\YMplugins.Addin.Autocad2024\bin\Debug\net48\YMplugins.Addin.Autocad2024.dll")))
                 },
 
             };
@@ -59,7 +59,7 @@ namespace Build
             project.Actions = new Action[] { managedAction };
 
             project.UI = WUI.WixUI_InstallDir;
-            project.LicenceFile = @"C:\Users\yusufzhon.marasulov\Documents\Ym.rtf";
+            project.LicenceFile = @".\LicenseAgreement.rtf";
             project.InstallPrivileges = InstallPrivileges.limited;
             project.BuildMsi();
         }

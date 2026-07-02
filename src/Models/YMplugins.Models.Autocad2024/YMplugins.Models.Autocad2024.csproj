@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <Configurations>Debug;Release;Autocad;Test</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="conf.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="conf.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Include="DWG_To_PDF_Uzle.pc3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Uzle.pmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ionic.Zip" Version="1.9.1.8" />
+    <PackageReference Include="SimpleInjector" Version="5.5.0" />
+    <PackageReference Include="AutoCAD.NET" Version="24.3.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Services\YMplugins.Services\YMplugins.Services.csproj" />
+    <ProjectReference Include="..\..\ViewModels\YMplugins.ViewModels.csproj" />
+    <ProjectReference Include="..\..\Views\WPF\YMplugins.Views.csproj" />
+    <ProjectReference Include="..\YMplugins.Models.DbCad\YMplugins.Models.DbCad.csproj" />
+    <ProjectReference Include="..\..\..\external\Gile.AutoCAD.Extension\Gile.AutoCAD.R20.Extension\Gile.AutoCAD.R20.Extension.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+
+</Project>

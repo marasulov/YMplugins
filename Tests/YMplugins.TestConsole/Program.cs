@@ -4,7 +4,7 @@ using Ionic.Zlib;
 using System.Text;
 using PiaNO;
 using PiaNO.Plot;
-using YMplugins.Models.Autocad2022.Utils;
+using YMplugins.Models.Autocad2024.Utils;
 //using iTextSharp.text.pdf.parser;
 //using iTextSharp.text.pdf;
 using iText.Kernel.Pdf;
@@ -90,9 +90,7 @@ class Program
         //ChangePmp(1500.ToString(), 1600.ToString(), "1500x1600");
 
 
-        //ExtractTextFromCustomArea(@"C:\Users\yusufzhon.marasulov\Documents\А0х34.pdf");
-
-        string pdfPath = @"C:\Users\yusufzhon.marasulov\Documents\А0х34.pdf";
+        string pdfPath = args.Length > 0 ? args[0] : Console.ReadLine();
 
         try
         {

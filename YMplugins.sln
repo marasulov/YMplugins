@@ -48,9 +48,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YMplugins.TestConsole", "Te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Build", "Build\Build.csproj", "{9A7CEFA1-8DED-4B15-A202-563CD40395A3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YMplugins.Addin.Autocad2022", "src\Addins\YMplugins.Addin.Autocad2022\YMplugins.Addin.Autocad2022.csproj", "{46E5FAD7-7ECE-44FA-A28C-FBC7428957D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YMplugins.Addin.Autocad2024", "src\Addins\YMplugins.Addin.Autocad2024\YMplugins.Addin.Autocad2024.csproj", "{46E5FAD7-7ECE-44FA-A28C-FBC7428957D3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YMplugins.Models.Autocad2022", "src\Models\YMplugins.Models.Autocad2022\YMplugins.Models.Autocad2022.csproj", "{5875C3A6-DB26-4152-A77D-F2CD1B94BD97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YMplugins.Models.Autocad2024", "src\Models\YMplugins.Models.Autocad2024\YMplugins.Models.Autocad2024.csproj", "{5875C3A6-DB26-4152-A77D-F2CD1B94BD97}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YMplugins.Tests.Views.WPFTest", "Tests\Views\YMplugins.Tests.Views.WPFTest\YMplugins.Tests.Views.WPFTest.csproj", "{37DDFB86-81CD-4894-BE1A-D064214BD8EE}"
 EndProject
@@ -71,6 +71,7 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{D05E1127-F9C8-45A4-A4AF-86931BF27EEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D05E1127-F9C8-45A4-A4AF-86931BF27EEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D05E1127-F9C8-45A4-A4AF-86931BF27EEF}.Debug|ARM32.ActiveCfg = Debug|Any CPU
 		{D05E1127-F9C8-45A4-A4AF-86931BF27EEF}.Debug|ARM32.Build.0 = Debug|Any CPU
 		{D05E1127-F9C8-45A4-A4AF-86931BF27EEF}.Debug|Debug.ActiveCfg = Debug|Any CPU
@@ -89,6 +90,7 @@ Global
 		{D05E1127-F9C8-45A4-A4AF-86931BF27EEF}.Release|x64.ActiveCfg = Release|Any CPU
 		{D05E1127-F9C8-45A4-A4AF-86931BF27EEF}.Release|x64.Build.0 = Release|Any CPU
 		{519F7ADC-1B5D-4CA0-904A-711DF117534C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{519F7ADC-1B5D-4CA0-904A-711DF117534C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{519F7ADC-1B5D-4CA0-904A-711DF117534C}.Debug|ARM32.ActiveCfg = Debug|Any CPU
 		{519F7ADC-1B5D-4CA0-904A-711DF117534C}.Debug|ARM32.Build.0 = Debug|Any CPU
 		{519F7ADC-1B5D-4CA0-904A-711DF117534C}.Debug|Debug.ActiveCfg = Debug|Any CPU

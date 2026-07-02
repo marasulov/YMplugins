@@ -12,14 +12,7 @@ namespace YMplugins.Services.SettingsReader
 
         public SettingsService()
         {
-
-            string assemblyFolder =
-                "C:\\Users\\yusufzhon.marasulov\\source\\repos\\YMplugins\\src\\Services\\YMplugins.Settings\\";
-
-#if !DEBUG
-                assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-#endif
-
+            string assemblyFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             _settingsFileName = Path.Combine(assemblyFolder, "Settings.json");
         }
 

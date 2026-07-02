@@ -11,8 +11,6 @@
     <PackageReference Include="AutoCAD.NET" Version="24.3.0" ExcludeAssets="runtime"/>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Gile.AutoCAD.Extension">
-      <HintPath>D:\from comp\docs\repos\TransmittalCreator\TransmittalCreator\bin\Debug\Gile.AutoCAD.Extension.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\..\external\Gile.AutoCAD.Extension\Gile.AutoCAD.R20.Extension\Gile.AutoCAD.R20.Extension.csproj" />
   </ItemGroup>
 </Project>

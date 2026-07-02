@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Models\YMplugins.Models.Autocad2022\YMplugins.Models.Autocad2022.csproj" />
+    <ProjectReference Include="..\..\src\Models\YMplugins.Models.Autocad2024\YMplugins.Models.Autocad2024.csproj" />
   </ItemGroup>
 
   <ItemGroup>

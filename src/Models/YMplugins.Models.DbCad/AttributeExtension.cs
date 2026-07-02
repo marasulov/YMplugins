@@ -10,9 +10,9 @@ namespace YMplugins.Models.DbCad
         /// <param name="blockReference">The block reference.</param>
         /// <param name="tag">The tag.</param>
         /// <returns>The value.</returns>
-        public static string GetBlockAttribute(this BlockReference blockReference, string tag)
+        public static string GetBlockAttribute(this BlockReference blockReference, Transaction tr, string tag)
         {
-            var attrs = Gile.AutoCAD.Extension.BlockReferenceExtension.GetAttributesValues(blockReference);
+            var attrs = Gile.AutoCAD.R20.Extension.BlockReferenceExtension.GetAttributesValues(blockReference, tr);
 
             return attrs.ContainsKey(tag) ? attrs[tag] : null;
         }

@@ -1,4 +1,4 @@
-using Autodesk.AutoCAD.DatabaseServices;
+п»їusing Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using System.Text.RegularExpressions;
 
@@ -7,9 +7,9 @@ namespace YMplugins.Models.DbCad
     public static class DbUtils
     {
         /// <summary>
-        /// Зуммирует объекты в файле по границам
+        /// Р—СѓРјРјРёСЂСѓРµС‚ РѕР±СЉРµРєС‚С‹ РІ С„Р°Р№Р»Рµ РїРѕ РіСЂР°РЅРёС†Р°Рј
         /// </summary>
-        /// <param name="fileName">Имя файла</param>
+        /// <param name="fileName">РРјСЏ С„Р°Р№Р»Р°</param>
         /// <returns></returns>
         public static string ZoomFilesAndSave(string fileName)
         {

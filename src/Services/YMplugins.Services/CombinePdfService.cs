@@ -24,37 +24,42 @@ namespace YMplugins.Services
                 if (directory != null) outputPdf = Path.Combine(directory, targetPdf);
             }
 
-            using (FileStream stream = new FileStream(outputPdf, FileMode.Create))
+            string currentFile = null;
+            try
             {
-                Document document = new Document();
-                PdfCopy pdf = new PdfCopy(document, stream);
-                PdfReader reader = null;
-                try
+                using (FileStream stream = new FileStream(outputPdf, FileMode.Create))
                 {
+                    Document document = new Document();
+                    PdfCopy pdf = new PdfCopy(document, stream);
                     document.Open();
                     foreach (string file in filenames)
                     {
-                        reader = new PdfReader(file);
-                        pdf.AddDocument(reader);
-                        reader.Close();
-                        File.Delete(file);
+                        currentFile = file;
+                        PdfReader reader = new PdfReader(file);
+                        try
+                        {
+                            pdf.AddDocument(reader);
+                        }
+                        finally
+                        {
+                            reader.Close();
+                        }
                     }
-                }
-                catch (Exception)
-                {
 
-                    if (reader != null)
-                    {
-                        reader.Close();
-                    }
+                    document.Close();
                 }
-                finally
-                {
-                    if (document != null)
-                    {
-                        document.Close();
-                    }
-                }
+            }
+            catch (Exception e)
+            {
+                throw new IOException(
+                    $"Не удалось объединить PDF (файл: {currentFile ?? outputPdf}): {e.Message}", e);
+            }
+
+            // Исходные файлы удаляются только после успешной склейки,
+            // чтобы при сбое пользователь не потерял уже напечатанные листы
+            foreach (string file in filenames)
+            {
+                File.Delete(file);
             }
 
             return outputPdf;

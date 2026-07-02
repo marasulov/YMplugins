@@ -2,7 +2,7 @@
 using Autodesk.AutoCAD.Windows;
 using System;
 using System.Text;
-using Gile.AutoCAD.Extension;
+using Gile.AutoCAD.R20.Extension;
 
 namespace YMplugins.Models.DbCad.Informers
 {
