@@ -38,7 +38,7 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
             }
             catch (Exception e)
             {
-                Active.Editor.WriteMessage(e.Message);
+                WriteToCommandLine(e.Message);
             }
         }
 
@@ -72,8 +72,8 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
             if (!File.Exists(Pc3Destination) & !File.Exists(PmpDestination))
             {
                 if (IsFileCopied(Pc3Source, Pc3Destination))
-                    Active.Editor.WriteMessage($"Файл {Pc3Source} скопирован в {Pc3Destination}");
-                Active.Editor.WriteMessage(IsFileCopied(PmpSource, PmpDestination)
+                    WriteToCommandLine($"Файл {Pc3Source} скопирован в {Pc3Destination}");
+                WriteToCommandLine(IsFileCopied(PmpSource, PmpDestination)
                     ? $"Файл {PmpSource} скопирован в {PmpDestination}"
                     : $"Не удалось скопировать файлы настройки, скопируйте с папки программы файлы {Pc3Source}  в {Pc3Destination} и {PmpDestination}");
             }
@@ -88,22 +88,22 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
                 if (pc3SourceInfo.LastWriteTime > pc3OnDestInfo.LastWriteTime)
                 {
                     File.Copy(Pc3Source, Pc3Destination, true);
-                    Active.Editor.WriteMessage($"Файл {Pc3Source} заменен на {Pc3Destination}");
+                    WriteToCommandLine($"Файл {Pc3Source} заменен на {Pc3Destination}");
                 }
 
                 if (pmpSourceInfo.LastWriteTime > pmpOnDestInfo.LastWriteTime)
                 {
                     File.Copy(PmpSource, PmpDestination, true);
-                    Active.Editor.WriteMessage($"Файл {PmpDestination} заменан на {PmpSource}");
+                    WriteToCommandLine($"Файл {PmpDestination} заменан на {PmpSource}");
                 }
                 else
                 {
-                    Active.Editor.WriteMessage(
+                    WriteToCommandLine(
                         "Не удалось скопировать файлы настройки, скопируйте  с папки программы файлы {0}  в {1} и {2} ",
                         Pc3Destination, Pc3Source, PmpSource);
                 }
 
-                Active.Editor.WriteMessage("Файлы настройки присутствуют, для перевода в pdf наберите CreateTranspdf");
+                WriteToCommandLine("Файлы настройки присутствуют, для перевода в pdf наберите CreateTranspdf");
             }
 
             return true;
@@ -118,9 +118,24 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
             }
             catch (Exception e)
             {
-                Active.Editor.WriteMessage($"\nНе удалось скопировать {location}: {e.Message}");
+                WriteToCommandLine($"\nНе удалось скопировать {location}: {e.Message}");
                 return false;
             }
+        }
+
+        /// <summary>
+        ///     Пишет в командную строку, если есть активный документ
+        ///     (при старте AutoCAD документа ещё нет).
+        /// </summary>
+        private static void WriteToCommandLine(string message, params object[] args)
+        {
+            var doc = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument;
+            if (doc == null) return;
+
+            if (args.Length == 0)
+                doc.Editor.WriteMessage(message);
+            else
+                doc.Editor.WriteMessage(message, args);
         }
 
         public static string GetConfFileInDebug()

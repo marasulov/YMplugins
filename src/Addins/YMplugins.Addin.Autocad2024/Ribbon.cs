@@ -32,44 +32,47 @@ using Gile.AutoCAD.R20.Extension;
 
             public void Initialize()
             {
+                // Лента может быть ещё не создана (подписка на ItemInitialized),
+                // уже создана (строим сразу) или полностью построена до загрузки
+                // плагина — тогда ItemInitialized не придёт, страхуемся через Idle.
                 ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
+                acadApp.Idle += Application_IdleBuildRibbon;
 
                 if (ComponentManager.Ribbon != null)
                 {
                     BuildRibbonTab();
                 }
 
-                var executablePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                var pd = new ProxyDomain();
-                var assembly = pd.GetAssembly(Path.Combine(executablePath, "MaterialDesignThemes.Wpf.dll"));
-
-                var assembly1 = pd.GetAssembly(Path.Combine(executablePath, "MaterialDesignColors.dll"));
-
-                if ((assembly != null) | (assembly1 != null)) Active.Editor.WriteMessage("style dlls not load");
-
-                var standartCopier = new StandartCopier();
-                var isConfFileCopied = standartCopier.CopyParamsFiles();
-
-                if (!isConfFileCopied) Active.Editor.WriteMessage("файлы не скопированы");
-            }
-
-            internal class ProxyDomain : MarshalByRefObject
-            {
-                public Assembly GetAssembly(string assemblyPath)
+                try
                 {
-                    try
-                    {
-                        return Assembly.LoadFrom(assemblyPath);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new InvalidOperationException(ex.Message);
-                    }
+                    var standartCopier = new StandartCopier();
+                    standartCopier.CopyParamsFiles();
+                }
+                catch (System.Exception ex)
+                {
+                    WriteToCommandLine($"\nCADBoost: не удалось подготовить файлы настройки: {ex.Message}");
                 }
             }
 
             public void Terminate()
             {
+            }
+
+            /// <summary>
+            ///     Пишет в командную строку, если есть активный документ.
+            ///     При старте AutoCAD (вкладка Start) документа нет — писать некуда.
+            /// </summary>
+            private static void WriteToCommandLine(string message)
+            {
+                acadApp.DocumentManager.MdiActiveDocument?.Editor.WriteMessage(message);
+            }
+
+            private void Application_IdleBuildRibbon(object sender, EventArgs e)
+            {
+                if (ComponentManager.Ribbon == null) return;
+
+                acadApp.Idle -= Application_IdleBuildRibbon;
+                BuildRibbonTab();
             }
 
             private void ComponentManager_ItemInitialized(object sender, RibbonItemEventArgs e)
@@ -135,8 +138,7 @@ using Gile.AutoCAD.R20.Extension;
                 }
                 catch (Exception ex)
                 {
-                    Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(
-                        ex.Message);
+                    WriteToCommandLine(ex.Message);
                 }
             }
 
@@ -170,8 +172,7 @@ using Gile.AutoCAD.R20.Extension;
                 }
                 catch (System.Exception ex)
                 {
-                    Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(
-                        ex.Message);
+                    WriteToCommandLine(ex.Message);
                 }
             }
 
@@ -279,7 +280,7 @@ using Gile.AutoCAD.R20.Extension;
                 }
                 catch (System.Exception ex)
                 {
-                    Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(ex.Message);
+                    WriteToCommandLine(ex.Message);
                 }
             }
 
@@ -322,7 +323,7 @@ using Gile.AutoCAD.R20.Extension;
                 catch (Exception ex)
                 {
                     // Логирование ошибки или отладочная информация
-                    Active.Editor.WriteMessage($"Error loading image: {ex.Message}");
+                    WriteToCommandLine($"Error loading image: {ex.Message}");
                     return null;
                 }
             }
