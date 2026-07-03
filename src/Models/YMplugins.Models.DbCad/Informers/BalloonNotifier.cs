@@ -55,37 +55,57 @@ namespace YMplugins.Models.DbCad.Informers
 
         void Application_Idle(object sender, EventArgs e)
         {
-            if (sb.Length != 0)
+            // Отписка строго до показа: если балун упадёт, обработчик не должен
+            // остаться подписанным и валиться на каждом следующем Idle.
+            Application.Idle -= notifyHandler;
+            notifyHandler = null;
+
+            var text = sb.ToString();
+            sb.Clear();
+            if (text.Length == 0) return;
+
+            try
             {
-                TrayItem ti = new TrayItem();
-                ti.ToolTipText = _toolTipText;
-                ti.Icon = Active.Document.GetStatusBar().TrayItems[0].Icon;
-                Application.StatusBar.TrayItems.Add(ti);
-                Application.StatusBar.Update();
-                ti.CloseBubbleWindows();
-                TrayItemBubbleWindow bw = new TrayItemBubbleWindow();
-                bw.Title = _bwTitile;
-                bw.Text = sb.ToString();
+                ShowBubble(text);
+            }
+            catch (System.Exception)
+            {
+                // Балун недоступен (например, пустой трей) — сообщение не теряем
+                Application.DocumentManager.MdiActiveDocument?.Editor
+                    .WriteMessage($"\n{_bwTitile}:\n{text}");
+            }
+        }
 
+        void ShowBubble(string text)
+        {
+            TrayItem ti = new TrayItem();
+            ti.ToolTipText = _toolTipText;
 
-                bw.IconType = bw.IconType != null ? _icon : IconType.Information;
-
-                if (_drawingPath != null)
-                {
-                    bw.HyperText = _drawingPath;
-                    bw.HyperLink = _drawingPath;
-                }
-
-                ti.ShowBubbleWindow(bw);
-
-
-                bw.Closed += delegate { CloseBw(ti); };
+            // В AutoCAD 2025 трей документа может быть пуст
+            var docTrayItems = Active.Document.GetStatusBar().TrayItems;
+            if (docTrayItems.Count > 0)
+            {
+                ti.Icon = docTrayItems[0].Icon;
             }
 
+            Application.StatusBar.TrayItems.Add(ti);
+            Application.StatusBar.Update();
+            ti.CloseBubbleWindows();
 
-            Application.Idle -= notifyHandler;
-            sb.Clear();
-            notifyHandler = null;
+            TrayItemBubbleWindow bw = new TrayItemBubbleWindow();
+            bw.Title = _bwTitile;
+            bw.Text = text;
+            bw.IconType = _icon == default ? IconType.Information : _icon;
+
+            if (_drawingPath != null)
+            {
+                bw.HyperText = _drawingPath;
+                bw.HyperLink = _drawingPath;
+            }
+
+            ti.ShowBubbleWindow(bw);
+
+            bw.Closed += delegate { CloseBw(ti); };
         }
 
         void CloseBw(TrayItem ti)
