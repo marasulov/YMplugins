@@ -40,8 +40,4 @@
     <Resource Include="Icons\translation.png" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /y /r &quot;$(TargetDir)*.dll&quot; &quot;%25appdata%25\Autodesk\ApplicationPlugins\YMplugins.bundle\Contents\$(TargetFramework)\&quot;" />
-  </Target>
-
 </Project>

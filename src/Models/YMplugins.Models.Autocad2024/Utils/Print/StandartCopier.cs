@@ -16,10 +16,6 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
         public StandartCopier()
         {
             string confFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty, "conf.json");
-#if DEBUG
-
-            confFile = GetConfFileInDebug();
-#endif
 
             var jsonFile = File.ReadAllText(confFile);
             var deserializeObject = JsonConvert.DeserializeObject<Params>(jsonFile);
@@ -138,12 +134,5 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
                 doc.Editor.WriteMessage(message, args);
         }
 
-        public static string GetConfFileInDebug()
-        {
-            var path = System.IO.Path.GetDirectoryName(
-                System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase);
-            path = path?.Substring(6);
-            return Path.Combine(path, "conf.json");
-        }
     }
 }
