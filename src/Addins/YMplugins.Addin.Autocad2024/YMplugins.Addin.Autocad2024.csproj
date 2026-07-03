@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <UseWPF>true</UseWPF>
+    <!-- Плагин деплоится папкой: все NuGet-зависимости должны лежать рядом с DLL -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Configurations>Debug;Release;Autocad;Test</Configurations>
   </PropertyGroup>
 
