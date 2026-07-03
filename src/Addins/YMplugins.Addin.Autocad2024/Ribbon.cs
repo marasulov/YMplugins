@@ -33,6 +33,7 @@ using Gile.AutoCAD.R20.Extension;
 
             public void Initialize()
             {
+                RegisterPluginFolderAssemblyResolver();
                 DetectUiLanguage();
 
                 // Лента может быть ещё не создана (подписка на ItemInitialized),
@@ -68,6 +69,28 @@ using Gile.AutoCAD.R20.Extension;
             private static void WriteToCommandLine(string message)
             {
                 acadApp.DocumentManager.MdiActiveDocument?.Editor.WriteMessage(message);
+            }
+
+            /// <summary>
+            ///     Доищет недостающие сборки в папке плагина. Нужно для WPF:
+            ///     BAML-парсер запрашивает сборки (MaterialDesignThemes.Wpf и др.)
+            ///     через Assembly.Load от имени PresentationFramework, и стандартный
+            ///     поиск не заглядывает в папку плагина, хотя файлы лежат там.
+            /// </summary>
+            private static void RegisterPluginFolderAssemblyResolver()
+            {
+                var pluginDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                if (pluginDir == null) return;
+
+                AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+                {
+                    var name = new AssemblyName(args.Name).Name;
+                    if (name == null || name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
+                        return null;
+
+                    var candidate = Path.Combine(pluginDir, name + ".dll");
+                    return File.Exists(candidate) ? Assembly.LoadFrom(candidate) : null;
+                };
             }
 
             /// <summary>
