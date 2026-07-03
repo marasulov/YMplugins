@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using YMplugins.Contracts;
+using YMplugins.Contracts.Localization;
 using YMplugins.Contracts.Dto;
 using YMplugins.Contracts.Dto.Enums;
 using YMplugins.ViewModels.Commands;
@@ -275,7 +276,7 @@ namespace YMplugins.ViewModels.VM
             }
         }
 
-        public string HeaderContent => $"Blocks found {PrintDataCollection?.Count ?? 0} | Selected for Printing: {SelectedPrintCount}";
+        public string HeaderContent => string.Format(Tr.HeaderContentFormat, PrintDataCollection?.Count ?? 0, SelectedPrintCount);
 
         public string Error
         {
@@ -289,7 +290,7 @@ namespace YMplugins.ViewModels.VM
             {
                 if (columnName == nameof(OutputFileName) && IsCombinePdf && string.IsNullOrWhiteSpace(OutputFileName))
                 {
-                    return "Output file name is required when combining PDFs.";
+                    return Tr.ErrOutputFileNameRequired;
                 }
                 return null;
             }

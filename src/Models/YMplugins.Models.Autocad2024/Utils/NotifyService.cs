@@ -1,6 +1,7 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using System.IO;
 using YMplugins.Contracts;
+using YMplugins.Contracts.Localization;
 using YMplugins.Models.DbCad.Informers;
 
 namespace YMplugins.Models.Autocad2024.Utils
@@ -9,7 +10,7 @@ namespace YMplugins.Models.Autocad2024.Utils
     {
         public void Notify(string message)
         {
-            Notify(message, "Создание файлов успешно завершено");
+            Notify(message, Tr.FilesCreatedTitle);
         }
 
         public void Notify(string message, string title)

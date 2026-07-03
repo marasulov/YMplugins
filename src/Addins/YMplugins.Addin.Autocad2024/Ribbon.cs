@@ -3,6 +3,7 @@ using System.Windows;
 using YMplugins.Addin.Autocad2024.Commands.Translator;
 using YMplugins.Models.Autocad2024.Utils.Print;
 using YMplugins.Services.Translator;
+using YMplugins.Contracts.Localization;
 
 namespace YMplugins.Addin.Autocad2024
 {
@@ -32,6 +33,8 @@ using Gile.AutoCAD.R20.Extension;
 
             public void Initialize()
             {
+                DetectUiLanguage();
+
                 // Лента может быть ещё не создана (подписка на ItemInitialized),
                 // уже создана (строим сразу) или полностью построена до загрузки
                 // плагина — тогда ItemInitialized не придёт, страхуемся через Idle.
@@ -65,6 +68,25 @@ using Gile.AutoCAD.R20.Extension;
             private static void WriteToCommandLine(string message)
             {
                 acadApp.DocumentManager.MdiActiveDocument?.Editor.WriteMessage(message);
+            }
+
+            /// <summary>
+            ///     Язык интерфейса плагина = язык интерфейса AutoCAD (LOCALE).
+            ///     Если переменная недоступна — язык системы.
+            /// </summary>
+            private static void DetectUiLanguage()
+            {
+                string language;
+                try
+                {
+                    language = acadApp.GetSystemVariable("LOCALE") as string;
+                }
+                catch (System.Exception)
+                {
+                    language = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+                }
+
+                YMplugins.Contracts.Localization.Tr.SetLanguage(language);
             }
 
             private void Application_IdleBuildRibbon(object sender, EventArgs e)
@@ -183,7 +205,7 @@ using Gile.AutoCAD.R20.Extension;
                     EnsureInitialized();
 
                     RibbonPanelSource ribSourcePanel = new RibbonPanelSource();
-                    ribSourcePanel.Title = "Translator";
+                    ribSourcePanel.Title = Tr.PanelTranslator;
 
                     RibbonPanel ribPanel = new RibbonPanel();
                     ribPanel.Source = ribSourcePanel;
@@ -192,9 +214,9 @@ using Gile.AutoCAD.R20.Extension;
                     RibbonToolTip tt = new RibbonToolTip();
                     RibbonCombo sourceCombo = new RibbonCombo();
                     sourceCombo.Id = "sourceLangCombo";
-                    sourceCombo.Text = tt.Title = "Source language";
+                    sourceCombo.Text = tt.Title = Tr.SourceLanguage;
                     sourceCombo.ShowText = true;
-                    var firstButton = GetRibbonButton("autoDetect", "Detect language", "auto");
+                    var firstButton = GetRibbonButton("autoDetect", Tr.DetectLanguage, "auto");
                     sourceCombo.Items.Add(firstButton);
 
                     foreach (KeyValuePair<string, string> lang in _languageModeMap)
@@ -206,7 +228,7 @@ using Gile.AutoCAD.R20.Extension;
 
                     RibbonCombo targetCombo = new RibbonCombo();
                     targetCombo.Id = "sourceLangCombo";
-                    targetCombo.Text = tt.Title = "Target language";
+                    targetCombo.Text = tt.Title = Tr.TargetLanguage;
                     targetCombo.ShowText = true;
 
                     foreach (KeyValuePair<string, string> lang in _languageModeMap)
@@ -259,15 +281,15 @@ using Gile.AutoCAD.R20.Extension;
 
                     RibbonButton ribBtn = new RibbonButton();
                     ribBtn.Id = "translateBtn";
-                    ribBtn.Name = "Translate";
-                    ribBtn.Text = "Translate";
+                    ribBtn.Name = Tr.BtnTranslate;
+                    ribBtn.Text = Tr.BtnTranslate;
                     ribBtn.CommandHandler = commandHandler;
                     ribBtn.CommandParameter = "YmTranslate";
                     ribBtn.Size = RibbonItemSize.Large;
                     ribBtn.LargeImage = LoadImage("translation");
                     ribBtn.ShowImage = true;
                     ribBtn.ShowText = true;
-                    tt.Content = "Translate";
+                    tt.Content = Tr.BtnTranslate;
                     ribBtn.ToolTip = tt;
                     ribBtn.Orientation = Orientation.Vertical;
 
@@ -287,7 +309,7 @@ using Gile.AutoCAD.R20.Extension;
             private void AutoPrintButtons(RibbonTab ribbonTab)
             {
                 RibbonPanelSource ribSourcePanel = new RibbonPanelSource();
-                ribSourcePanel.Title = "AutoPrint";
+                ribSourcePanel.Title = Tr.PanelAutoPrint;
 
                 RibbonPanel ribPanel = new RibbonPanel();
                 ribPanel.Source = ribSourcePanel;
@@ -298,15 +320,15 @@ using Gile.AutoCAD.R20.Extension;
                 RibbonToolTip tt = new RibbonToolTip();
                 RibbonButton ribBtn = new RibbonButton();
                 ribBtn.Id = "translateBtn";
-                ribBtn.Name = "AutoPrint";
-                ribBtn.Text = "AutoPrint";
+                ribBtn.Name = Tr.BtnAutoPrint;
+                ribBtn.Text = Tr.BtnAutoPrint;
                 ribBtn.CommandHandler = commandHandler;
                 ribBtn.CommandParameter = "AutoPrint";
                 ribBtn.Size = RibbonItemSize.Large;
                 ribBtn.LargeImage = LoadImage("autoprint");
                 ribBtn.ShowImage = true;
                 ribBtn.ShowText = true;
-                tt.Content = "autoprint";
+                tt.Content = Tr.BtnAutoPrint;
                 ribBtn.ToolTip = tt;
                 ribBtn.Orientation = Orientation.Vertical;
 

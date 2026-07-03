@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Net.Http.Headers;
 using YMplugins.Contracts;
+using YMplugins.Contracts.Localization;
 using YMplugins.Contracts.Dto;
 using YMplugins.Contracts.Dto.Enums;
 using YMplugins.ViewModels.VM;
@@ -33,20 +34,20 @@ namespace YMplugins.ViewModels.Commands
             vm.Error = string.Empty;
             if (vm.PrintDataCollection == null || !vm.PrintDataCollection.Any())
             {
-                vm.Error = string.Join("\n", "Block not selected");
+                vm.Error = Tr.ErrBlockNotSelected;
                 return;
             }
 
             var emptyFileNameBlocks = vm.PrintDataCollection.Where(b => string.IsNullOrWhiteSpace(b.FileName)).ToList();
             if (emptyFileNameBlocks.Any())
             {
-                vm.Error = "File name is absent.";
+                vm.Error = Tr.ErrFileNameAbsent;
                 return;
             }
 
             if (vm.IsCombinePdf && string.IsNullOrWhiteSpace(vm.OutputFileName))
             {
-                vm.Error = "Output file name is required when combining PDFs.";
+                vm.Error = Tr.ErrOutputFileNameRequired;
                 return;
 
 
@@ -96,7 +97,7 @@ namespace YMplugins.ViewModels.Commands
             }
             catch (System.Exception ex)
             {
-                _notifyService.Notify(ex.Message, "Ошибка печати");
+                _notifyService.Notify(ex.Message, Tr.PrintErrorTitle);
             }
         }
     }
