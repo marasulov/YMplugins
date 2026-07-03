@@ -29,9 +29,9 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
             var closestFormat = format; //FormatFinder.FindFormatWithScale(width, height);
             if (string.IsNullOrEmpty(closestFormat))
             {
-                return "Не найден подходящий формат";
+                throw new InvalidOperationException(
+                    $"Не удалось определить формат листа для размеров {width} x {height}");
             }
-            Console.WriteLine($"Найден формат: {closestFormat}");
 
             foreach (var line in pConfig.CanonicalMediaNames)
             {
@@ -50,8 +50,6 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
             // Если каноническое имя не найдено точно, попробуем по формату
             if (string.IsNullOrEmpty(canonName))
             {
-                Console.WriteLine("Каноническое имя не найдено по точным размерам, ищем по формату");
-                // Логика поиска по формату, если точное имя не найдено
                 foreach (var line in pConfig.CanonicalMediaNames)
                 {
                     if (line.Contains(closestFormat)) // Если в строке присутствует найденный формат
@@ -62,7 +60,13 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
                 }
             }
 
-            return !string.IsNullOrEmpty(canonName) ? canonName : "Не найдено подходящее каноническое имя";
+            if (string.IsNullOrEmpty(canonName))
+            {
+                throw new InvalidOperationException(
+                    $"В настройках плоттера {_standartCopier.Pc3Name} не найден формат {width} x {height} ({closestFormat})");
+            }
+
+            return canonName;
         }
 
         public string GetCanonNameByWidthAndHeight(PrintInfo printInfo, double tolerance = 10.0)
@@ -73,14 +77,15 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
             {
                 width = Math.Round(printInfo.XDim / printInfo.ScaleX);
                 height = Math.Round(printInfo.YDim / printInfo.ScaleX);
-                Active.Editor.WriteMessage($"printInfo.IsFormatHorizontal {isHor} {width} - {height}");
             }
             else
             {
                 width = Math.Round(printInfo.YDim / printInfo.ScaleX);
                 height = Math.Round(printInfo.XDim / printInfo.ScaleX);
-                Active.Editor.WriteMessage($"printInfo.IsFormatHorizontal {isHor} {width} - {height}");
             }
+#if DEBUG
+            Active.Editor.WriteMessage($"printInfo.IsFormatHorizontal {isHor} {width} - {height}");
+#endif
 
             return FindCanonName(width, height, printInfo.Format, tolerance);
         }
