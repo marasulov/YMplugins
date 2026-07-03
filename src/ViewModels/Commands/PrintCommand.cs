@@ -70,11 +70,11 @@ namespace YMplugins.ViewModels.Commands
 
                 if (vm.SelectedPrintingOrder == PrintingOrder.ByX)
                 {
-                    printData = vm.PrintDataCollection.OrderBy(x => x.Position.X).ToArray();
+                    printData = printData.OrderBy(x => x.Position.X).ToArray();
                 }
                 else if (vm.SelectedPrintingOrder == PrintingOrder.ByY)
                 {
-                    printData = vm.PrintDataCollection.OrderByDescending(x => x.Position.Y).ToArray();
+                    printData = printData.OrderByDescending(x => x.Position.Y).ToArray();
                 }
 
                 string[] fileNames = new string[printData.Length];
