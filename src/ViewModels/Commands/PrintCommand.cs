@@ -96,7 +96,7 @@ namespace YMplugins.ViewModels.Commands
             }
             catch (System.Exception ex)
             {
-                _notifyService.Notify($"Ошибка печати: {ex.Message}");
+                _notifyService.Notify(ex.Message, "Ошибка печати");
             }
         }
     }

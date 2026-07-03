@@ -12,5 +12,10 @@ namespace Mocks
         {
             Debug.WriteLine(message);
         }
+
+        public void Notify(string message, string title)
+        {
+            Debug.WriteLine($"{title}: {message}");
+        }
     }
 }
