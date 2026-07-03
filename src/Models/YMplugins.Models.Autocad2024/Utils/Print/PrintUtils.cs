@@ -1,6 +1,10 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.PlottingServices;
+#if NET8_0_OR_GREATER
+using Gile.AutoCAD.R25.Extension;
+#else
 using Gile.AutoCAD.R20.Extension;
+#endif
 using YMplugins.Contracts.Dto;
 using Application = Autodesk.AutoCAD.ApplicationServices.Core.Application;
 using Exception = Autodesk.AutoCAD.Runtime.Exception;

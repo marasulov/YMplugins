@@ -35,11 +35,18 @@ namespace Build
                     new InstallDir(pluginDir,
                         new File(@".\..\PackageContents.xml"),
                         new Dir(@"Contents",
-                            new File(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Release\net48\conf.json"),
-                            new File(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Release\net48\DWG_To_PDF_Uzle.pc3"),
-                            new File(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Release\net48\Uzle.pmp"),
-                            new DirFiles(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Release\net48\*.dll"),
-                            new File(@".\..\src\Addins\YMplugins.Addin.Autocad2024\bin\Release\net48\YMplugins.Addin.Autocad2024.dll")))
+                            new Dir(@"net48",
+                                new File(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Release\net48\conf.json"),
+                                new File(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Release\net48\DWG_To_PDF_Uzle.pc3"),
+                                new File(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Release\net48\Uzle.pmp"),
+                                new DirFiles(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Release\net48\*.dll"),
+                                new File(@".\..\src\Addins\YMplugins.Addin.Autocad2024\bin\Release\net48\YMplugins.Addin.Autocad2024.dll")),
+                            new Dir(@"net8.0-windows",
+                                new File(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Release\net8.0-windows\conf.json"),
+                                new File(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Release\net8.0-windows\DWG_To_PDF_Uzle.pc3"),
+                                new File(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Release\net8.0-windows\Uzle.pmp"),
+                                new DirFiles(@".\..\src\Models\YMplugins.Models.Autocad2024\bin\Release\net8.0-windows\*.dll"),
+                                new File(@".\..\src\Addins\YMplugins.Addin.Autocad2024\bin\Release\net8.0-windows\YMplugins.Addin.Autocad2024.dll"))))
                 },
 
             };

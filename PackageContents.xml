@@ -1,8 +1,11 @@
 ﻿<ApplicationPackage SchemaVersion="1.0" AppVersion="1.0" Name="CadBoost" Description="YMplugins" ProductCode="{EFD231FD-8B0A-449F-B958-3AC6331EA0DC}">
   <CompanyDetails Name="YM" Email="yusuf.marasulov@gmail.com"/>
   <Components>
-    <ComponentEntry AppName="YMplugin" ModuleName="./Contents/YMplugins.Addin.Autocad2024.dll">
+    <ComponentEntry AppName="YMplugin" ModuleName="./Contents/net48/YMplugins.Addin.Autocad2024.dll">
       <RuntimeRequirements OS="Win64" Platform="AutoCAD*" SeriesMin="R24.3" SeriesMax="R24.3"/>
+    </ComponentEntry>
+    <ComponentEntry AppName="YMplugin" ModuleName="./Contents/net8.0-windows/YMplugins.Addin.Autocad2024.dll">
+      <RuntimeRequirements OS="Win64" Platform="AutoCAD*" SeriesMin="R25.0" SeriesMax="R25.1"/>
     </ComponentEntry>
   </Components>
 </ApplicationPackage>

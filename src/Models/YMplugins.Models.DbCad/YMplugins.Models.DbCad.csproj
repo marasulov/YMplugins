@@ -1,16 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworks>net48;net8.0-windows</TargetFrameworks>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
+    <UseWPF>true</UseWPF>
     <Configurations>Debug;Release;Autocad;Test</Configurations>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AutoCAD.NET" Version="24.3.0" ExcludeAssets="runtime"/>
-  </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <PackageReference Include="AutoCAD.NET" Version="24.3.0" ExcludeAssets="runtime" />
     <ProjectReference Include="..\..\..\external\Gile.AutoCAD.Extension\Gile.AutoCAD.R20.Extension\Gile.AutoCAD.R20.Extension.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
+    <PackageReference Include="AutoCAD.NET" Version="25.0.1" ExcludeAssets="runtime" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.7" ExcludeAssets="runtime" />
+    <ProjectReference Include="..\..\..\external\Gile.AutoCAD.Extension\Gile.AutoCAD.R25.Extension\Gile.AutoCAD.R25.Extension.csproj" />
   </ItemGroup>
 </Project>

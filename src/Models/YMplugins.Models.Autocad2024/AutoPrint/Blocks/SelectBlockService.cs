@@ -1,7 +1,11 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
+#if NET8_0_OR_GREATER
+using Gile.AutoCAD.R25.Extension;
+#else
 using Gile.AutoCAD.R20.Extension;
+#endif
 using YMplugins.Contracts;
 
 namespace YMplugins.Models.Autocad2024.AutoPrint.Blocks

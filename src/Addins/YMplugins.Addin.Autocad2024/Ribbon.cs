@@ -9,7 +9,11 @@ namespace YMplugins.Addin.Autocad2024
     using Autodesk.AutoCAD.ApplicationServices;
     using Autodesk.AutoCAD.Runtime;
     using Autodesk.Windows;
-    using Gile.AutoCAD.R20.Extension;
+    #if NET8_0_OR_GREATER
+using Gile.AutoCAD.R25.Extension;
+#else
+using Gile.AutoCAD.R20.Extension;
+#endif
     using System;
     using System.Collections.Generic;
     using System.Reflection;

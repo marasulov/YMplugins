@@ -1,0 +1,346 @@
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.Runtime;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Gile.AutoCAD.R25.Extension
+{
+    /// <summary>
+    /// Provides extension methods for the Database type.
+    /// </summary>
+    public static class DatabaseExtension
+    {
+        /// <summary>
+        /// Gets the ObjectId of the last nondeleted entity in the drawing. 
+        /// </summary>
+        /// <param name="db">Instance to which the method applies.</param>
+        /// <returns>The ObjectId of the last entity, ObjectId.Null if none.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="db"/> is null.</exception>
+        public static ObjectId EntLast(this Database db)
+        {
+            System.ArgumentNullException.ThrowIfNull(db);
+
+            var seed = db.Handseed.Value;
+            var entityClass = RXObject.GetClass(typeof(Entity));
+            using (var tr = new OpenCloseTransaction())
+            {
+                while (1 < seed)
+                {
+                    if (db.TryGetObjectId(new Handle(seed), out ObjectId id) &&
+                        id.ObjectClass.IsDerivedFrom(entityClass) &&
+                        !id.IsErased &&
+                        id.ObjectClass.Name != "AcDbBlockEnd" &&
+                        id.ObjectClass.Name != "AcDbBlockBegin")
+                    {
+                        var entity = (Entity)tr.GetObject(id, OpenMode.ForRead);
+                        if (entity.IsOwnedByLayout(tr))
+                            return id;
+                    }
+                    seed--;
+                }
+            }
+            return ObjectId.Null;
+        }
+
+        /// <summary>
+        /// Gets the named object dictionary.
+        /// </summary>
+        /// <param name="db">Instance to which the method applies.</param>
+        /// <param name="tr">Transaction or OpenCloseTransaction to use.</param>
+        /// <param name="mode">Open mode to obtain in.</param>
+        /// <returns>The named object dictionary.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="db"/> is null.</exception>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="tr"/> is null.</exception>
+        public static DBDictionary GetNOD(this Database db, Transaction tr, OpenMode mode = OpenMode.ForRead)
+        {
+            System.ArgumentNullException.ThrowIfNull(db);
+            System.ArgumentNullException.ThrowIfNull(tr);
+
+            return (DBDictionary)tr.GetObject(db.NamedObjectsDictionaryId, mode);
+        }
+
+        /// <summary>
+        /// Gets the model space block table record.
+        /// </summary>
+        /// <param name="db">Instance to which the method applies.</param>
+        /// <param name="tr">Transaction or OpenCloseTransaction to use.</param>
+        /// <param name="mode">Open mode to obtain in.</param>
+        /// <returns>The model space.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="db"/> is null.</exception>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="tr"/> is null.</exception>
+        public static BlockTableRecord GetModelSpace(this Database db, Transaction tr, OpenMode mode = OpenMode.ForRead)
+        {
+            System.ArgumentNullException.ThrowIfNull(db);
+            System.ArgumentNullException.ThrowIfNull(tr);
+
+            return (BlockTableRecord)tr.GetObject(SymbolUtilityServices.GetBlockModelSpaceId(db), mode);
+        }
+
+        /// <summary>
+        /// Gets the current space block table record.
+        /// </summary>
+        /// <param name="db">Instance to which the method applies.</param>
+        /// <param name="tr">Transaction or OpenCloseTransaction to use.</param>
+        /// <param name="mode">Open mode to obtain in.</param>
+        /// <returns>The current space.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="db"/> is null.</exception>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="tr"/> is null.</exception>
+        public static BlockTableRecord GetCurrentSpace(this Database db, Transaction tr, OpenMode mode = OpenMode.ForRead)
+        {
+            System.ArgumentNullException.ThrowIfNull(db);
+            System.ArgumentNullException.ThrowIfNull(tr);
+
+            return (BlockTableRecord)tr.GetObject(db.CurrentSpaceId, mode);
+        }
+
+        /// <summary>
+        /// Gets the block table record of each layout.
+        /// </summary>
+        /// <param name="db">Instance to which the method applies.</param>
+        /// <param name="tr">Transaction or OpenCloseTransaction to use.</param>
+        /// <param name="exceptModel">Value indicating if the model space layout is left out.</param>
+        /// <param name="mode">Open mode to obtain in.</param>
+        /// <returns>The sequence of block table records.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="db"/> is null.</exception>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="tr"/> is null.</exception>
+        public static IEnumerable<BlockTableRecord> GetLayoutBlockTableRecords(this Database db, Transaction tr, bool exceptModel = true, OpenMode mode = OpenMode.ForRead)
+        {
+            System.ArgumentNullException.ThrowIfNull(db);
+            System.ArgumentNullException.ThrowIfNull(tr);
+
+            return db.GetLayouts(tr, exceptModel).Select(l => (BlockTableRecord)tr.GetObject(l.BlockTableRecordId, mode));
+        }
+
+        /// <summary>
+        /// Gets the layouts.
+        /// </summary>
+        /// <param name="db">Instance to which the method applies.</param>
+        /// <param name="tr">Transaction or OpenCloseTransaction to use.</param>
+        /// <param name="exceptModel">Value indicating if the model space layout is left out.</param>
+        /// <param name="mode">Open mode to obtain in.</param>
+        /// <param name="openErased">Value indicating whether to obtain erased objects.</param>
+        /// <returns>The sequence of layouts.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="db"/> is null.</exception>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="tr"/> is null.</exception>
+        public static IEnumerable<Layout> GetLayouts(this Database db, Transaction tr, bool exceptModel = true, OpenMode mode = OpenMode.ForRead, bool openErased = false)
+        {
+            System.ArgumentNullException.ThrowIfNull(db);
+            System.ArgumentNullException.ThrowIfNull(tr);
+
+            var layouts = (DBDictionary)tr.GetObject(db.LayoutDictionaryId, OpenMode.ForRead);
+            foreach (DBDictionaryEntry entry in layouts)
+            {
+                if ((entry.Key != "Model" || !exceptModel) && (!entry.Value.IsErased || openErased))
+                {
+                    yield return (Layout)tr.GetObject(entry.Value, mode, openErased);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the layouts names.
+        /// </summary>
+        /// <param name="db">Instance to which the method applies.</param>
+        /// <param name="tr">Transaction or OpenCloseTransaction to use.</param>
+        /// <returns>The sequence of layout names.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="db"/> is null.</exception>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="tr"/> is null.</exception>
+        public static IEnumerable<string> GetLayoutNames(this Database db, Transaction tr)
+        {
+            System.ArgumentNullException.ThrowIfNull(db);
+            System.ArgumentNullException.ThrowIfNull(tr);
+
+            return db.GetLayouts(tr).OrderBy(l => l.TabOrder).Select(l => l.LayoutName);
+        }
+
+        /// <summary>
+        /// Gets the value of the custom property.
+        /// </summary>
+        /// <param name="db">Instance to which the method applies.</param>
+        /// <param name="key">Custome property key.</param>
+        /// <returns>The value of the custom property; or null, if it does not exist.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="db"/> is null.</exception>
+        /// <exception cref="System.ArgumentException">Thrown if <paramref name ="key"/> is null or empty.</exception>
+        public static string? GetCustomProperty(this Database db, string key)
+        {
+            System.ArgumentNullException.ThrowIfNull(db);
+            System.ArgumentException.ThrowIfNullOrWhiteSpace(key);
+
+            var summaryInfoBuilder = new DatabaseSummaryInfoBuilder(db.SummaryInfo);
+            var customProperties = summaryInfoBuilder.CustomPropertyTable;
+            if (customProperties[key] is null)
+                return null;
+            return ((string)customProperties[key]!).Trim();
+        }
+
+        /// <summary>
+        /// Gets all the custom properties.
+        /// </summary>
+        /// <param name="db">Instance to which the method applies.</param>
+        /// <returns>A dictionary of custom properties.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="db"/> is null.</exception>
+        public static Dictionary<string, string> GetCustomProperties(this Database db)
+        {
+            System.ArgumentNullException.ThrowIfNull(db);
+
+            var result = new Dictionary<string, string>();
+            var customPropertie = db.SummaryInfo.CustomProperties;
+            while (customPropertie.MoveNext())
+            {
+                var entry = customPropertie.Entry;
+                result.Add((string)entry.Key, ((string)entry.Value!).Trim());
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Sets the value of the custom property if it exists; otherwise, add the property.
+        /// </summary>
+        /// <param name="db">Instance to which the method applies.</param>
+        /// <param name="key">Property key.</param>
+        /// <param name="value">Property value.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="db"/> is null.</exception>
+        /// <exception cref="System.ArgumentException">Thrown if <paramref name ="key"/> is null or empty.</exception>
+        public static void SetCustomProperty(this Database db, string key, string value)
+        {
+            System.ArgumentNullException.ThrowIfNull(db);
+            System.ArgumentException.ThrowIfNullOrWhiteSpace(key);
+
+            var summaryInfoBuilder = new DatabaseSummaryInfoBuilder(db.SummaryInfo);
+            var customProperties = summaryInfoBuilder.CustomPropertyTable;
+            if (customProperties.Contains(key))
+            {
+                customProperties[key] = value;
+            }
+            else
+            {
+                customProperties.Add(key, value);
+            }
+            db.SummaryInfo = summaryInfoBuilder.ToDatabaseSummaryInfo();
+        }
+
+        /// <summary>
+        /// Sets the values of the custom properties if they exist; otherwise, add them.
+        /// </summary>
+        /// <param name="db">Instance to which the method applies.</param>
+        /// <param name="values">KeyValue pairs for properties.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="db"/> is null.</exception>
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name ="values"/> is null.</exception>
+        public static void SetCustomProperties(this Database db, params KeyValuePair<string, string>[] values)
+        {
+            System.ArgumentNullException.ThrowIfNull(db);
+            System.ArgumentNullException.ThrowIfNull(values);
+
+            var summaryInfoBuilder = new DatabaseSummaryInfoBuilder(db.SummaryInfo);
+            var customProperties = summaryInfoBuilder.CustomPropertyTable;
+            foreach (KeyValuePair<string, string> pair in values)
+            {
+                string key = pair.Key;
+                if (customProperties.Contains(key))
+                {
+                    customProperties[key] = pair.Value;
+                }
+                else
+                {
+                    customProperties.Add(key, pair.Value);
+                }
+            }
+            db.SummaryInfo = summaryInfoBuilder.ToDatabaseSummaryInfo();
+        }
+
+        /// <summary>
+        /// Imports the symbol table record from the specified file.
+        /// </summary>
+        /// <typeparam name="T">Type of SymbolTable.</typeparam>
+        /// <param name="targetDb">Instance to which the method applies.</param>
+        /// <param name="sourceFileName">Complete path of the source file.</param>
+        /// <param name="recordName">Name of the record to import.</param>
+        /// <param name="cloning">Input action for duplicate records</param>
+        /// <returns>The ObjectId of the imported record; ObjectId.Null if cloning failed.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name ="targetDb"/> is null.</exception>
+        public static ObjectId ImportRecord<T>(
+            this Database targetDb, string sourceFileName, string recordName, DuplicateRecordCloning cloning)
+            where T : SymbolTable
+        {
+            ArgumentNullException.ThrowIfNull(targetDb);
+
+            using var sourceDb = new Database(false, true);
+            sourceDb.ReadDwgFile(sourceFileName, FileOpenMode.OpenForReadAndAllShare, false, null);
+            using Transaction tr = sourceDb.TransactionManager.StartTransaction();
+            var sourceTable = (T)tr.GetObject(sourceDb.GetTableId<T>(), OpenMode.ForRead);
+            if (!sourceTable.Has(recordName))
+                return ObjectId.Null;
+            ObjectId sourceTableRecordId = sourceTable[recordName];
+            var ids = new ObjectIdCollection { sourceTableRecordId };
+            var mapping = new IdMapping();
+            sourceDb.WblockCloneObjects(ids, targetDb.GetTableId<T>(), mapping, cloning, false);
+            tr.Commit();
+            return mapping[sourceTableRecordId].IsCloned ?
+                mapping[sourceTableRecordId].Value :
+                ObjectId.Null;
+        }
+
+        /// <summary>
+        /// Imports SymbolTableRecords whose names match the template supplied from the specified file.
+        /// </summary>
+        /// <typeparam name="T">Type of SymbolTable.</typeparam>
+        /// <param name="targetDb">Instance to which the method applies.</param>
+        /// <param name="sourceFileName">Complete path of the source file.</param>
+        /// <param name="pattern">WcMatch pattern.</param>
+        /// <param name="cloning">Input action for duplicate records.</param>
+        /// <returns>A dictionary containing the names and ObjectIds of the imported records.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name ="targetDb"/> is null.</exception>
+        public static Dictionary<string, ObjectId> ImportRecords<T>(
+            this Database targetDb, string sourceFileName, string pattern, DuplicateRecordCloning cloning)
+            where T : SymbolTable
+        {
+            ArgumentNullException.ThrowIfNull(targetDb);
+
+            using var sourceDb = new Database(false, true);
+            sourceDb.ReadDwgFile(sourceFileName, FileOpenMode.OpenForReadAndAllShare, false, null);
+            using Transaction tr = sourceDb.TransactionManager.StartTransaction();
+            var sourceTable = (T)tr.GetObject(sourceDb.GetTableId<T>(), OpenMode.ForRead);
+            var records = sourceTable
+                .Cast<ObjectId>()
+                .Select(id => (SymbolTableRecord)tr.GetObject(id, OpenMode.ForRead))
+                .Where(r => Autodesk.AutoCAD.Internal.Utils.WcMatchEx(r.Name, pattern, true))
+                .ToDictionary(r => r.Name, r => r.ObjectId);
+            var ids = new ObjectIdCollection([.. records.Values]);
+            var mapping = new IdMapping();
+            sourceDb.WblockCloneObjects(ids, targetDb.GetTableId<T>(), mapping, cloning, false);
+            tr.Commit();
+            return records
+                .Where(r => mapping[r.Value].IsCloned)
+                .ToDictionary(r => r.Key, r => mapping[r.Value].Value);
+        }
+
+        /// <summary>
+        /// Gets the ObjectId of the specified SymbolTable.
+        /// </summary>
+        /// <typeparam name="T">Type of SymbolTable.</typeparam>
+        /// <param name="db">Instance to which the method applies.</param>
+        /// <returns>The ObjectId of the specified SymbolTable.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name ="db"/> is null.</exception>
+        /// <exception cref="NotImplementedException"></exception>
+        public static ObjectId GetTableId<T>(this Database db) where T : SymbolTable
+        {
+            ArgumentNullException.ThrowIfNull(db);
+
+            return typeof(T).Name switch
+            {
+                nameof(BlockTable) => db.BlockTableId,
+                nameof(DimStyleTable) => db.DimStyleTableId,
+                nameof(LayerTable) => db.LayerTableId,
+                nameof(LinetypeTable) => db.LinetypeTableId,
+                nameof(RegAppTable) => db.RegAppTableId,
+                nameof(TextStyleTable) => db.TextStyleTableId,
+                nameof(UcsTable) => db.UcsTableId,
+                nameof(ViewTable) => db.ViewTableId,
+                nameof(ViewportTable) => db.ViewportTableId,
+                _ => throw new NotImplementedException(),
+            };
+        }
+    }
+}

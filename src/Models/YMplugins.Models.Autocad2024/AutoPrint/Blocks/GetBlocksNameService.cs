@@ -1,5 +1,9 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
+#if NET8_0_OR_GREATER
+using Gile.AutoCAD.R25.Extension;
+#else
 using Gile.AutoCAD.R20.Extension;
+#endif
 using System.Collections.Generic;
 using YMplugins.Contracts;
 
