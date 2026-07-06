@@ -24,7 +24,7 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
 
         public string FindCanonName(double width, double height, string format, double tolerance = 10.0)
         {
-            var pConfig = PlotConfigManager.SetCurrentConfig(_standartCopier.Pc3Source);
+            var pConfig = PlotConfigManager.SetCurrentConfig(_standartCopier.Pc3PathForReading);
             var pat = @"\d{1,}?\.\d{2}"; // Регулярное выражение для поиска размеров
             var canonName = "";
             var pattern = new Regex(pat, RegexOptions.Compiled | RegexOptions.Singleline);

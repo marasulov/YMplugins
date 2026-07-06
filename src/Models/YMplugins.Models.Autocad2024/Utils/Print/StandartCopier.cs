@@ -15,10 +15,8 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
     {
         public StandartCopier()
         {
-            string confFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty, "conf.json");
-
-            var jsonFile = File.ReadAllText(confFile);
-            var deserializeObject = JsonConvert.DeserializeObject<Params>(jsonFile);
+            var assemblyDir = Path.GetDirectoryName(typeof(StandartCopier).Assembly.Location);
+            var deserializeObject = LoadParams(assemblyDir);
 
             try
             {
@@ -28,15 +26,51 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
                 PmpDestination = Path.Combine(HostApplicationServices.Current.GetEnvironmentVariable("PrinterDescDir"),
                     deserializeObject.Pmp);
 
-                var locationFolder = Path.GetDirectoryName(confFile);
-                Pc3Source = Path.Combine(locationFolder, deserializeObject.Pc3);
-                PmpSource = Path.Combine(locationFolder, deserializeObject.Pmp);
+                if (!string.IsNullOrEmpty(assemblyDir))
+                {
+                    Pc3Source = Path.Combine(assemblyDir, deserializeObject.Pc3);
+                    PmpSource = Path.Combine(assemblyDir, deserializeObject.Pmp);
+                }
             }
             catch (Exception e)
             {
                 WriteToCommandLine(e.Message);
             }
         }
+
+        /// <summary>
+        ///     conf.json читается с диска рядом со сборкой, а если его там нет
+        ///     (Add-in Manager загружает копию DLL из Temp без соседних файлов) —
+        ///     из встроенного в сборку ресурса.
+        /// </summary>
+        private static Params LoadParams(string assemblyDir)
+        {
+            var confFile = string.IsNullOrEmpty(assemblyDir) ? null : Path.Combine(assemblyDir, "conf.json");
+            string json;
+
+            if (confFile != null && File.Exists(confFile))
+            {
+                json = File.ReadAllText(confFile);
+            }
+            else
+            {
+                using (var stream = typeof(StandartCopier).Assembly
+                           .GetManifestResourceStream("YMplugins.Models.Autocad2024.conf.json"))
+                using (var reader = new StreamReader(stream))
+                {
+                    json = reader.ReadToEnd();
+                }
+            }
+
+            return JsonConvert.DeserializeObject<Params>(json);
+        }
+
+        /// <summary>
+        ///     Путь к pc3 для чтения настроек: файл рядом со сборкой,
+        ///     а если его нет — уже установленная копия в папке плоттеров AutoCAD.
+        /// </summary>
+        public string Pc3PathForReading =>
+            !string.IsNullOrEmpty(Pc3Source) && File.Exists(Pc3Source) ? Pc3Source : Pc3Destination;
 
         /// <summary>
         ///     Имя файла pc3 из conf.json (для SetPlotConfigurationName)
@@ -65,6 +99,17 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
 
         public bool CopyParamsFiles()
         {
+            if (string.IsNullOrEmpty(Pc3Source) || !File.Exists(Pc3Source) || !File.Exists(PmpSource))
+            {
+                // Рядом со сборкой файлов плоттера нет (загрузка через Add-in Manager) —
+                // копировать нечего, работаем с уже установленными в папке плоттеров
+                var installed = File.Exists(Pc3Destination) && File.Exists(PmpDestination);
+                if (!installed)
+                    WriteToCommandLine(
+                        $"\nCADBoost: файлы плоттера не найдены. Скопируйте {Pc3Name} в {Pc3Destination} или установите плагин через MSI.");
+                return installed;
+            }
+
             if (!File.Exists(Pc3Destination) & !File.Exists(PmpDestination))
             {
                 if (IsFileCopied(Pc3Source, Pc3Destination))

@@ -19,7 +19,7 @@ namespace YMplugins.Models.Autocad2024.Utils.LayoutsServices
         public void Set(PrintInfo[] printDatas)
         {
             var standartCopier = new StandartCopier();
-            PlotConfigManager.SetCurrentConfig(standartCopier.Pc3Source);
+            PlotConfigManager.SetCurrentConfig(standartCopier.Pc3PathForReading);
 
             CanonNameResolver canonNameResolver = new CanonNameResolver(standartCopier);
 
