@@ -39,7 +39,7 @@ namespace YMplugins.Contracts.Localization
         public static string SelectOnScreen => R("Указать на экране", "Select on screen");
         public static string SelectLayer => R("Слой", "Select layer");
         public static string SelectOnLayerScreen => R("Указать слой на экране", "Select layer on screen");
-        public static string EnterPolylineScale => R("Масштаб полилинии", "Polyline scale");
+        public static string EnterPolylineScale => R("Масштаб полилинии (1 = автоопределение)", "Polyline scale (1 = auto-detect)");
         public static string PrintingOrder => R("Порядок печати", "Printing order");
         public static string PrintingNumberingOrder => R("Порядок нумерации при печати", "Printing numbering order");
         public static string Naming => R("Именование", "Naming");

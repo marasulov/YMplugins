@@ -1,77 +1,85 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace YMplugins.Models.Autocad2024.Utils
 {
     public class FormatFinder
     {
-        ///// <summary>
-        ///// Словарь, содержащий все форматы с указанием размеров для книжной и альбомной ориентации
-        ///// </summary>
-        //private static readonly Dictionary<string, (double Width, double Height)> GOSTFormats = new()
-        //{
-        //    // Стандартные форматы
-        //    { "A4", (210, 297) },
-        //    { "A3", (297, 420) },
-        //    { "A2", (420, 594) },
-        //    { "A1", (594, 841) },
-        //    { "A0", (841, 1189) },
-
-        //    // Альбомные (горизонтальные) форматы
-        //    { "A4 г", (297, 210) },
-        //    { "A3 г", (420, 297) },
-        //    { "A2 г", (594, 420) },
-        //    { "A1 г", (841, 594) },
-        //    { "A0 г", (1189, 841) },
-
-        //    // Кратные форматы для книжной ориентации (увеличиваем только меньшую сторону)
-        //    { "A4x3 в", (210 * 3, 297) }, { "A4x4 в", (210 * 4, 297) },
-        //    { "A4x5 в", (210 * 5, 297) }, { "A4x6 в", (210 * 6, 297) },
-
-        //    { "A3x3 в", (297 * 3, 420) }, { "A3x4 в", (297 * 4, 420) },
-        //    { "A3x5 в", (297 * 5, 420) }, { "A3x6 в", (297 * 6, 420) },
-
-        //    { "A2x3 в", (420 * 3, 594) }, { "A2x4 в", (420 * 4, 594) },
-        //    { "A2x5 в", (420 * 5, 594) }, { "A2x6 в", (420 * 6, 594) },
-
-        //    { "A1x3 в", (594 * 3, 841) }, { "A1x4 в", (594 * 4, 841) },
-        //    { "A1x5 в", (594 * 5, 841) }, { "A1x6 в", (594 * 6, 841) },
-
-        //    { "A0x3 в", (841 * 3, 1189) }, { "A0x4 в", (841 * 4, 1189) },
-        //    { "A0x5 в", (841 * 5, 1189) }, { "A0x6 в", (841 * 6, 1189) },
-
-        //    // Кратные форматы для альбомной ориентации (увеличиваем только меньшую сторону)
-        //    { "A4x3 г", (297, 210 * 3) }, { "A4x4 г", (297, 210 * 4) },
-        //    { "A4x5 г", (297, 210 * 5) }, { "A4x6 г", (297, 210 * 6) },
-        //    { "A4x7 г", (297, 210 * 7) }, { "A4x8 г", (297, 210 * 8) },
-        //    { "A4x9 г", (297, 210 * 9) },
-
-        //    { "A3x3 г", (420, 297 * 3) }, { "A3x4 г", (420, 297 * 4) },
-        //    { "A3x5 г", (420, 297 * 5) }, { "A3x6 г", (420, 297 * 6) },
-        //    { "A3x7 г", (420, 297 * 7) },
-
-        //    { "A2x3 г", (594, 420 * 3) }, { "A2x4 г", (594, 420 * 4) },
-        //    { "A2x5 г", (594, 420 * 5) }, { "A2x6 г", (594, 420 * 6) },
-
-        //    { "A1x3 г", (841, 594 * 3) }, { "A1x4 г", (841, 594 * 4) },
-        //    { "A1x5 г", (841, 594 * 5) }, { "A1x6 г", (841, 594 * 6) },
-
-        //    { "A0x2 г", (1189, 841 * 2) },
-        //    { "A0x3 г", (1189, 841 * 3) }, { "A0x4 г", (1189, 841 * 4) },
-        //    { "A0x5 г", (1189, 841 * 5) }, { "A0x6 г", (1189, 841 * 6) },
-        //};
-
-        ////TODO finding scaling
-
+        /// <summary>
+        ///     Допуск совпадения с форматом, мм на сторону (в размерах бумаги).
+        /// </summary>
         private const double Tolerance = 5.0;
 
         /// <summary>
-        /// Статический метод для поиска формата с учётом кратности
+        ///     Стандартные масштабы, в которых чертят рамки:
+        ///     натуральная величина и масштабы уменьшения 1:25 … 1:1000.
         /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <returns></returns>
+        public static readonly double[] StandardScales =
+            { 1, 25, 40, 50, 75, 100, 200, 400, 500, 800, 1000 };
+
+        /// <summary>
+        ///     Автоматически подбирает формат листа и масштаб рамки по её габаритам.
+        ///     Перебирает стандартные масштабы и для каждого ищет формат ГОСТ,
+        ///     с которым рамка совпадает в пределах допуска после деления на масштаб.
+        ///     Из всех подошедших вариантов выбирается самый точный.
+        /// </summary>
+        /// <returns>
+        ///     Формат и масштаб, либо (null, null), если габариты не совпали
+        ///     ни с одним форматом ни в одном стандартном масштабе.
+        /// </returns>
+        public static (string Format, double? Scale) DetectFormatAndScale(double xDim, double yDim)
+        {
+            string bestFormat = null;
+            double? bestScale = null;
+            double bestDiff = double.MaxValue;
+            double bestScalePreference = double.MaxValue;
+
+            bool frameIsLandscape = xDim > yDim;
+
+            foreach (var scale in StandardScales)
+            {
+                double paperX = xDim / scale;
+                double paperY = yDim / scale;
+
+                // Форматы А-серии кратны двойке, поэтому рамка может одинаково
+                // точно совпасть, например, с А4 в 1:100 и А2 в 1:50. При равной
+                // точности предпочитаем масштаб, ближайший к 1:100 (наиболее
+                // распространённая конвенция).
+                double scalePreference = Math.Abs(Math.Log(scale / 100.0));
+
+                foreach (var format in GOSTFormats)
+                {
+                    var (formatX, formatY) = format.Value;
+
+                    // Ориентация записи в словаре должна совпадать с ориентацией рамки
+                    if (formatX > formatY != frameIsLandscape) continue;
+
+                    double diffX = Math.Abs(paperX - formatX);
+                    double diffY = Math.Abs(paperY - formatY);
+                    if (diffX > Tolerance || diffY > Tolerance) continue;
+
+                    double diff = diffX + diffY;
+                    bool better = diff < bestDiff - 0.001 ||
+                                  (Math.Abs(diff - bestDiff) <= 0.001 && scalePreference < bestScalePreference);
+                    if (better)
+                    {
+                        bestDiff = diff;
+                        bestScale = scale;
+                        bestFormat = format.Key;
+                        bestScalePreference = scalePreference;
+                    }
+                }
+            }
+
+            if (bestFormat == null) return (null, null);
+
+            var label = bestScale > 1 ? $"{bestFormat} 1:{bestScale}" : bestFormat;
+            return (label, bestScale);
+        }
+
+        /// <summary>
+        ///     Поиск ближайшего формата при известном (заданном вручную) масштабе.
+        /// </summary>
         public static string FindFormatWithScale(double width, double height, double scale)
         {
             double normalizedWidth = Math.Min(width, height);
@@ -84,7 +92,7 @@ namespace YMplugins.Models.Autocad2024.Utils
             {
                 var (standardWidth, standardHeight) = format.Value;
 
-                double differenceWidthHeight = GetDifference(normalizedWidth/scale, normalizedHeight/scale, standardWidth, standardHeight);
+                double differenceWidthHeight = GetDifference(normalizedWidth / scale, normalizedHeight / scale, standardWidth, standardHeight);
                 double differenceHeightWidth = GetDifference(normalizedWidth / scale, normalizedHeight / scale, standardHeight, standardWidth);
 
                 // Ищем формат с минимальным отклонением
@@ -107,36 +115,32 @@ namespace YMplugins.Models.Autocad2024.Utils
         /// <summary>
         /// Метод для подсчета разницы между размерами
         /// </summary>
-        /// <param name="width1"></param>
-        /// <param name="height1"></param>
-        /// <param name="width2"></param>
-        /// <param name="height2"></param>
-        /// <returns></returns>
         private static double GetDifference(double width1, double height1, double width2, double height2)
         {
             return Math.Abs(width1 - width2) + Math.Abs(height1 - height2);
         }
 
         /// <summary>
-        /// Словарь, содержащий все форматы с указанием размеров для книжной и альбомной ориентации
+        /// Словарь, содержащий все форматы с указанием размеров для книжной и альбомной ориентации.
+        /// Значение — (размер по X, размер по Y) в мм.
         /// </summary>
         private static readonly Dictionary<string, (double xFormatDim, double yFormatDim)> GOSTFormats = new()
         {
-            // Альбомные (горизонтальные) форматы
+            // Книжные (вертикальные) форматы
             { "A4 в" , (210, 297) },
             { "A3 в", (297, 420) },
             { "A2 в", (420, 594) },
             { "A1 в", (594, 841) },
             { "A0 в", (841, 1189) },
 
-            // Книжные (вертикальные) форматы
+            // Альбомные (горизонтальные) форматы
             { "A4 г", (297, 210) },
             { "A3 г", (420, 297) },
             { "A2 г", (594, 420) },
             { "A1 г", (841, 594) },
             { "A0 г", (1189, 841) },
 
-            // Кратные форматы для книжной ориентации (угеличигаем только меньшую сторону)
+            // Кратные форматы, широкая сторона по X
             { "A4x3 г", (210 * 3, 297) }, { "A4x4 г", (210 * 4, 297) },
             { "A4x5 г", (210 * 5, 297) }, { "A4x6 г", (210 * 6, 297) },
 
@@ -152,7 +156,7 @@ namespace YMplugins.Models.Autocad2024.Utils
             { "A0x3 г", (841 * 3, 1189) }, { "A0x4 г", (841 * 4, 1189) },
             { "A0x5 г", (841 * 5, 1189) }, { "A0x6 г", (841 * 6, 1189) },
 
-            // Кратные форматы для альбомной ориентации (увеличиваем только меньшую сторону)
+            // Кратные форматы, широкая сторона по Y
             { "A4x3 в", (297, 210 * 3) }, { "A4x4 в", (297, 210 * 4) },
             { "A4x5 в", (297, 210 * 5) }, { "A4x6 в", (297, 210 * 6) },
             { "A4x7 в", (297, 210 * 7) }, { "A4x8 в", (297, 210 * 8) },
@@ -172,165 +176,5 @@ namespace YMplugins.Models.Autocad2024.Utils
             { "A0x3 в", (1189, 841 * 3) }, { "A0x4 в", (1189, 841 * 4) },
             { "A0x5 в", (1189, 841 * 5) }, { "A0x6 в", (1189, 841 * 6) },
         };
-
-        //public static (string Format, double? Scale) FindFormatWithScale(double xDim, double yDim, double? userScale = null, double tolerance = 0.05)
-        //{
-        //    // Определяем меньшую и большую сторону
-        //    double minDim = Math.Min(xDim, yDim);
-        //    double maxDim = Math.Max(xDim, yDim);
-        //    double minDifference = double.MaxValue;
-        //    // Определяем ориентацию
-        //    bool isLandscape = xDim > yDim; // Альбомная, если xDim больше yDim
-        //    string closestFormat = null;
-        //    double? closestScale = null;
-
-        //    // Шаг 1: сначала ищем формат с масштабом 1
-        //    foreach (var format in GOSTFormats)
-        //    {
-        //        var formatX = format.Value.xFormatDim;
-        //        var formatY = format.Value.yFormatDim;
-
-        //        // Проверяем соответствие формату с масштабом 1 в зависимости от ориентации
-        //        if (isLandscape)
-        //        {
-        //            // Если альбомная ориентация
-        //            if (Math.Abs(xDim - formatX) <= tolerance && Math.Abs(yDim - formatY) <= tolerance)
-        //            {
-        //                closestFormat = format.Key;
-        //                closestScale = 1;
-        //                return (closestFormat, closestScale); // сразу возвращаем, если нашли подходящий формат
-        //            }
-        //        }
-        //        else
-        //        {
-        //            // Если книжная ориентация
-        //            if (Math.Abs(yDim - formatY) <= tolerance && Math.Abs(xDim - formatX) <= tolerance)
-        //            {
-        //                closestFormat = format.Key;
-        //                closestScale = 1;
-        //                return (closestFormat, closestScale); // сразу возвращаем, если нашли подходящий формат
-        //            }
-        //        }
-        //    }
-
-        //    // Шаг 2: если формат не найден, ищем подходящий масштаб
-        //    foreach (var format in GOSTFormats)
-        //    {
-        //        double formatX = format.Value.xFormatDim;
-        //        double formatY = format.Value.yFormatDim;
-
-
-        //        if (userScale.HasValue)
-        //        {
-        //            // Если задан масштаб, проверяем его
-        //            double scaledX = formatX * userScale.Value;
-        //            double scaledY = formatY * userScale.Value;
-
-        //            if (isLandscape)
-        //            {
-        //                // Если альбомная ориентация
-        //                if (Math.Abs(minDim - scaledX) <= tolerance && Math.Abs(maxDim - scaledY) <= tolerance)
-        //                {
-        //                    closestFormat = format.Key;
-        //                    closestScale = userScale;
-        //                    break;
-        //                }
-        //            }
-        //            else
-        //            {
-        //                // Если книжная ориентация
-        //                if (Math.Abs(minDim - scaledY) <= tolerance && Math.Abs(maxDim - scaledX) <= tolerance)
-        //                {
-        //                    closestFormat = format.Key;
-        //                    closestScale = userScale;
-        //                    break;
-        //                }
-        //            }
-        //        }
-        //        else
-        //        {
-        //            double scaleX = minDim / formatX;
-        //            double scaleY = maxDim / formatY;
-        //            var mathx = Math.Abs(scaleX-scaleY);
-        //            var mathY = Math.Abs(scaleY);
-        //            var p = AreAlmostEqualPercentage(scaleX, scaleY, 10);
-        //            var checkscale = mathx / mathY <= tolerance;
-        //            var closeToWholeNumber = IsCloseToWholeNumber((scaleX + scaleY) / 2, tolerance);
-        //            if (p)
-        //            {
-        //                scaleX = RoundToNearestAllowedScale(scaleX);
-        //                scaleY = RoundToNearestAllowedScale(scaleY);
-        //                if (IsAllowedScale(scaleX))
-        //                {
-        //                    closestFormat = format.Key;
-                            
-        //                    //double averageScale = Math.Round((scaleX + scaleY) / 2);
-
-        //                    //double difference = Math.Abs(scaleX - averageScale) + Math.Abs(scaleY - averageScale);
-
-        //                    //if (difference < minDifference)
-        //                    //{
-        //                    //    minDifference = difference;
-        //                    //    closestFormat = format.Key;
-        //                    //    closestScale = averageScale;
-        //                    //}
-        //                }
-                        
-        //            }
-        //        }
-        //    }
-
-        //    return (closestFormat, closestScale);
-        //}
-
-        //// Вспомогательная функция для проверки, является ли число близким к целому
-        //private static bool IsCloseToWholeNumber(double value, double tolerance)
-        //{
-        //    return Math.Abs(value - Math.Round(value)) <= tolerance;
-        //}
-
-        //public static bool AreAlmostEqualPercentage(double value1, double value2, double percentageTolerance)
-        //{
-        //    double maxValue = Math.Max(value1, value2);
-        //    double difference = Math.Abs(value1 - value2);
-
-        //    // Рассчитываем допустимую разницу в процентах
-        //    double tolerance = maxValue * (percentageTolerance / 100.0);
-        //    return difference <= tolerance;
-        //}
-
-        //public static bool IsAllowedScale(double scale, double tolerance = 0.05)
-        //{
-        //    double[] allowedScales = new double[]
-        //    {
-        //        0.5, 0.4, 0.25, 0.2, 0.1, 0.0667, 0.05, 0.04, 0.025, 0.02, 0.0133, 0.01, 0.005, 0.0025, 0.002, 0.00125, 0.001, // Масштабы уменьшения
-        //        1,  // Натуральная величина
-        //        2, 2.5, 4, 5, 10, 20, 40, 50, 100,1000 // Масштабы увеличения
-        //    };
-
-        //    foreach (var allowedScale in allowedScales)
-        //    {
-        //        if (Math.Abs(scale - allowedScale) <= tolerance * allowedScale)
-        //        {
-        //            return true;
-        //        }
-        //    }
-
-        //    return false;
-        //}
-
-        //public static double RoundToNearestAllowedScale(double scale)
-        //{
-        //    double[] allowedScales = new double[]
-        //    {
-        //        0.5, 0.4, 0.25, 0.2, 0.1, 0.0667, 0.05, 0.04, 0.025, 0.02, 0.0133, 0.01, 0.005, 0.0025, 0.002, 0.00125, 0.001, // Масштабы уменьшения
-        //        1,  // Натуральная величина
-        //        2, 2.5, 4, 5, 10, 15, 20, 25, 40, 50, 75, 100, 200, 400, 500, 800, 1000 // Масштабы увеличения
-        //    };
-
-        //    // Ищем ближайшее допустимое значение
-        //    double closestScale = allowedScales.OrderBy(s => Math.Abs(s - scale)).First();
-        //    return closestScale;
-        //}
     }
 }

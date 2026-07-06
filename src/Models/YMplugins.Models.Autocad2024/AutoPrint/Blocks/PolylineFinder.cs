@@ -122,7 +122,27 @@ namespace YMplugins.Models.Autocad2024.AutoPrint.Blocks
             var xDim = maxPoint.X - minPoint.X;
             var yDim = maxPoint.Y - minPoint.Y;
 
-            var format = FormatFinder.FindFormatWithScale(xDim, yDim, scale);
+            string format;
+
+            // Масштаб 1 (значение по умолчанию в окне) означает «определить
+            // автоматически по габаритам рамки»; любое другое значение — ручной масштаб
+            if (scale == 1)
+            {
+                var (autoFormat, autoScale) = FormatFinder.DetectFormatAndScale(xDim, yDim);
+                if (autoScale.HasValue)
+                {
+                    format = autoFormat;
+                    scale = autoScale.Value;
+                }
+                else
+                {
+                    format = FormatFinder.FindFormatWithScale(xDim, yDim, scale);
+                }
+            }
+            else
+            {
+                format = FormatFinder.FindFormatWithScale(xDim, yDim, scale);
+            }
 
             return new PrintInfo(
                 objId.Handle.Value,

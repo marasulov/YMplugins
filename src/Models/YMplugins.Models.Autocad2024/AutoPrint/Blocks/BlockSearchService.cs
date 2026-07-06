@@ -77,9 +77,13 @@ namespace YMplugins.Models.Autocad2024.AutoPrint.Blocks
                 var xDim = blockExtents.MaxPoint.X - blockExtents.MinPoint.X;
                 var yDim = blockExtents.MaxPoint.Y - blockExtents.MinPoint.Y;
                 var position = blockRef.Position;
-                var blockScale = blockRef.ScaleFactors.X;
                 var blockPointPosition = new PointDTO(position.X, position.Y, position.Z);
-                var format = FormatFinder.FindFormatWithScale(xDim, yDim, blockScale);
+
+                // Масштаб определяется по габаритам рамки (рамку часто чертят
+                // увеличенной в 25…1000 раз); масштаб вставки блока — запасной вариант
+                var (autoFormat, autoScale) = FormatFinder.DetectFormatAndScale(xDim, yDim);
+                var blockScale = autoScale ?? blockRef.ScaleFactors.X;
+                var format = autoFormat ?? FormatFinder.FindFormatWithScale(xDim, yDim, blockScale);
                 
 #if DEBUG
                 Active.Editor.WriteMessage($"format {format}");
