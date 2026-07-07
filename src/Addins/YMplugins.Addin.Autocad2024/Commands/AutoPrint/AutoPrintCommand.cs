@@ -26,7 +26,6 @@ namespace YMplugins.Addin.Autocad2024.Commands.AutoPrint
         [CommandMethod("Autoprint")]
         public static void Print()
         {
-            Active.Document.SendStringToExecute("_QSAVE ", true, false, false);
             var container = new Container();
             container.Options.EnableAutoVerification = false;
 
@@ -73,10 +72,11 @@ namespace YMplugins.Addin.Autocad2024.Commands.AutoPrint
             context.GetLayersCommand.Execute(null);
 
             // ShowModalWindow привязывает WPF-окно к главному окну AutoCAD и
-            // корректно интегрируется с его циклом сообщений. Сырой ShowDialog()
-            // оставлял редактор без курсора, а окно не всплывало до переключения
-            // документа.
-            Autodesk.AutoCAD.ApplicationServices.Application.ShowModalWindow(window);
+            // корректно интегрируется с его циклом сообщений. Явно передаём
+            // дескриптор главного окна как владельца — иначе на первый вызов
+            // окно не всплывало, а курсор пропадал в пространстве модели.
+            Autodesk.AutoCAD.ApplicationServices.Application.ShowModalWindow(
+                Autodesk.AutoCAD.ApplicationServices.Application.MainWindow.Handle, window);
         }
 
     }
