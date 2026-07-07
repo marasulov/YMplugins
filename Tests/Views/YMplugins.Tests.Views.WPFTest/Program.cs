@@ -23,6 +23,7 @@ namespace YMplugins.Tests.Views.WPFTest
             container.Register<GetLayersCommand>();
             container.Register<PrintCommand>();
             container.Register<SelectBlockCommand>();
+            container.Register<SelectLayerCommand>();
             container.Register<ZoomToPointCommand>();
             container.Register<AutoPrintVm>(Lifestyle.Transient);
             container.Register<AutoPrintView>(Lifestyle.Transient);
@@ -39,6 +40,7 @@ namespace YMplugins.Tests.Views.WPFTest
             container.Register<IZoomEntity, ZoomService>();
             container.Register<IGetLayersService, GetLayersService>();
             container.Register<ISelectBlockService, SelectBlockService>();
+            container.Register<ISelectLayerService, SelectLayerService>();
             container.Register<IAttributesService, AttributeService>();
             container.Register<ICombinePdfService, CombinePdfService>();
             container.Register<IAutoCadFileService, AutoCadFileService>();

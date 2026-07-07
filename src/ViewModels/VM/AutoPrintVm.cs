@@ -47,6 +47,7 @@ namespace YMplugins.ViewModels.VM
             GetAttributesCommand getAttributesCommand,
             PrintCommand printCommand,
             SelectBlockCommand selectBlockCommand,
+            SelectLayerCommand selectLayerCommand,
             ZoomToPointCommand zoomToPointCommand,
             IAttributesService attributesService,
             ISearchService searchService)
@@ -55,7 +56,7 @@ namespace YMplugins.ViewModels.VM
             _searchService = searchService ?? throw new ArgumentNullException(nameof(searchService));
 
             InitializeCommands(getBlocksNameCommand, getLayersCommand, getAttributesCommand,
-                               printCommand, selectBlockCommand, zoomToPointCommand);
+                               printCommand, selectBlockCommand, selectLayerCommand, zoomToPointCommand);
         }
 
         public List<string> BlocksNames
@@ -306,6 +307,7 @@ namespace YMplugins.ViewModels.VM
         public Action OpenAction { get; set; }
         public GetBlocksNameCommand GetBlocksNameCommand { get; private set; }
         public SelectBlockCommand SelectBlockCommand { get; private set; }
+        public SelectLayerCommand SelectLayerCommand { get; private set; }
         public GetLayersCommand GetLayersCommand { get; private set; }
         public GetAttributesCommand GetAttributesCommand { get; private set; }
         public PrintCommand PrintCommand { get; private set; }
@@ -329,6 +331,7 @@ namespace YMplugins.ViewModels.VM
             GetAttributesCommand getAttributesCommand,
             PrintCommand printCommand,
             SelectBlockCommand selectBlockCommand,
+            SelectLayerCommand selectLayerCommand,
             ZoomToPointCommand zoomToPointCommand)
         {
             GetBlocksNameCommand = getBlocksNameCommand ?? throw new ArgumentNullException(nameof(getBlocksNameCommand));
@@ -340,6 +343,7 @@ namespace YMplugins.ViewModels.VM
             GetAttributesCommand = getAttributesCommand ?? throw new ArgumentNullException(nameof(getAttributesCommand));
             PrintCommand = printCommand ?? throw new ArgumentNullException(nameof(printCommand));
             SelectBlockCommand = selectBlockCommand ?? throw new ArgumentNullException(nameof(selectBlockCommand));
+            SelectLayerCommand = selectLayerCommand ?? throw new ArgumentNullException(nameof(selectLayerCommand));
             ZoomToPointCommand = zoomToPointCommand ?? throw new ArgumentNullException(nameof(zoomToPointCommand));
         }
 

@@ -167,7 +167,7 @@
                       ItemsSource="{Binding  Layers}"
                       SelectedItem="{Binding SelectedLayerOnScreen, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                       SelectedIndex="0" />
-                        <Button Content="{x:Static loc:Tr.SelectOnLayerScreen}" Command="{Binding SelectedLayerOnScreen}"  CommandParameter="{Binding }" />
+                        <Button Content="{x:Static loc:Tr.SelectOnLayerScreen}" Command="{Binding SelectLayerCommand}"  CommandParameter="{Binding }" />
                         
 
                         <StackPanel >
