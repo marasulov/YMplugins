@@ -72,7 +72,11 @@ namespace YMplugins.Addin.Autocad2024.Commands.AutoPrint
             context.GetBlocksNameCommand.Execute(null);
             context.GetLayersCommand.Execute(null);
 
-            window.ShowDialog();
+            // ShowModalWindow привязывает WPF-окно к главному окну AutoCAD и
+            // корректно интегрируется с его циклом сообщений. Сырой ShowDialog()
+            // оставлял редактор без курсора, а окно не всплывало до переключения
+            // документа.
+            Autodesk.AutoCAD.ApplicationServices.Application.ShowModalWindow(window);
         }
 
     }
