@@ -1,5 +1,6 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.PlottingServices;
 using System;
@@ -32,11 +33,17 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
 
             var blockPosition = new Point2d(_printModel.Position.X, _printModel.Position.Y);
             var blockDimension = new Point2d(blockPosition.X + _printModel.XDim, blockPosition.Y + _printModel.YDim);
-            //var blockDimension = new Point2d(_printModel.Position2.X, _printModel.Position2.Y);
-            var points = new Extents2d(blockPosition, blockDimension);
+
+            // Для печати из пространства модели окно задаётся в системе координат
+            // отображения (DCS), а рамка найдена в мировых координатах (WCS).
+            // Если вид панорамирован к рамкам (далеко от начала координат), без
+            // перевода WCS->DCS окно указывает в пустое место — лист выходит пустым.
+            var points = acLayout.ModelType
+                ? ToDisplayCoordinates(blockPosition, blockDimension)
+                : new Extents2d(blockPosition, blockDimension);
 
             bool isHor = _printModel.IsFormatHorizontal();
-            
+
             CanonNameResolver resolver = new CanonNameResolver(standartCopier);
             string canonName = resolver.GetCanonNameByWidthAndHeight(_printModel);
 
@@ -51,6 +58,30 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
             acPlInfo.OverrideSettings = acPlSet;
 
             return acPlInfo;
+        }
+
+        /// <summary>
+        ///     Переводит углы окна печати из мировых координат (WCS) в систему
+        ///     координат отображения (DCS) текущего вида модели. Нужно для
+        ///     PlotType.Window при печати из пространства модели.
+        /// </summary>
+        private Extents2d ToDisplayCoordinates(Point2d min, Point2d max)
+        {
+            Editor ed = _document.Editor;
+            using (ViewTableRecord view = ed.GetCurrentView())
+            {
+                Matrix3d wcs2dcs = Matrix3d.PlaneToWorld(view.ViewDirection);
+                wcs2dcs = Matrix3d.Displacement(view.Target - Point3d.Origin) * wcs2dcs;
+                wcs2dcs = Matrix3d.Rotation(-view.ViewTwist, view.ViewDirection, view.Target) * wcs2dcs;
+                wcs2dcs = wcs2dcs.Inverse();
+
+                var c1 = new Point3d(min.X, min.Y, 0).TransformBy(wcs2dcs);
+                var c2 = new Point3d(max.X, max.Y, 0).TransformBy(wcs2dcs);
+
+                return new Extents2d(
+                    new Point2d(Math.Min(c1.X, c2.X), Math.Min(c1.Y, c2.Y)),
+                    new Point2d(Math.Max(c1.X, c2.X), Math.Max(c1.Y, c2.Y)));
+            }
         }
 
         public PlotProgressDialog CreatePlotProgressDialog()
