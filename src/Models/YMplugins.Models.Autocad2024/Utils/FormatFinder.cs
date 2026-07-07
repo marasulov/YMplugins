@@ -27,12 +27,21 @@ namespace YMplugins.Models.Autocad2024.Utils
         ///     Формат и масштаб, либо (null, null), если габариты не совпали
         ///     ни с одним форматом ни в одном стандартном масштабе.
         /// </returns>
+        /// <summary>
+        ///     Вес штрафа за отклонение масштаба от 1:100 в общей оценке.
+        ///     Форматы А-серии кратны двойке (A2 ровно вдвое больше A4), поэтому
+        ///     одна и та же рамка идеально совпадает и с «A2 1:100», и с «A4 1:200».
+        ///     Штраф разрешает эту неоднозначность в пользу масштаба, ближайшего
+        ///     к 1:100 (доминирующая конвенция), но настолько мал, что не перебивает
+        ///     реальную разницу в геометрической точности для разных форматов.
+        /// </summary>
+        private const double ScalePenaltyWeight = 0.1;
+
         public static (string Format, double? Scale) DetectFormatAndScale(double xDim, double yDim)
         {
             string bestFormat = null;
             double? bestScale = null;
-            double bestDiff = double.MaxValue;
-            double bestScalePreference = double.MaxValue;
+            double bestScore = double.MaxValue;
 
             bool frameIsLandscape = xDim > yDim;
 
@@ -41,11 +50,7 @@ namespace YMplugins.Models.Autocad2024.Utils
                 double paperX = xDim / scale;
                 double paperY = yDim / scale;
 
-                // Форматы А-серии кратны двойке, поэтому рамка может одинаково
-                // точно совпасть, например, с А4 в 1:100 и А2 в 1:50. При равной
-                // точности предпочитаем масштаб, ближайший к 1:100 (наиболее
-                // распространённая конвенция).
-                double scalePreference = Math.Abs(Math.Log(scale / 100.0));
+                double scalePenalty = Math.Abs(Math.Log(scale / 100.0));
 
                 foreach (var format in GOSTFormats)
                 {
@@ -58,15 +63,14 @@ namespace YMplugins.Models.Autocad2024.Utils
                     double diffY = Math.Abs(paperY - formatY);
                     if (diffX > Tolerance || diffY > Tolerance) continue;
 
-                    double diff = diffX + diffY;
-                    bool better = diff < bestDiff - 0.001 ||
-                                  (Math.Abs(diff - bestDiff) <= 0.001 && scalePreference < bestScalePreference);
-                    if (better)
+                    // Оценка = геометрическое отклонение (мм) + мягкий штраф за
+                    // «неудобный» масштаб. Меньше — лучше.
+                    double score = diffX + diffY + ScalePenaltyWeight * scalePenalty;
+                    if (score < bestScore)
                     {
-                        bestDiff = diff;
+                        bestScore = score;
                         bestScale = scale;
                         bestFormat = format.Key;
-                        bestScalePreference = scalePreference;
                     }
                 }
             }
