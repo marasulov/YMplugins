@@ -47,13 +47,17 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
             CanonNameResolver resolver = new CanonNameResolver(standartCopier);
             string canonName = resolver.GetCanonNameByWidthAndHeight(_printModel);
 
+            // Порядок важен: SetPlotConfigurationName при смене плоттера/формата
+            // сбрасывает уже заданные window area, тип печати, поворот и масштаб.
+            // Поэтому плоттер и формат назначаются первыми, а параметры окна
+            // и вписывания — после них.
+            acPlSetVdr.SetPlotConfigurationName(acPlSet, standartCopier.Pc3Name, canonName);
             acPlSetVdr.SetPlotWindowArea(acPlSet, points);
             acPlSetVdr.SetPlotType(acPlSet, PlotType.Window);
             acPlSetVdr.SetPlotRotation(acPlSet, !isHor ? PlotRotation.Degrees090 : PlotRotation.Degrees000);
-            acPlSetVdr.SetUseStandardScale(acPlSet, false);
+            acPlSetVdr.SetUseStandardScale(acPlSet, true);
             acPlSetVdr.SetStdScaleType(acPlSet, StdScaleType.ScaleToFit);
             acPlSetVdr.SetPlotCentered(acPlSet, true);
-            acPlSetVdr.SetPlotConfigurationName(acPlSet, standartCopier.Pc3Name, canonName);
 
             acPlInfo.OverrideSettings = acPlSet;
 
