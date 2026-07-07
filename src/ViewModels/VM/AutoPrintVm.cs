@@ -23,7 +23,7 @@ namespace YMplugins.ViewModels.VM
         private BlockAttribute _selectedAttr;
         private bool _isUpdatingAttributes;
         private int _numerationStartValue;
-        private PrintByOption _selectedPrintByOption;
+        private PrintByOption _selectedPrintByOption = PrintByOption.ByPolyline;
         private string _prefix;
         private string _suffix;
         private bool _isCheckedNumbering = true;
@@ -39,7 +39,7 @@ namespace YMplugins.ViewModels.VM
         private int _plineScale = 1;
         private bool _isDeleteEmptyLayouts;
         private bool _isSetLayoutsToPlotSetting;
-        private bool _isCreatePdf;
+        private bool _isCreatePdf = true;
 
         public AutoPrintVm(
             GetBlocksNameCommand getBlocksNameCommand,

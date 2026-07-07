@@ -54,10 +54,13 @@
                                  Name="ToPdfRadioButton"
                                  IsChecked="{Binding IsCreatePdf}" />
 
-                    <RadioButton Content="{x:Static loc:Tr.CreateDwg}" 
+                    <RadioButton Content="{x:Static loc:Tr.CreateDwg}"
                                  Name="ToDwglineRadioButton"
                                  IsChecked="{Binding IsCreatePdf, Converter={StaticResource InverseBoolConverter}}" />
                 </StackPanel>
+
+                <Separator Margin="0,6" />
+
                 <StackPanel>
                     <RadioButton Content="{x:Static loc:Tr.ByBlock}"
                                  Name="ByBlockRadioButton"
