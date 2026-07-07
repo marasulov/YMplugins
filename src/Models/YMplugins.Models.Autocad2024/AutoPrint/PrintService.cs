@@ -17,12 +17,20 @@ namespace YMplugins.Models.Autocad2024.AutoPrint
             List<string> fileNames = new List<string>();
             StandartCopier standartCopier = new StandartCopier();
             var printUtils = new PrintUtils();
-            foreach (PrintInfo info in data)
+
+            // Печать выполняется из обработчика WPF-окна, вне контекста команды
+            // с автоблокировкой, поэтому смену листа и настроек печати нужно
+            // защитить явной блокировкой документа (иначе eLockViolation).
+            using (Active.Document.LockDocument())
             {
-                var fileName = printUtils.PlotCurrentLayout(info, standartCopier);
-                if (!string.IsNullOrEmpty(fileName))
-                    fileNames.Add(fileName);
+                foreach (PrintInfo info in data)
+                {
+                    var fileName = printUtils.PlotCurrentLayout(info, standartCopier);
+                    if (!string.IsNullOrEmpty(fileName))
+                        fileNames.Add(fileName);
+                }
             }
+
             return fileNames.ToArray();
         }
     }

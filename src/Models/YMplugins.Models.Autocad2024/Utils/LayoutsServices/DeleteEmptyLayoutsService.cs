@@ -20,11 +20,16 @@ namespace YMplugins.Models.Autocad2024.Utils.LayoutsServices
             var layoutNames = GetTabOrderedLayoutNames(Active.Database);
             var layoutsWithBlocks = printDatas.Where(x => x.Space.Contains("Layout")).Select(x=>x.Space);
             if (layoutNames.Count == layoutsWithBlocks.Count() | layoutNames.Count == 0 | layoutsWithBlocks.Count() == 0) return;
-            var emptyLayouts = layoutNames.Except(layoutsWithBlocks); 
-            foreach (var layoutName in emptyLayouts)
-                if ((layoutName != "Model"))
-                    layoutManager.DeleteLayout(layoutName);
-            Active.Editor.Regen();
+            var emptyLayouts = layoutNames.Except(layoutsWithBlocks);
+
+            // Удаление листов меняет БД — нужна явная блокировка документа
+            using (Active.Document.LockDocument())
+            {
+                foreach (var layoutName in emptyLayouts)
+                    if ((layoutName != "Model"))
+                        layoutManager.DeleteLayout(layoutName);
+                Active.Editor.Regen();
+            }
         }
 
         private static List<string> GetTabOrderedLayoutNames(Database db)

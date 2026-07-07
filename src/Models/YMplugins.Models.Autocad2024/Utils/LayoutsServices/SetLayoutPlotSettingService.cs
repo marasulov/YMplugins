@@ -23,9 +23,12 @@ namespace YMplugins.Models.Autocad2024.Utils.LayoutsServices
 
             CanonNameResolver canonNameResolver = new CanonNameResolver(standartCopier);
 
+            // Смена текущего листа и правка настроек печати меняют БД — нужна
+            // явная блокировка документа (вызов идёт из обработчика WPF-окна)
+            using (Active.Document.LockDocument())
             using (var trans = Active.Database.TransactionManager.StartTransaction())
             {
-               
+
                 var layoutDatas = printDatas.Where(x => x.Space.Contains("Layout"));
 
                 foreach (var printInfo in layoutDatas)
