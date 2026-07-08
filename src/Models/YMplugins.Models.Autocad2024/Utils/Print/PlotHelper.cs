@@ -52,9 +52,20 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
             // Поэтому плоттер и формат назначаются первыми, а параметры окна
             // и вписывания — после них.
             acPlSetVdr.SetPlotConfigurationName(acPlSet, standartCopier.Pc3Name, canonName);
+
+            // Ориентация canonical paper известна только после SetPlotConfigurationName.
+            // Плоттер может вернуть форматы >= A3 в portrait ориентации (стандартные
+            // DWG-To-PDF), тогда для landscape-рамки надо поворачивать canvas на 90°,
+            // иначе ScaleToFit ужмёт рамку в узкую сторону — появятся большие поля.
+            var paperSize = acPlSet.PlotPaperSize;
+            bool paperIsHor = paperSize.X > paperSize.Y;
+            var rotation = paperIsHor == isHor
+                ? PlotRotation.Degrees000
+                : PlotRotation.Degrees090;
+
             acPlSetVdr.SetPlotWindowArea(acPlSet, points);
             acPlSetVdr.SetPlotType(acPlSet, PlotType.Window);
-            acPlSetVdr.SetPlotRotation(acPlSet, !isHor ? PlotRotation.Degrees090 : PlotRotation.Degrees000);
+            acPlSetVdr.SetPlotRotation(acPlSet, rotation);
             acPlSetVdr.SetUseStandardScale(acPlSet, true);
             acPlSetVdr.SetStdScaleType(acPlSet, StdScaleType.ScaleToFit);
             acPlSetVdr.SetPlotCentered(acPlSet, true);

@@ -44,23 +44,34 @@ namespace YMplugins.Models.Autocad2024.Utils.LayoutsServices
 
                     PlotSettingsValidator validator = PlotSettingsValidator.Current;
 
-                    validator.SetPlotType(plotSettings, PlotType.Extents);
-
                     var isHor = printInfo.IsFormatHorizontal();
+                    string canonName = canonNameResolver.GetCanonNameByWidthAndHeight(printInfo);
 
-                    validator.SetPlotRotation(plotSettings, isHor ? PlotRotation.Degrees000 : PlotRotation.Degrees090);
+                    // Порядок важен: SetPlotConfigurationName сбрасывает ранее
+                    // заданные window area, тип печати, поворот и масштаб.
+                    validator.SetPlotConfigurationName(plotSettings, standartCopier.Pc3Name, canonName);
 
-                    //validator.SetUseStandardScale(plotSettings, true);
+                    // Ориентацию canonical paper можно узнать только после
+                    // SetPlotConfigurationName. При несовпадении с ориентацией
+                    // рамки canvas разворачивается на 90°, иначе landscape-рамка
+                    // ужмётся в узкую сторону portrait-листа (стандартные форматы
+                    // DWG-To-PDF выдаются в portrait).
+                    var paperSize = plotSettings.PlotPaperSize;
+                    bool paperIsHor = paperSize.X > paperSize.Y;
+                    var rotation = paperIsHor == isHor
+                        ? PlotRotation.Degrees000
+                        : PlotRotation.Degrees090;
+
+                    validator.SetPlotType(plotSettings, PlotType.Extents);
+                    validator.SetPlotRotation(plotSettings, rotation);
+
                     Extents2d plotExtents2d = new(
                         new Point2d(printInfo.Position.X,printInfo.Position.Y),
                         new Point2d(printInfo.XDim * printInfo.ScaleX,printInfo.YDim * printInfo.ScaleX));
                     validator.SetPlotWindowArea(plotSettings, plotExtents2d);
+                    validator.SetUseStandardScale(plotSettings, true);
                     validator.SetStdScaleType(plotSettings, StdScaleType.ScaleToFit);
-
-                    
                     validator.SetPlotCentered(plotSettings, true);
-                    string canonName = canonNameResolver.GetCanonNameByWidthAndHeight(printInfo);
-                    validator.SetPlotConfigurationName(plotSettings, standartCopier.Pc3Name, canonName);
                     layout.UpgradeOpen();
                     
                     layout.CopyFrom(plotSettings);
