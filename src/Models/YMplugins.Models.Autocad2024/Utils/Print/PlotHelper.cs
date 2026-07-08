@@ -53,12 +53,27 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
             // и вписывания — после них.
             acPlSetVdr.SetPlotConfigurationName(acPlSet, standartCopier.Pc3Name, canonName);
 
-            // Ориентация canonical paper известна только после SetPlotConfigurationName.
             // Плоттер может вернуть форматы >= A3 в portrait ориентации (стандартные
             // DWG-To-PDF), тогда для landscape-рамки надо поворачивать canvas на 90°,
             // иначе ScaleToFit ужмёт рамку в узкую сторону — появятся большие поля.
-            var paperSize = acPlSet.PlotPaperSize;
-            bool paperIsHor = paperSize.X > paperSize.Y;
+            //
+            // Ориентацию бумаги берём из самого имени формата, а НЕ из
+            // acPlSet.PlotPaperSize: последнее AutoCAD переворачивает вслед за
+            // унаследованным от листа (CopyFrom) PlotRotation и может вернуть размер
+            // ещё не применённого формата — из-за этого раньше выбирался неверный
+            // поворот и появлялись большие поля.
+            bool paperIsHor;
+            if (CanonNameResolver.TryGetPaperSizeFromCanonName(canonName, out double paperW, out double paperH))
+            {
+                paperIsHor = paperW > paperH;
+            }
+            else
+            {
+                // Формат без размеров в имени — запасной вариант.
+                var paperSize = acPlSet.PlotPaperSize;
+                paperIsHor = paperSize.X > paperSize.Y;
+            }
+
             var rotation = paperIsHor == isHor
                 ? PlotRotation.Degrees000
                 : PlotRotation.Degrees090;

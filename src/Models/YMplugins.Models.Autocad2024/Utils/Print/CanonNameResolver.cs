@@ -37,6 +37,14 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
                     $"Не удалось определить формат листа для размеров {width} x {height}");
             }
 
+            // Среди совпавших по размеру имён приоритет у кастомных форматов
+            // из нашего pmp (UserDefinedMetric ...): они объявлены без полей
+            // (printable = media). Встроенные медиа драйвера pdfplot
+            // (ISO_A3_(420.00_x_297.00_MM) и т.п.) совпадают по тем же размерам,
+            // идут в списке раньше, но имеют непечатаемые поля (~5 мм по бокам,
+            // ~17 мм сверху/снизу) — из-за них ScaleToFit ужимал рамку и на
+            // листе появлялись большие белые поля.
+            var fallbackName = "";
             foreach (var line in pConfig.CanonicalMediaNames)
             {
                 if (!pattern.IsMatch(line)) continue; // Пропускаем строки без размеров
@@ -47,10 +55,19 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
                 // Сравниваем размеры с учетом допустимой погрешности
                 if (Math.Abs(items.Item1 - width) <= tolerance && Math.Abs(items.Item2 - height) <= tolerance)
                 {
-                    canonName = line;
-                    break;
+                    if (line.StartsWith("UserDefinedMetric", StringComparison.OrdinalIgnoreCase))
+                    {
+                        canonName = line;
+                        break;
+                    }
+
+                    if (string.IsNullOrEmpty(fallbackName))
+                        fallbackName = line;
                 }
             }
+
+            if (string.IsNullOrEmpty(canonName))
+                canonName = fallbackName;
             // Если каноническое имя не найдено точно, попробуем по формату
             if (string.IsNullOrEmpty(canonName))
             {
@@ -223,6 +240,28 @@ namespace YMplugins.Models.Autocad2024.Utils.Print
 
         //    return canonName;
         //}
+
+        /// <summary>
+        ///     Габариты бумаги (мм), закодированные в каноническом имени формата,
+        ///     например ISO_A3_(297.00_x_420.00_MM) -> (297, 420).
+        ///     Ориентацию бумаги надёжнее брать отсюда, чем из
+        ///     PlotSettings.PlotPaperSize: последнее AutoCAD переворачивает вслед
+        ///     за текущим PlotRotation (унаследованным через CopyFrom) и может
+        ///     вернуть размер ещё не применённого формата.
+        /// </summary>
+        public static bool TryGetPaperSizeFromCanonName(string canonName, out double width, out double height)
+        {
+            width = height = 0;
+            if (string.IsNullOrEmpty(canonName)) return false;
+
+            var pattern = new Regex(@"\d{1,}?\.\d{2}", RegexOptions.Compiled | RegexOptions.Singleline);
+            var matches = pattern.Matches(canonName);
+            if (matches.Count < 2) return false;
+
+            width = Convert.ToDouble(matches[0].Value, CultureInfo.InvariantCulture);
+            height = Convert.ToDouble(matches[1].Value, CultureInfo.InvariantCulture);
+            return true;
+        }
 
         private static (double, double) DivideStringToWidthAndHeight(Regex pattern, string line)
         {
